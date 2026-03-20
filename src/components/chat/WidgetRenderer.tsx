@@ -1,5 +1,6 @@
 import type { JSX } from 'react'
 
+import { ExpandableWidget } from '../ui/ExpandableWidget'
 import { BarChartWidget } from '../widgets/BarChartWidget'
 import { KpiWidget } from '../widgets/KpiWidget'
 import { LineChartWidget } from '../widgets/LineChartWidget'
@@ -24,15 +25,35 @@ export const WidgetRenderer = ({
 }: WidgetRendererProps): JSX.Element => {
   switch (message.type) {
     case 'schema':
-      return <SchemaWidget data={message.data as SchemaData} />
+      return (
+        <ExpandableWidget widgetId={message.id}>
+          <SchemaWidget data={message.data as SchemaData} />
+        </ExpandableWidget>
+      )
     case 'kpi':
-      return <KpiWidget data={message.data as KpiData} />
+      return (
+        <ExpandableWidget widgetId={message.id}>
+          <KpiWidget data={message.data as KpiData} />
+        </ExpandableWidget>
+      )
     case 'bar':
-      return <BarChartWidget data={message.data as BarData} />
+      return (
+        <ExpandableWidget widgetId={message.id}>
+          <BarChartWidget data={message.data as BarData} />
+        </ExpandableWidget>
+      )
     case 'line':
-      return <LineChartWidget data={message.data as LineData} />
+      return (
+        <ExpandableWidget widgetId={message.id}>
+          <LineChartWidget data={message.data as LineData} />
+        </ExpandableWidget>
+      )
     case 'table':
-      return <TableWidget data={message.data as TableData} />
+      return (
+        <ExpandableWidget widgetId={message.id}>
+          <TableWidget data={message.data as TableData} />
+        </ExpandableWidget>
+      )
     case 'text':
     default:
       return (

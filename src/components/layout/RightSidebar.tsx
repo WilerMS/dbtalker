@@ -24,27 +24,9 @@ const widgetOptions: WidgetOption[] = [
 export const RightSidebar = ({
   injectWidget,
   isLoading,
-  messages,
 }: RightSidebarProps): JSX.Element => {
-  const widgetCount = messages.filter(
-    (message) => message.type !== 'text',
-  ).length
-
   return (
-    <aside className="flex flex-col gap-4 rounded-[2rem] border border-zinc-800 bg-zinc-900/50 p-5 backdrop-blur-sm xl:min-h-full">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5">
-        <p className="text-xs tracking-[0.35em] text-zinc-400 uppercase">
-          Widget tester
-        </p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-100">
-          Inserta vistas en caliente
-        </h2>
-        <p className="mt-3 text-sm leading-6 text-zinc-400">
-          Cada botón empuja un mensaje bot al feed usando la misma capa async
-          mock que usaría el backend real.
-        </p>
-      </div>
-
+    <aside className="fixed flex h-fit flex-col gap-4 rounded-4xl border border-zinc-800 bg-zinc-900/50 p-5 backdrop-blur-sm xl:top-6 xl:right-6 xl:bottom-6 xl:z-20 xl:w-[320px] xl:max-w-[calc(100vw-3rem)]">
       <div className="grid gap-3">
         {widgetOptions.map((widget) => (
           <button
@@ -59,18 +41,6 @@ export const RightSidebar = ({
             {widget.label}
           </button>
         ))}
-      </div>
-
-      <div className="mt-auto rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4">
-        <p className="text-xs tracking-[0.28em] text-zinc-400 uppercase">
-          Feed state
-        </p>
-        <p className="mt-3 text-4xl font-bold text-emerald-400 [text-shadow:0_0_20px_rgba(52,211,153,0.6)]">
-          {widgetCount}
-        </p>
-        <p className="mt-2 text-sm text-zinc-400">
-          widgets activos en la conversación
-        </p>
       </div>
     </aside>
   )
