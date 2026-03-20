@@ -1,10 +1,18 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, type JSX, type ReactNode } from 'react'
+import { useEffect, type CSSProperties, type JSX, type ReactNode } from 'react'
+
+export interface WidgetModalSize {
+  width?: number | string
+  maxWidth?: number | string
+  height?: number | string
+  maxHeight?: number | string
+}
 
 interface WidgetModalProps {
   isOpen: boolean
   onClose: () => void
   children: ReactNode
+  size?: WidgetModalSize
 }
 
 const widgetModalTransition = {
@@ -14,10 +22,21 @@ const widgetModalTransition = {
   mass: 0.95,
 } as const
 
+const resolveSizeValue = (
+  value: WidgetModalSize[keyof WidgetModalSize],
+): string | number | undefined => {
+  if (typeof value === 'number') {
+    return `${value}px`
+  }
+
+  return value
+}
+
 export const WidgetModal = ({
   isOpen,
   onClose,
   children,
+  size,
 }: WidgetModalProps): JSX.Element => {
   useEffect(() => {
     if (!isOpen) {
@@ -40,6 +59,13 @@ export const WidgetModal = ({
     }
   }, [isOpen, onClose])
 
+  const modalStyle: CSSProperties = {
+    width: resolveSizeValue(size?.width ?? 'min(96vw, 1200px)'),
+    maxWidth: resolveSizeValue(size?.maxWidth),
+    height: resolveSizeValue(size?.height),
+    maxHeight: resolveSizeValue(size?.maxHeight ?? '86vh'),
+  }
+
   return (
     <AnimatePresence>
       {isOpen ? (
@@ -61,7 +87,8 @@ export const WidgetModal = ({
 
           <motion.div
             transition={widgetModalTransition}
-            className="fixed top-1/2 left-1/2 z-10 max-h-[86vh] w-[min(96vw,1200px)] -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-2xl"
+            style={modalStyle}
+            className="fixed top-1/2 left-1/2 z-10 min-h-0 -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-2xl"
           >
             {children}
           </motion.div>

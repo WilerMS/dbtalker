@@ -20,38 +20,97 @@ interface MessageRendererProps {
   message: Message
 }
 
+const expandedWidgetSizes = {
+  schema: {
+    width: 'min(96vw, 1400px)',
+    height: '82vh',
+  },
+  kpi: {
+    width: 'min(90vw, 720px)',
+  },
+  bar: {
+    width: 'min(95vw, 1180px)',
+    height: '78vh',
+  },
+  line: {
+    width: 'min(95vw, 1180px)',
+    height: '78vh',
+  },
+  table: {
+    width: 'min(96vw, 1320px)',
+    height: '80vh',
+  },
+} as const
+
 export const MessageRenderer = ({
   message,
 }: MessageRendererProps): JSX.Element => {
   switch (message.type) {
     case 'schema':
       return (
-        <ExpandableWidget widgetId={message.id}>
-          <SchemaWidget data={message.data as SchemaData} />
+        <ExpandableWidget
+          widgetId={message.id}
+          expandedSize={expandedWidgetSizes.schema}
+        >
+          {({ isExpanded }) => (
+            <SchemaWidget
+              data={message.data as SchemaData}
+              isExpanded={isExpanded}
+            />
+          )}
         </ExpandableWidget>
       )
     case 'kpi':
       return (
-        <ExpandableWidget widgetId={message.id}>
-          <KpiWidget data={message.data as KpiData} />
+        <ExpandableWidget
+          widgetId={message.id}
+          expandedSize={expandedWidgetSizes.kpi}
+        >
+          {({ isExpanded }) => (
+            <KpiWidget data={message.data as KpiData} isExpanded={isExpanded} />
+          )}
         </ExpandableWidget>
       )
     case 'bar':
       return (
-        <ExpandableWidget widgetId={message.id}>
-          <BarChartWidget data={message.data as BarData} />
+        <ExpandableWidget
+          widgetId={message.id}
+          expandedSize={expandedWidgetSizes.bar}
+        >
+          {({ isExpanded }) => (
+            <BarChartWidget
+              data={message.data as BarData}
+              isExpanded={isExpanded}
+            />
+          )}
         </ExpandableWidget>
       )
     case 'line':
       return (
-        <ExpandableWidget widgetId={message.id}>
-          <LineChartWidget data={message.data as LineData} />
+        <ExpandableWidget
+          widgetId={message.id}
+          expandedSize={expandedWidgetSizes.line}
+        >
+          {({ isExpanded }) => (
+            <LineChartWidget
+              data={message.data as LineData}
+              isExpanded={isExpanded}
+            />
+          )}
         </ExpandableWidget>
       )
     case 'table':
       return (
-        <ExpandableWidget widgetId={message.id}>
-          <TableWidget data={message.data as TableData} />
+        <ExpandableWidget
+          widgetId={message.id}
+          expandedSize={expandedWidgetSizes.table}
+        >
+          {({ isExpanded }) => (
+            <TableWidget
+              data={message.data as TableData}
+              isExpanded={isExpanded}
+            />
+          )}
         </ExpandableWidget>
       )
     case 'text':

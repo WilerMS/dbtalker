@@ -8,11 +8,14 @@ import { buildBaseChartOptions } from './chartTheme'
 
 interface LineChartWidgetProps {
   data: LineData
+  isExpanded?: boolean
 }
 
 export const LineChartWidget = ({
   data,
+  isExpanded = false,
 }: LineChartWidgetProps): JSX.Element => {
+  const chartHeight = isExpanded ? 460 : 280
   const categories = data.points.map((point) => point.x)
   const baseOptions = buildBaseChartOptions({
     categories,
@@ -91,7 +94,7 @@ export const LineChartWidget = ({
           type="area"
           options={options}
           series={series}
-          height={280}
+          height={chartHeight}
         />
       </div>
     </div>

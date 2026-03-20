@@ -2,11 +2,20 @@ import { Maximize2 } from 'lucide-react'
 import { LayoutGroup, motion } from 'framer-motion'
 import { useState, type JSX, type ReactNode } from 'react'
 
-import { WidgetModal } from './WidgetModal'
+import { WidgetModal, type WidgetModalSize } from './WidgetModal'
+
+interface ExpandableWidgetRenderProps {
+  isExpanded: boolean
+}
+
+type ExpandableWidgetChildren =
+  | ReactNode
+  | ((props: ExpandableWidgetRenderProps) => ReactNode)
 
 interface ExpandableWidgetProps {
   widgetId: string
-  children: ReactNode
+  children: ExpandableWidgetChildren
+  expandedSize?: WidgetModalSize
 }
 
 const widgetTransition = {
@@ -19,9 +28,12 @@ const widgetTransition = {
 export const ExpandableWidget = ({
   widgetId,
   children,
+  expandedSize,
 }: ExpandableWidgetProps): JSX.Element => {
   const [isExpanded, setIsExpanded] = useState(false)
   const layoutId = `widget-layout-${widgetId}`
+  const renderedChildren =
+    typeof children === 'function' ? children({ isExpanded }) : children
 
   return (
     <LayoutGroup id={layoutId}>
@@ -32,7 +44,7 @@ export const ExpandableWidget = ({
           className={`relative ${isExpanded ? 'invisible' : ''}`}
           aria-hidden={isExpanded}
         >
-          {children}
+          {renderedChildren}
           <button
             type="button"
             onClick={() => setIsExpanded(true)}
@@ -44,13 +56,17 @@ export const ExpandableWidget = ({
           </button>
         </motion.div>
 
-        <WidgetModal isOpen={isExpanded} onClose={() => setIsExpanded(false)}>
+        <WidgetModal
+          isOpen={isExpanded}
+          onClose={() => setIsExpanded(false)}
+          size={expandedSize}
+        >
           <motion.div
             layoutId={layoutId}
             transition={widgetTransition}
             className="relative"
           >
-            {children}
+            {renderedChildren}
           </motion.div>
         </WidgetModal>
       </div>

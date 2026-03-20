@@ -4,11 +4,17 @@ import type { TableData } from '../../types/chat'
 
 interface TableWidgetProps {
   data: TableData
+  isExpanded?: boolean
 }
 
-export const TableWidget = ({ data }: TableWidgetProps): JSX.Element => {
+export const TableWidget = ({
+  data,
+  isExpanded = false,
+}: TableWidgetProps): JSX.Element => {
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50">
+    <div
+      className={`rounded-2xl border border-zinc-800 bg-zinc-900/50 ${isExpanded ? 'max-h-[72vh] overflow-auto' : 'overflow-hidden'}`}
+    >
       <table className="w-full text-sm">
         <thead>
           <tr>

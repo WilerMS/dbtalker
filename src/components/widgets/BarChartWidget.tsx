@@ -8,9 +8,14 @@ import { buildBaseChartOptions } from './chartTheme'
 
 interface BarChartWidgetProps {
   data: BarData
+  isExpanded?: boolean
 }
 
-export const BarChartWidget = ({ data }: BarChartWidgetProps): JSX.Element => {
+export const BarChartWidget = ({
+  data,
+  isExpanded = false,
+}: BarChartWidgetProps): JSX.Element => {
+  const chartHeight = isExpanded ? 440 : 260
   const baseOptions = buildBaseChartOptions({
     categories: data.labels,
     yAxisLabelFormatter: (value) => `${Math.round(value)}`,
@@ -98,7 +103,7 @@ export const BarChartWidget = ({ data }: BarChartWidgetProps): JSX.Element => {
           type="bar"
           options={options}
           series={series}
-          height={260}
+          height={chartHeight}
         />
       </div>
     </div>

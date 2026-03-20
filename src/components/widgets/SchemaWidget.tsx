@@ -1,6 +1,7 @@
-import type { JSX } from 'react'
+import { useState, type JSX } from 'react'
 import {
   Background,
+  Controls,
   MarkerType,
   ReactFlow,
   type Edge,
@@ -12,13 +13,20 @@ import type { SchemaData, SchemaNodeData } from '../../types/chat'
 
 interface SchemaWidgetProps {
   data: SchemaData
+  isExpanded?: boolean
 }
 
 const nodeTypes = {
   table: SchemaTableNode,
 }
 
-export const SchemaWidget = ({ data }: SchemaWidgetProps): JSX.Element => {
+export const SchemaWidget = ({
+  data,
+  isExpanded = false,
+}: SchemaWidgetProps): JSX.Element => {
+  const [isInteractive, setIsInteractive] = useState(false)
+  const interactiveEnabled = isExpanded && isInteractive
+
   const nodes: Node<SchemaNodeData>[] = data.nodes.map((node, index) => ({
     ...node,
     type: 'table',
@@ -61,7 +69,9 @@ export const SchemaWidget = ({ data }: SchemaWidgetProps): JSX.Element => {
   }))
 
   return (
-    <div className="h-80 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
+    <div
+      className={`overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 ${isExpanded ? 'h-[78vh]' : 'h-80'}`}
+    >
       <ReactFlow
         className="schema-flow"
         fitView
@@ -75,17 +85,25 @@ export const SchemaWidget = ({ data }: SchemaWidgetProps): JSX.Element => {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        panOnDrag
-        zoomOnScroll={false}
+        nodesDraggable={interactiveEnabled}
+        nodesConnectable={interactiveEnabled}
+        elementsSelectable={interactiveEnabled}
+        panOnDrag={isExpanded ? interactiveEnabled : true}
+        zoomOnScroll={interactiveEnabled}
         zoomActivationKeyCode="Control"
         preventScrolling={false}
-        zoomOnDoubleClick={false}
+        zoomOnDoubleClick={interactiveEnabled}
         proOptions={{ hideAttribution: true }}
       >
         <Background color="#27272a" gap={20} />
+        {isExpanded ? (
+          <Controls
+            position="top-right"
+            showInteractive
+            onInteractiveChange={setIsInteractive}
+            className="rounded-xl border border-zinc-800 bg-zinc-900/90 text-zinc-200 shadow-[0_0_18px_rgba(52,211,153,0.18)] backdrop-blur-sm"
+          />
+        ) : null}
       </ReactFlow>
     </div>
   )
