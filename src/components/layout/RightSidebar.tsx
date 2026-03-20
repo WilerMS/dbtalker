@@ -27,7 +27,7 @@ export const RightSidebar = ({
   isLoading,
 }: RightSidebarProps): JSX.Element => {
   return (
-    <aside className="fixed top-3 left-3 z-20 w-40 rounded-xl border border-zinc-800 bg-zinc-900/75 p-2 backdrop-blur-sm">
+    <aside className="fixed top-3 right-3 z-20 w-40 rounded-xl border border-zinc-800 bg-zinc-900/75 p-2 backdrop-blur-sm">
       <div className="grid gap-1.5">
         {widgetOptions.map((widget) => (
           <button

@@ -16,7 +16,7 @@ const waitForLatency = async (): Promise<void> => {
 }
 
 const loremIpsumPreviewText =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum id nibh quis nibh tempor volutpat. Integer hendrerit, nibh ut faucibus tristique, ipsum nibh porta lorem, et posuere augue turpis id risus. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam. Curabitur commodo, leo et tristique commodo, velit nunc gravida arcu, ut luctus augue velit id lectus. Donec interdum mi eget lorem dictum, quis pulvinar nibh ultrices. Nam non ultricies justo. Maecenas volutpat sem sed sapien luctus, at malesuada metus efficitur. Aliquam erat volutpat. Duis feugiat, eros in egestas facilisis, turpis lectus fermentum purus, ac dignissim justo justo et velit. Quisque gravida pretium sapien, vel viverra augue gravida sed. Morbi fermentum erat sed nibh porta, ut commodo justo posuere.'
+  'El esquema de su base de datos incluye tablas para usuarios, órdenes, productos, pagos y envíos, con relaciones claras entre ellas. Por ejemplo, la tabla de órdenes se relaciona con usuarios a través de user_id y con productos a través de order_items. Esto permite consultas complejas para obtener insights valiosos sobre el comportamiento de los clientes y el rendimiento del negocio.'
 
 const schemaPreviewData: SchemaData = {
   nodes: [
