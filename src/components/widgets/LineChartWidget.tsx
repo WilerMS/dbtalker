@@ -82,7 +82,7 @@ export const LineChartWidget = ({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-[0_0_30px_rgba(16,185,129,0.08)]">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/35 p-6 shadow-[0_0_30px_rgba(16,185,129,0.08)]">
       <p className="text-xs tracking-[0.3em] text-zinc-400 uppercase">
         {data.title}
       </p>

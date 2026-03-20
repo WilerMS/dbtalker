@@ -12,7 +12,7 @@ export const KpiWidget = ({ data }: KpiWidgetProps): JSX.Element => {
     : 'text-emerald-400'
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/35 p-6">
       <p className="text-5xl font-bold text-emerald-400 [text-shadow:0_0_20px_rgba(52,211,153,0.6)]">
         {data.value}
       </p>
