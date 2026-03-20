@@ -91,11 +91,7 @@ export const MainChat = ({
                 <div className="w-full max-w-3xl min-w-0">
                   <div className="flex flex-col gap-3">
                     {group.messages.map((message) => (
-                      <MessageBubble
-                        key={message.id}
-                        message={message}
-                        showHeader={false}
-                      />
+                      <MessageBubble key={message.id} message={message} />
                     ))}
                   </div>
                 </div>
