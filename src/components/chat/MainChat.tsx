@@ -74,7 +74,7 @@ export const MainChat = ({
   return (
     <section className="relative flex h-full min-h-0 flex-col overflow-hidden backdrop-blur-sm">
       <div className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 min-h-0 flex-1 overflow-y-auto pt-4 pb-45">
-        <div className="mx-auto flex w-full max-w-187.5 flex-col gap-6">
+        <div className="mx-auto flex w-full max-w-187.5 flex-col gap-6 px-4 lg:px-0">
           {groupMessagesByRole(messages).map((group) => (
             <div
               key={`${group.role}-${group.timestamp.getTime()}`}
