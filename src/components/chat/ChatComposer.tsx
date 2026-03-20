@@ -1,20 +1,20 @@
 import { Send, Sparkles } from 'lucide-react'
-import type { JSX, ChangeEvent, KeyboardEvent, SubmitEvent } from 'react'
+import { type JSX, type ChangeEvent, type KeyboardEvent, useState } from 'react'
 import './ChatComposer.css'
 
 interface ChatComposerProps {
-  draft: string
   isLoading: boolean
-  onDraftChange: (value: string) => void
-  onSubmit: (event: SubmitEvent<HTMLFormElement>) => Promise<void>
+  onValueChange?: (value: string) => void
+  onSubmit: (value: string) => Promise<void>
 }
 
 export const ChatComposer = ({
-  draft,
   isLoading,
-  onDraftChange,
   onSubmit,
+  onValueChange,
 }: ChatComposerProps): JSX.Element => {
+  const [draft, setDraft] = useState<string>('')
+
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>): void => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -33,7 +33,12 @@ export const ChatComposer = ({
           <div className="chat-composer-frame group relative rounded-2xl p-px">
             <form
               onSubmit={(event) => {
-                void onSubmit(event)
+                event.preventDefault()
+                if (draft.trim() && !isLoading) {
+                  void onSubmit(draft)
+                  setDraft('')
+                  onValueChange?.('')
+                }
               }}
               className="chat-composer-form relative rounded-2xl"
             >
@@ -45,7 +50,8 @@ export const ChatComposer = ({
                 <textarea
                   value={draft}
                   onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
-                    onDraftChange(event.target.value)
+                    setDraft(event.target.value)
+                    onValueChange?.(event.target.value)
                   }}
                   onKeyDown={handleKeyDown}
                   placeholder="Pregunta por un esquema, un KPI o una tabla..."

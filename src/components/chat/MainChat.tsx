@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type JSX, type SubmitEvent } from 'react'
+import { useEffect, useMemo, useRef, type JSX } from 'react'
 
 import { ChatComposer } from './ChatComposer'
 import { LoadingMessage } from './LoadingMessage'
@@ -46,7 +46,6 @@ export const MainChat = ({
   messages,
   sendMessage,
 }: MainChatProps): JSX.Element => {
-  const [draft, setDraft] = useState<string>('')
   const bottomAnchorRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -56,26 +55,26 @@ export const MainChat = ({
     })
   }, [isLoading, messages])
 
-  const handleSubmit = async (
-    event: SubmitEvent<HTMLFormElement>,
-  ): Promise<void> => {
-    event.preventDefault()
-
-    const nextDraft = draft.trim()
+  const handleSubmit = async (value: string): Promise<void> => {
+    const nextDraft = value.trim()
 
     if (!nextDraft || isLoading) {
       return
     }
 
-    setDraft('')
     await sendMessage(nextDraft)
   }
+
+  const groupedMessages = useMemo(
+    () => groupMessagesByRole(messages),
+    [messages],
+  )
 
   return (
     <section className="relative flex h-full min-h-0 flex-col overflow-hidden backdrop-blur-sm">
       <div className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 min-h-0 flex-1 overflow-y-auto pt-4 pb-45">
         <div className="mx-auto flex w-full max-w-187.5 flex-col gap-6 px-4 lg:px-0">
-          {groupMessagesByRole(messages).map((group) => (
+          {groupedMessages.map((group) => (
             <div
               key={`${group.role}-${group.timestamp.getTime()}`}
               className={[
@@ -108,12 +107,7 @@ export const MainChat = ({
         </div>
       </div>
 
-      <ChatComposer
-        draft={draft}
-        isLoading={isLoading}
-        onDraftChange={setDraft}
-        onSubmit={handleSubmit}
-      />
+      <ChatComposer isLoading={isLoading} onSubmit={handleSubmit} />
     </section>
   )
 }
