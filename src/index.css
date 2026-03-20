@@ -2,7 +2,8 @@
 
 :root {
   color-scheme: dark;
-  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  font-family:
+    'Fira Code Variable', 'Fira Code', 'Space Grotesk', 'Segoe UI', monospace;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

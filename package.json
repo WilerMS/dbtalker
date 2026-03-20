@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource-variable/fira-code": "^5.2.7",
     "apexcharts": "^5.10.4",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.577.0",
