@@ -29,16 +29,16 @@ export const ChatComposer = ({
     <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-10 bg-linear-to-t from-zinc-950/80 via-zinc-950/45 to-transparent pb-6 backdrop-blur-md">
       <div className="pointer-events-none absolute -top-16 right-0 left-0 h-16 bg-linear-to-t from-zinc-950/95 via-zinc-950/70 to-transparent" />
       <div className="pointer-events-auto mx-auto max-w-210 px-4">
-        <div className="group relative animate-[borderGlow_3s_ease-in-out_infinite] rounded-2xl bg-[linear-gradient(90deg,rgba(52,211,153,0.3),rgba(16,185,129,0.5),rgba(52,211,153,0.3))] bg-size-[200%_200%] p-px shadow-[0_0_15px_rgba(52,211,153,0.15)] transition-all duration-300 ease-in-out focus-within:shadow-[0_0_25px_rgba(52,211,153,0.3),0_0_50px_rgba(52,211,153,0.15)] hover:bg-[rgba(52,211,153,0.5)]">
+        <div className="group relative animate-[borderGlow_4s_ease-in-out_infinite] rounded-2xl bg-[linear-gradient(120deg,rgba(63,63,70,0.85),rgba(82,82,91,0.92),rgba(52,211,153,0.2),rgba(82,82,91,0.92),rgba(63,63,70,0.85))] bg-size-[220%_220%] p-px shadow-[0_0_14px_rgba(24,24,27,0.6)] transition-all duration-300 ease-in-out focus-within:shadow-[0_0_0_1px_rgba(52,211,153,0.35),0_0_24px_rgba(52,211,153,0.18)] hover:shadow-[0_0_18px_rgba(63,63,70,0.55)]">
           <form
             onSubmit={(event) => {
               void onSubmit(event)
             }}
-            className="relative rounded-2xl bg-zinc-900/75 backdrop-blur-xl transition-all duration-300"
+            className="relative rounded-2xl bg-zinc-900/90 backdrop-blur-xl transition-all duration-300"
           >
             <div className="flex items-end gap-3 p-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-400/10">
-                <Sparkles className="h-4 w-4 text-emerald-400 transition-colors duration-300 group-hover:text-emerald-200" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-700/60 bg-zinc-800/80">
+                <Sparkles className="h-4 w-4 text-emerald-300/90 transition-colors duration-300 group-hover:text-emerald-200" />
               </div>
 
               <textarea
