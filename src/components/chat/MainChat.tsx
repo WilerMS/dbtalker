@@ -70,8 +70,8 @@ export const MainChat = ({
   }
 
   return (
-    <section className="relative flex min-h-[calc(100svh-2rem)] flex-col overflow-hidden rounded-4xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-sm xl:min-h-[calc(100svh-3rem)]">
-      <div className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 flex-1 overflow-y-auto px-4 pt-4 pb-36 sm:px-6">
+    <section className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-4xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
+      <div className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 min-h-0 flex-1 overflow-y-auto px-4 pt-4 sm:px-6">
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
           {groupMessagesByRole(messages).map((group) => (
             <div

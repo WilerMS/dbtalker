@@ -15,12 +15,13 @@ export const ChatComposer = ({
   onSubmit,
 }: ChatComposerProps): JSX.Element => {
   return (
-    <div className="pointer-events-none sticky bottom-0 z-10 px-4 pt-6 pb-4 sm:px-6">
+    <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-10 pb-4">
       <form
         onSubmit={(event) => {
           void onSubmit(event)
         }}
-        className="pointer-events-auto mx-auto flex w-full max-w-3xl items-center gap-3 rounded-full border border-zinc-800 bg-zinc-900/80 px-5 py-3 backdrop-blur-md transition-shadow duration-300 focus-within:border-emerald-400/50 focus-within:shadow-[0_0_20px_rgba(52,211,153,0.4)]"
+        className="pointer-events-auto mx-auto flex items-center gap-3 rounded-full border border-zinc-800 bg-zinc-900/80 px-5 py-3 backdrop-blur-md transition-shadow duration-300 focus-within:border-emerald-400/50 focus-within:shadow-[0_0_20px_rgba(52,211,153,0.4)]"
+        style={{ width: '750px' }}
       >
         <input
           value={draft}
