@@ -28,6 +28,7 @@ export const BarChartWidget = ({ data }: BarChartWidgetProps): JSX.Element => {
     chart: {
       ...baseOptions.chart,
       type: 'bar',
+      parentHeightOffset: 0,
       dropShadow: {
         enabled: true,
         color: '#34d399',
@@ -92,7 +93,7 @@ export const BarChartWidget = ({ data }: BarChartWidgetProps): JSX.Element => {
       <p className="text-xs tracking-[0.3em] text-zinc-400 uppercase">
         {data.title}
       </p>
-      <div className="mt-6 rounded-[1.25rem] border border-zinc-800/80 bg-zinc-950/70 p-3">
+      <div className="mt-4">
         <ReactApexChart
           type="bar"
           options={options}

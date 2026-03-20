@@ -31,6 +31,7 @@ export const LineChartWidget = ({
     chart: {
       ...baseOptions.chart,
       type: 'area',
+      parentHeightOffset: 0,
       dropShadow: {
         enabled: true,
         color: '#34d399',
@@ -85,7 +86,7 @@ export const LineChartWidget = ({
       <p className="text-xs tracking-[0.3em] text-zinc-400 uppercase">
         {data.title}
       </p>
-      <div className="mt-6 rounded-[1.25rem] border border-zinc-800/80 bg-zinc-950/70 p-3">
+      <div className="mt-4">
         <ReactApexChart
           type="area"
           options={options}
