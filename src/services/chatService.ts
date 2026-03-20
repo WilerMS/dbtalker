@@ -19,7 +19,7 @@ const schemaPreviewData: SchemaData = {
   nodes: [
     {
       id: 'users',
-      position: { x: 0, y: 40 },
+      position: { x: 40, y: 190 },
       data: {
         label: 'users',
         columns: [
@@ -31,7 +31,7 @@ const schemaPreviewData: SchemaData = {
     },
     {
       id: 'orders',
-      position: { x: 260, y: 0 },
+      position: { x: 380, y: 80 },
       data: {
         label: 'orders',
         columns: [
@@ -43,13 +43,91 @@ const schemaPreviewData: SchemaData = {
     },
     {
       id: 'sessions',
-      position: { x: 260, y: 220 },
+      position: { x: 380, y: 300 },
       data: {
         label: 'sessions',
         columns: [
           { name: 'id', type: 'uuid', isPrimaryKey: true },
           { name: 'user_id', type: 'uuid' },
           { name: 'last_seen_at', type: 'timestamp' },
+        ],
+      },
+    },
+    {
+      id: 'order_items',
+      position: { x: 730, y: 78 },
+      data: {
+        label: 'order_items',
+        columns: [
+          { name: 'id', type: 'uuid', isPrimaryKey: true },
+          { name: 'order_id', type: 'uuid' },
+          { name: 'product_id', type: 'uuid' },
+          { name: 'qty', type: 'int' },
+        ],
+      },
+    },
+    {
+      id: 'products',
+      position: { x: 1060, y: 78 },
+      data: {
+        label: 'products',
+        columns: [
+          { name: 'id', type: 'uuid', isPrimaryKey: true },
+          { name: 'sku', type: 'varchar' },
+          { name: 'price', type: 'numeric' },
+          { name: 'inventory', type: 'int' },
+        ],
+      },
+    },
+    {
+      id: 'payments',
+      position: { x: 730, y: 275 },
+      data: {
+        label: 'payments',
+        columns: [
+          { name: 'id', type: 'uuid', isPrimaryKey: true },
+          { name: 'order_id', type: 'uuid' },
+          { name: 'provider', type: 'varchar' },
+          { name: 'status', type: 'varchar' },
+        ],
+      },
+    },
+    {
+      id: 'invoices',
+      position: { x: 1060, y: 275 },
+      data: {
+        label: 'invoices',
+        columns: [
+          { name: 'id', type: 'uuid', isPrimaryKey: true },
+          { name: 'payment_id', type: 'uuid' },
+          { name: 'issued_at', type: 'timestamp' },
+          { name: 'currency', type: 'char(3)' },
+        ],
+      },
+    },
+    {
+      id: 'shipments',
+      position: { x: 730, y: 472 },
+      data: {
+        label: 'shipments',
+        columns: [
+          { name: 'id', type: 'uuid', isPrimaryKey: true },
+          { name: 'order_id', type: 'uuid' },
+          { name: 'carrier', type: 'varchar' },
+          { name: 'delivered_at', type: 'timestamp' },
+        ],
+      },
+    },
+    {
+      id: 'addresses',
+      position: { x: 380, y: 490 },
+      data: {
+        label: 'addresses',
+        columns: [
+          { name: 'id', type: 'uuid', isPrimaryKey: true },
+          { name: 'user_id', type: 'uuid' },
+          { name: 'city', type: 'varchar' },
+          { name: 'country', type: 'varchar' },
         ],
       },
     },
@@ -60,6 +138,48 @@ const schemaPreviewData: SchemaData = {
       id: 'users-sessions',
       source: 'users',
       target: 'sessions',
+      label: '1:n',
+    },
+    {
+      id: 'users-addresses',
+      source: 'users',
+      target: 'addresses',
+      label: '1:n',
+    },
+    {
+      id: 'orders-items',
+      source: 'orders',
+      target: 'order_items',
+      label: '1:n',
+    },
+    {
+      id: 'products-items',
+      source: 'products',
+      target: 'order_items',
+      label: '1:n',
+    },
+    {
+      id: 'orders-payments',
+      source: 'orders',
+      target: 'payments',
+      label: '1:n',
+    },
+    {
+      id: 'payments-invoices',
+      source: 'payments',
+      target: 'invoices',
+      label: '1:1',
+    },
+    {
+      id: 'orders-shipments',
+      source: 'orders',
+      target: 'shipments',
+      label: '1:n',
+    },
+    {
+      id: 'addresses-shipments',
+      source: 'addresses',
+      target: 'shipments',
       label: '1:n',
     },
   ],

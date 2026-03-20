@@ -1,7 +1,6 @@
 import type { JSX } from 'react'
 import {
   Background,
-  Controls,
   MarkerType,
   ReactFlow,
   type Edge,
@@ -20,13 +19,18 @@ const nodeTypes = {
 }
 
 export const SchemaWidget = ({ data }: SchemaWidgetProps): JSX.Element => {
-  const nodes: Node<SchemaNodeData>[] = data.nodes.map((node) => ({
+  const nodes: Node<SchemaNodeData>[] = data.nodes.map((node, index) => ({
     ...node,
     type: 'table',
+    className: 'schema-flow-node',
+    style: {
+      animationDelay: `${index * 140}ms`,
+    },
   }))
 
   const edges: Edge[] = data.edges.map((edge) => ({
     ...edge,
+    type: 'smoothstep',
     animated: true,
     markerEnd: {
       type: MarkerType.ArrowClosed,
@@ -34,26 +38,44 @@ export const SchemaWidget = ({ data }: SchemaWidgetProps): JSX.Element => {
     },
     style: {
       stroke: '#34d399',
-      strokeWidth: 2,
+      strokeWidth: 2.2,
+      strokeLinecap: 'round',
     },
     labelStyle: {
-      fill: '#a1a1aa',
-      fontSize: 10,
+      fill: '#d4d4d8',
+      fontSize: 10.5,
+      letterSpacing: '0.08em',
       textTransform: 'uppercase',
+    },
+    labelBgStyle: {
+      fill: '#18181b',
+      fillOpacity: 0.9,
+      stroke: '#3f3f46',
+      strokeWidth: 1,
+    },
+    labelBgBorderRadius: 6,
+    pathOptions: {
+      borderRadius: 16,
+      offset: 18,
     },
   }))
 
   return (
     <div className="h-80 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
       <ReactFlow
+        className="schema-flow"
         fitView
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={false}
+        panOnDrag
+        zoomOnDoubleClick={false}
         proOptions={{ hideAttribution: true }}
       >
         <Background color="#27272a" gap={20} />
-        <Controls className="!border-zinc-800 !bg-zinc-900 !text-zinc-100" />
       </ReactFlow>
     </div>
   )
