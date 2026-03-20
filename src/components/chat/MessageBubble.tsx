@@ -1,6 +1,6 @@
 import type { JSX } from 'react'
 
-import { MessageRenderer } from './WidgetRenderer'
+import { MessageRenderer } from './MessageRenderer'
 import type { Message } from '../../types/chat'
 
 interface MessageBubbleProps {
