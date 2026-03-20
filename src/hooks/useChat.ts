@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import {
   getAssistantResponse,
   getInitialMessages,
+  getPreviewTextMessage,
   getPreviewWidget,
 } from '../services/chatService'
 import type { Message, MessageType, PreviewWidgetType } from '../types/chat'
@@ -79,14 +80,12 @@ export const useChat = (): UseChatResult => {
   }
 
   const injectWidget = async (type: MessageType): Promise<void> => {
-    if (!isPreviewWidgetType(type)) {
-      return
-    }
-
     setIsLoading(true)
 
     try {
-      const widgetMessage = await getPreviewWidget(type)
+      const widgetMessage = isPreviewWidgetType(type)
+        ? await getPreviewWidget(type)
+        : await getPreviewTextMessage()
 
       setMessages((currentMessages) => [...currentMessages, widgetMessage])
     } finally {

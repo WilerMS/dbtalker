@@ -20,8 +20,7 @@ export const ChatComposer = ({
         onSubmit={(event) => {
           void onSubmit(event)
         }}
-        className="pointer-events-auto mx-auto flex items-center gap-3 rounded-full border border-zinc-800 bg-zinc-900/80 px-5 py-3 backdrop-blur-md transition-shadow duration-300 focus-within:border-emerald-400/50 focus-within:shadow-[0_0_20px_rgba(52,211,153,0.4)]"
-        style={{ width: '750px' }}
+        className="pointer-events-auto mx-auto flex w-187.5 items-center gap-3 rounded-full border border-zinc-800 bg-zinc-900/80 px-5 py-3 backdrop-blur-md transition-shadow duration-300 focus-within:border-emerald-400/50 focus-within:shadow-[0_0_20px_rgba(52,211,153,0.4)]"
       >
         <input
           value={draft}

@@ -15,6 +15,9 @@ const waitForLatency = async (): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, 800))
 }
 
+const loremIpsumPreviewText =
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum id nibh quis nibh tempor volutpat. Integer hendrerit, nibh ut faucibus tristique, ipsum nibh porta lorem, et posuere augue turpis id risus. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam. Curabitur commodo, leo et tristique commodo, velit nunc gravida arcu, ut luctus augue velit id lectus. Donec interdum mi eget lorem dictum, quis pulvinar nibh ultrices. Nam non ultricies justo. Maecenas volutpat sem sed sapien luctus, at malesuada metus efficitur. Aliquam erat volutpat. Duis feugiat, eros in egestas facilisis, turpis lectus fermentum purus, ac dignissim justo justo et velit. Quisque gravida pretium sapien, vel viverra augue gravida sed. Morbi fermentum erat sed nibh porta, ut commodo justo posuere.'
+
 const schemaPreviewData: SchemaData = {
   nodes: [
     {
@@ -258,7 +261,6 @@ export const getInitialMessages = async (): Promise<Message[]> => {
       'KubePath listo. Pide un esquema, una métrica o una tabla y te respondo con un widget en el feed.',
     ),
     buildWidgetMessage('schema'),
-    buildWidgetMessage('kpi'),
   ]
 }
 
@@ -314,4 +316,10 @@ export const getPreviewWidget = async (
   await waitForLatency()
 
   return buildWidgetMessage(widgetType)
+}
+
+export const getPreviewTextMessage = async (): Promise<Message> => {
+  await waitForLatency()
+
+  return buildTextMessage(loremIpsumPreviewText)
 }

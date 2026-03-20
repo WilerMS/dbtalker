@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent, type JSX } from 'react'
 import { ChatComposer } from './ChatComposer'
 import { LoadingMessage } from './LoadingMessage'
 import { MessageBubble } from './MessageBubble'
+import { SpeakerAvatar } from './SpeakerAvatar'
 import type { Message } from '../../types/chat'
 
 interface MessageGroup {
@@ -71,54 +72,34 @@ export const MainChat = ({
 
   return (
     <section className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-4xl border border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
-      <div className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 min-h-0 flex-1 overflow-y-auto px-4 pt-4 sm:px-6">
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+      <div className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 min-h-0 flex-1 overflow-y-auto pt-4 pb-25">
+        <div className="mx-auto flex w-full max-w-187.5 flex-col gap-4">
           {groupMessagesByRole(messages).map((group) => (
             <div
               key={`${group.role}-${group.timestamp.getTime()}`}
-              className="flex w-full items-start gap-3"
+              className={[
+                'flex w-full items-start gap-3',
+                group.role === 'user' ? 'justify-end' : 'justify-start',
+              ].join(' ')}
             >
-              {group.role === 'bot' && (
-                <span
-                  aria-label="Assistant"
-                  className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-emerald-400/50 bg-zinc-900/80 text-xs font-semibold text-emerald-300"
-                >
-                  AI
-                </span>
-              )}
-
-              <div className="max-w-3xl flex-1">
-                <div className="mb-4 flex items-center gap-3 text-xs">
-                  <span className="tracking-[0.3em] text-zinc-400 uppercase">
-                    {group.role === 'user' ? 'User' : 'Assistant'}
-                  </span>
-                  <span className="text-zinc-600">
-                    {group.timestamp.toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  {group.messages.map((message) => (
-                    <MessageBubble
-                      key={message.id}
-                      message={message}
-                      showHeader={false}
-                    />
-                  ))}
+              <div className="flex w-full min-w-0 flex-col gap-2">
+                <SpeakerAvatar
+                  role={group.role as 'user' | 'bot'}
+                  timestamp={group.timestamp}
+                  orientation={group.role === 'user' ? 'right' : 'left'}
+                />
+                <div className="w-full max-w-3xl min-w-0">
+                  <div className="flex flex-col gap-3">
+                    {group.messages.map((message) => (
+                      <MessageBubble
+                        key={message.id}
+                        message={message}
+                        showHeader={false}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-
-              {group.role === 'user' && (
-                <span
-                  aria-label="User"
-                  className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900/80 text-sm font-semibold text-zinc-200"
-                >
-                  U
-                </span>
-              )}
             </div>
           ))}
           {isLoading ? <LoadingMessage /> : null}

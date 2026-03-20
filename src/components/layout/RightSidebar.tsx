@@ -1,6 +1,6 @@
 import type { JSX } from 'react'
 
-import type { Message, MessageType, PreviewWidgetType } from '../../types/chat'
+import type { Message, MessageType } from '../../types/chat'
 
 interface RightSidebarProps {
   injectWidget: (type: MessageType) => Promise<void>
@@ -10,10 +10,11 @@ interface RightSidebarProps {
 
 interface WidgetOption {
   label: string
-  type: PreviewWidgetType
+  type: MessageType
 }
 
 const widgetOptions: WidgetOption[] = [
+  { label: 'Lorem', type: 'text' },
   { label: 'Schema', type: 'schema' },
   { label: 'KPI', type: 'kpi' },
   { label: 'Bars', type: 'bar' },
