@@ -26,19 +26,19 @@ export const ChatComposer = ({
   }
 
   return (
-    <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-10 bg-linear-to-t from-zinc-950/80 via-zinc-950/45 to-transparent pb-6 backdrop-blur-md">
-      <div className="pointer-events-none absolute -top-16 right-0 left-0 h-16 bg-linear-to-t from-zinc-950/95 via-zinc-950/70 to-transparent" />
+    <div className="chat-composer-shell pointer-events-none absolute right-0 bottom-0 left-0 z-10 pb-6">
+      <div className="chat-composer-shell-top pointer-events-none absolute -top-16 right-0 left-0 h-16" />
       <div className="pointer-events-auto mx-auto max-w-210 px-4">
-        <div className="group relative animate-[borderGlow_4s_ease-in-out_infinite] rounded-2xl bg-[linear-gradient(120deg,rgba(63,63,70,0.85),rgba(82,82,91,0.92),rgba(52,211,153,0.2),rgba(82,82,91,0.92),rgba(63,63,70,0.85))] bg-size-[220%_220%] p-px shadow-[0_0_14px_rgba(24,24,27,0.6)] transition-all duration-300 ease-in-out focus-within:shadow-[0_0_0_1px_rgba(52,211,153,0.35),0_0_24px_rgba(52,211,153,0.18)] hover:shadow-[0_0_18px_rgba(63,63,70,0.55)]">
+        <div className="chat-composer-frame group relative rounded-2xl p-px">
           <form
             onSubmit={(event) => {
               void onSubmit(event)
             }}
-            className="relative rounded-2xl bg-zinc-900/90 backdrop-blur-xl transition-all duration-300"
+            className="chat-composer-form relative rounded-2xl"
           >
             <div className="flex items-end gap-3 p-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-700/60 bg-zinc-800/80">
-                <Sparkles className="h-4 w-4 text-emerald-300/90 transition-colors duration-300 group-hover:text-emerald-200" />
+              <div className="chat-composer-icon-wrap flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                <Sparkles className="chat-composer-icon h-4 w-4 transition-colors duration-300" />
               </div>
 
               <textarea
@@ -50,16 +50,16 @@ export const ChatComposer = ({
                 placeholder="Pregunta por un esquema, un KPI o una tabla..."
                 disabled={isLoading}
                 rows={1}
-                className="field-sizing-content max-h-40 min-h-10 flex-1 resize-none overflow-y-auto bg-transparent py-1.5 text-sm leading-relaxed text-zinc-100 placeholder:text-zinc-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="chat-composer-textarea field-sizing-content max-h-40 min-h-10 flex-1 resize-none overflow-y-auto py-1.5 text-sm leading-relaxed focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
 
               <button
                 type="submit"
                 disabled={!draft.trim() || isLoading}
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-800 transition-all duration-300 ease-in-out ${
+                className={`chat-composer-submit flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-300 ease-in-out ${
                   draft.trim() && !isLoading
-                    ? 'text-emerald-400 hover:border-emerald-400/50 hover:bg-emerald-400/20 hover:shadow-[0_0_15px_rgba(52,211,153,0.4)]'
-                    : 'cursor-not-allowed text-zinc-600'
+                    ? 'chat-composer-submit-enabled'
+                    : 'chat-composer-submit-disabled cursor-not-allowed'
                 }`}
               >
                 <Send className="h-4 w-4" />
@@ -68,7 +68,7 @@ export const ChatComposer = ({
           </form>
         </div>
 
-        <p className="mt-3 text-center text-xs text-zinc-600">
+        <p className="chat-composer-caption mt-3 text-center text-xs">
           KubePath puede cometer errores. Verifica consultas importantes antes
           de ejecutar.
         </p>
