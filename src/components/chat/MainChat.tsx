@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type JSX, type SubmitEvent } from 'react'
 
+import { AIMessage } from './AIMessage'
 import { ChatComposer } from './ChatComposer'
 import { LoadingMessage } from './LoadingMessage'
-import { MessageBubble } from './MessageBubble'
 import { SpeakerAvatar } from './SpeakerAvatar'
+import { UserMessage } from './UserMessage'
 import type { Message } from '../../types/chat'
 
 interface MessageGroup {
@@ -73,7 +74,7 @@ export const MainChat = ({
   return (
     <section className="relative flex h-full min-h-0 flex-col overflow-hidden backdrop-blur-sm">
       <div className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 min-h-0 flex-1 overflow-y-auto pt-4 pb-45">
-        <div className="mx-auto flex w-full max-w-187.5 flex-col gap-4">
+        <div className="mx-auto flex w-full max-w-187.5 flex-col gap-6">
           {groupMessagesByRole(messages).map((group) => (
             <div
               key={`${group.role}-${group.timestamp.getTime()}`}
@@ -82,7 +83,7 @@ export const MainChat = ({
                 group.role === 'user' ? 'justify-end' : 'justify-start',
               ].join(' ')}
             >
-              <div className="flex w-full min-w-0 flex-col gap-2">
+              <div className="flex w-full min-w-0 flex-col gap-4">
                 <SpeakerAvatar
                   role={group.role as 'user' | 'bot'}
                   timestamp={group.timestamp}
@@ -90,9 +91,13 @@ export const MainChat = ({
                 />
                 <div className="w-full max-w-3xl min-w-0">
                   <div className="flex flex-col gap-3">
-                    {group.messages.map((message) => (
-                      <MessageBubble key={message.id} message={message} />
-                    ))}
+                    {group.messages.map((message) =>
+                      group.role === 'user' ? (
+                        <UserMessage key={message.id} message={message} />
+                      ) : (
+                        <AIMessage key={message.id} message={message} />
+                      ),
+                    )}
                   </div>
                 </div>
               </div>
