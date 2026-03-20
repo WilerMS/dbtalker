@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type JSX, type SubmitEvent } from 'react'
 
-import { AIMessage } from './AIMessage'
 import { ChatComposer } from './ChatComposer'
 import { LoadingMessage } from './LoadingMessage'
 import { SpeakerAvatar } from './SpeakerAvatar'
-import { UserMessage } from './UserMessage'
 import type { Message } from '../../types/chat'
+import { UserMessage } from './UserMessage'
+import { AIMessage } from './AIMessage'
 
 interface MessageGroup {
   role: string
