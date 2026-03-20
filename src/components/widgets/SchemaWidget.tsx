@@ -65,6 +65,13 @@ export const SchemaWidget = ({ data }: SchemaWidgetProps): JSX.Element => {
       <ReactFlow
         className="schema-flow"
         fitView
+        fitViewOptions={{
+          padding: 0.2,
+          minZoom: 0.62,
+          maxZoom: 1,
+        }}
+        minZoom={0.55}
+        maxZoom={1.25}
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
@@ -72,6 +79,9 @@ export const SchemaWidget = ({ data }: SchemaWidgetProps): JSX.Element => {
         nodesConnectable={false}
         elementsSelectable={false}
         panOnDrag
+        zoomOnScroll={false}
+        zoomActivationKeyCode="Control"
+        preventScrolling={false}
         zoomOnDoubleClick={false}
         proOptions={{ hideAttribution: true }}
       >
