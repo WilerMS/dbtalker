@@ -219,6 +219,8 @@ const tablePreviewData: TableData = {
     { service: 'auth-api', status: 'healthy', latency_ms: 83 },
     { service: 'orders-api', status: 'healthy', latency_ms: 117 },
     { service: 'analytics-worker', status: 'degraded', latency_ms: 242 },
+    { service: 'billing-api', status: 'healthy', latency_ms: 95 },
+    { service: 'search-api', status: 'degraded', latency_ms: 310 },
   ],
 }
 
