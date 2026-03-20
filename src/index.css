@@ -135,7 +135,6 @@ textarea {
   stroke: rgba(52, 211, 153, 0.2);
 }
 
-
 @keyframes schemaNodeIn {
   from {
     opacity: 0;
