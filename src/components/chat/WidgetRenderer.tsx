@@ -16,13 +16,13 @@ import type {
   LineData,
 } from '../../types/chat'
 
-interface WidgetRendererProps {
+interface MessageRendererProps {
   message: Message
 }
 
-export const WidgetRenderer = ({
+export const MessageRenderer = ({
   message,
-}: WidgetRendererProps): JSX.Element => {
+}: MessageRendererProps): JSX.Element => {
   switch (message.type) {
     case 'schema':
       return (

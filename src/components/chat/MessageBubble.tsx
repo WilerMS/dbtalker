@@ -1,6 +1,6 @@
 import type { JSX } from 'react'
 
-import { WidgetRenderer } from './WidgetRenderer'
+import { MessageRenderer } from './WidgetRenderer'
 import type { Message } from '../../types/chat'
 
 interface MessageBubbleProps {
@@ -15,7 +15,7 @@ export const MessageBubble = ({
   const isUserMessage = message.role === 'user'
 
   if (!showHeader) {
-    return <WidgetRenderer message={message} />
+    return <MessageRenderer message={message} />
   }
 
   return (
@@ -51,7 +51,7 @@ export const MessageBubble = ({
             })}
           </span>
         </div>
-        <WidgetRenderer message={message} />
+        <MessageRenderer message={message} />
       </div>
 
       {isUserMessage ? (
