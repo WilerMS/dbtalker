@@ -24,7 +24,7 @@ export const DatabaseRoute = ({
   const chat = useChat(selectedDatabaseId)
 
   if (!hasMatchingDatabase || !id_db) {
-    return <Navigate to={`/${fallbackDatabaseId}`} replace />
+    return <Navigate to={`/app/${fallbackDatabaseId}`} replace />
   }
 
   return (
@@ -33,7 +33,7 @@ export const DatabaseRoute = ({
       databases={databases}
       selectedDatabaseId={selectedDatabaseId}
       onSelectDatabase={(databaseId) => {
-        navigate(`/${databaseId}`)
+        navigate(`/app/${databaseId}`)
       }}
     />
   )

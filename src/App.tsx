@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { DatabaseRoute } from './routes/DatabaseRoute'
 import { listDatabases } from './services/dbService'
 import type { DatabaseRecord } from './types/database'
+import { LandingPage } from './components/layout/LandingPage'
 
 const App = (): JSX.Element => {
   const { data: databases = [], isLoading: isLoadingDatabases } = useQuery<
@@ -36,15 +37,14 @@ const App = (): JSX.Element => {
 
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/landing" element={<Navigate to="/" replace />} />
+      <Route path="/app" element={<DatabaseRoute databases={databases} />} />
       <Route
-        path="/"
-        element={<Navigate to={`/${databases[0].id}`} replace />}
+        path="/app/:id_db"
+        element={<DatabaseRoute databases={databases} />}
       />
-      <Route path="/:id_db" element={<DatabaseRoute databases={databases} />} />
-      <Route
-        path="*"
-        element={<Navigate to={`/${databases[0].id}`} replace />}
-      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
