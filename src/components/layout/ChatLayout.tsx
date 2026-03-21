@@ -28,7 +28,7 @@ export const ChatLayout = ({
         onSelectDatabase={onSelectDatabase}
         selectedDatabaseId={selectedDatabaseId}
       />
-      <div className="h-full pl-16 sm:pl-20">
+      <div className="h-full">
         <MainChat
           isLoading={isLoading}
           messages={messages}
