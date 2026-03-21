@@ -4,27 +4,7 @@ import { Terminal } from 'lucide-react'
 
 export const LandingPage = (): JSX.Element => {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-zinc-950 px-6 text-center text-zinc-100">
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(circle at 50% 18%, rgba(52,211,153,0.16), transparent 35%), radial-gradient(circle at 78% 82%, rgba(16,185,129,0.08), transparent 40%)',
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-35"
-        aria-hidden="true"
-        style={{
-          backgroundImage:
-            'linear-gradient(to right, rgba(63,63,70,0.16) 1px, transparent 1px), linear-gradient(to bottom, rgba(63,63,70,0.16) 1px, transparent 1px)',
-          backgroundSize: '58px 58px',
-          maskImage:
-            'linear-gradient(180deg, rgba(0,0,0,0.56), rgba(0,0,0,0.16) 72%, transparent)',
-        }}
-      />
-
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center text-zinc-100">
       <section className="relative z-10 mx-auto max-w-4xl">
         <h1 className="text-5xl leading-tight font-bold tracking-tight text-zinc-100 sm:text-6xl md:text-7xl">
           Talk to your{' '}

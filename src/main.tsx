@@ -19,7 +19,16 @@ createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <App />
+        <div className="app-shell">
+          <div className="app-shell__backdrop" aria-hidden="true">
+            <div className="app-shell__gradient" />
+            <div className="app-shell__grid" />
+            <div className="app-shell__glow" />
+          </div>
+          <div className="app-shell__content">
+            <App />
+          </div>
+        </div>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,

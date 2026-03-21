@@ -17,7 +17,7 @@ const App = (): JSX.Element => {
 
   if (isLoadingDatabases) {
     return (
-      <div className="grid h-screen place-items-center bg-zinc-950 text-zinc-100">
+      <div className="grid h-screen place-items-center text-zinc-100">
         <p className="text-xs tracking-[0.2em] text-emerald-300 uppercase">
           Loading Databases
         </p>
@@ -27,7 +27,7 @@ const App = (): JSX.Element => {
 
   if (databases.length === 0) {
     return (
-      <div className="grid h-screen place-items-center bg-zinc-950 text-zinc-100">
+      <div className="grid h-screen place-items-center text-zinc-100">
         <p className="text-xs tracking-[0.2em] text-zinc-400 uppercase">
           No databases registered
         </p>

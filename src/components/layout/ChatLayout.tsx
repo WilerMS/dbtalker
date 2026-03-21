@@ -22,7 +22,7 @@ export const ChatLayout = ({
   sendMessage,
 }: ChatLayoutProps): JSX.Element => {
   return (
-    <div className="relative h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="relative h-screen overflow-hidden text-zinc-100">
       <SidePanel
         databases={databases}
         onSelectDatabase={onSelectDatabase}
