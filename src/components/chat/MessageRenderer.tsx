@@ -30,15 +30,15 @@ const expandedWidgetSizes = {
   },
   bar: {
     width: 'min(95vw, 1180px)',
-    height: '78vh',
+    height: '600px',
   },
   line: {
     width: 'min(95vw, 1180px)',
-    height: '78vh',
+    height: '550px',
   },
   table: {
     width: 'min(96vw, 1320px)',
-    height: '80vh',
+    height: '550px',
   },
 } as const
 
@@ -103,7 +103,10 @@ export const MessageRenderer = ({
       return (
         <ExpandableWidget
           widgetId={message.id}
-          expandedSize={expandedWidgetSizes.table}
+          expandedSize={{
+            width: 'min(96vw, 1320px)',
+            height: `${(message.data as TableData).rows.length * 45 + 50}px`,
+          }}
         >
           {({ isExpanded }) => (
             <TableWidget
