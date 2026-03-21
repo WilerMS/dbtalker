@@ -1,9 +1,8 @@
 import type { JSX } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-
-import { AppLayout } from '../layout/AppLayout'
-import { useChat } from '../../hooks/useChat'
-import type { DatabaseRecord } from '../../types/database'
+import type { DatabaseRecord } from '../types/database'
+import { useChat } from '../hooks/useChat'
+import { AppLayout } from '../components/layout/AppLayout'
 
 interface DatabaseRouteProps {
   databases: DatabaseRecord[]

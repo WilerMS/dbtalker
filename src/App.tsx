@@ -2,7 +2,7 @@ import { type JSX } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 
-import { DatabaseRoute } from './components/routes/DatabaseRoute'
+import { DatabaseRoute } from './routes/DatabaseRoute'
 import { listDatabases } from './services/dbService'
 import type { DatabaseRecord } from './types/database'
 
