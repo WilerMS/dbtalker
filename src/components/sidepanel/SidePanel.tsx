@@ -1,6 +1,7 @@
 import type { JSX } from 'react'
-import { Database, Leaf, HardDrive } from 'lucide-react'
+import { Database, Leaf, HardDrive, Settings, LogOut } from 'lucide-react'
 import type { DatabaseEngine, DatabaseRecord } from '../../types/database'
+import { SidePanelItemButton } from './SidePanelItemButton'
 
 interface SidePanelProps {
   databases: DatabaseRecord[]
@@ -26,10 +27,10 @@ export const SidePanel = ({
   selectedDatabaseId,
 }: SidePanelProps): JSX.Element => {
   return (
-    <aside className="pointer-events-none fixed left-0 z-30 h-screen">
+    <aside className="pointer-events-none fixed top-4 bottom-4 left-4 z-30">
       <nav
         aria-label="Database menu"
-        className="pointer-events-auto flex h-full w-20 flex-col items-center gap-3 border-r border-zinc-700/80 bg-zinc-900/74 py-4 shadow-[0_0_28px_rgba(16,185,129,0.1)] backdrop-blur-md"
+        className="pointer-events-auto flex h-full w-20 flex-col items-center gap-3 rounded-2xl border border-zinc-700/40 bg-linear-to-b from-zinc-900/62 via-emerald-950/48 to-zinc-900/58 py-4 shadow-[0_0_28px_rgba(16,185,129,0.1)] backdrop-blur-md"
       >
         <header className="mb-1 flex flex-col items-center gap-2 border-b border-zinc-800/85 pb-3">
           <span className="grid size-9 place-items-center rounded-full border border-emerald-500/60 bg-zinc-900/85 text-[11px] font-semibold tracking-[0.08em] text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.2)]">
@@ -41,35 +42,36 @@ export const SidePanel = ({
         </header>
 
         {databases.map((database) => (
-          <button
+          <SidePanelItemButton
             key={database.id}
-            type="button"
-            aria-current={database.id === selectedDatabaseId}
-            aria-label={database.name}
+            ariaLabel={database.name}
             title={database.name}
+            isActive={database.id === selectedDatabaseId}
             onClick={() => {
               onSelectDatabase(database.id)
             }}
-            className={`group flex size-11 cursor-pointer items-center justify-center rounded-full border bg-zinc-800/70 shadow-[inset_0_0_0_1px_rgba(24,24,27,0.75)] transition-all duration-300 ease-out ${
-              database.id === selectedDatabaseId
-                ? 'border-emerald-300/95 text-emerald-100 shadow-[0_0_18px_rgba(52,211,153,0.45),inset_0_0_0_1px_rgba(16,185,129,0.4)]'
-                : 'border-emerald-500/55 text-emerald-200 hover:border-emerald-300/90 hover:bg-zinc-800/95 hover:text-emerald-100 hover:shadow-[0_0_18px_rgba(52,211,153,0.38),inset_0_0_0_1px_rgba(16,185,129,0.4)]'
-            }`}
           >
-            <span className="transition-transform duration-300 group-hover:scale-105">
-              {getDatabaseIcon(database.engine)}
-            </span>
-          </button>
+            {getDatabaseIcon(database.engine)}
+          </SidePanelItemButton>
         ))}
 
-        <button
-          type="button"
-          aria-label="Add database"
-          title="Add database"
-          className="group flex size-11 cursor-pointer items-center justify-center rounded-full border border-emerald-500/55 bg-zinc-800/70 text-emerald-200 shadow-[inset_0_0_0_1px_rgba(24,24,27,0.75)] transition-all duration-300 ease-out hover:border-emerald-300/90 hover:bg-zinc-800/95 hover:text-emerald-100 hover:shadow-[0_0_18px_rgba(52,211,153,0.38),inset_0_0_0_1px_rgba(16,185,129,0.4)]"
-        >
+        <SidePanelItemButton ariaLabel="Add database" title="Add database">
           +
-        </button>
+        </SidePanelItemButton>
+
+        <div className="grow" />
+
+        <SidePanelItemButton ariaLabel="Settings" title="Settings">
+          <Settings size={20} />
+        </SidePanelItemButton>
+
+        <SidePanelItemButton
+          ariaLabel="Log out"
+          title="Log out"
+          variant="danger"
+        >
+          <LogOut size={20} />
+        </SidePanelItemButton>
       </nav>
     </aside>
   )
