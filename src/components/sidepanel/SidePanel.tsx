@@ -1,19 +1,30 @@
 import type { JSX } from 'react'
 import { Database, Leaf, HardDrive } from 'lucide-react'
+import type { DatabaseEngine, DatabaseRecord } from '../../types/database'
 
-interface MenuDatabaseItem {
-  id: string
-  label: string
-  icon: JSX.Element
+interface SidePanelProps {
+  databases: DatabaseRecord[]
+  selectedDatabaseId: string
+  onSelectDatabase: (databaseId: string) => void
 }
 
-const databaseItems: MenuDatabaseItem[] = [
-  { id: 'db-postgres', label: 'PostgreSQL', icon: <Database size={20} /> },
-  { id: 'db-mongodb', label: 'MongoDB', icon: <Leaf size={20} /> },
-  { id: 'db-sqlite', label: 'SQLite', icon: <HardDrive size={20} /> },
-]
+const getDatabaseIcon = (engine: DatabaseEngine): JSX.Element => {
+  switch (engine) {
+    case 'mongodb':
+      return <Leaf size={20} />
+    case 'sqlite':
+      return <HardDrive size={20} />
+    case 'postgresql':
+    default:
+      return <Database size={20} />
+  }
+}
 
-export const SidePanel = (): JSX.Element => {
+export const SidePanel = ({
+  databases,
+  onSelectDatabase,
+  selectedDatabaseId,
+}: SidePanelProps): JSX.Element => {
   return (
     <aside className="pointer-events-none fixed left-0 z-30 h-screen">
       <nav
@@ -29,16 +40,24 @@ export const SidePanel = (): JSX.Element => {
           </span>
         </header>
 
-        {databaseItems.map((item) => (
+        {databases.map((database) => (
           <button
-            key={item.id}
+            key={database.id}
             type="button"
-            aria-label={item.label}
-            title={item.label}
-            className="group flex size-11 cursor-pointer items-center justify-center rounded-full border border-emerald-500/55 bg-zinc-800/70 text-emerald-200 shadow-[inset_0_0_0_1px_rgba(24,24,27,0.75)] transition-all duration-300 ease-out hover:border-emerald-300/90 hover:bg-zinc-800/95 hover:text-emerald-100 hover:shadow-[0_0_18px_rgba(52,211,153,0.38),inset_0_0_0_1px_rgba(16,185,129,0.4)]"
+            aria-current={database.id === selectedDatabaseId}
+            aria-label={database.name}
+            title={database.name}
+            onClick={() => {
+              onSelectDatabase(database.id)
+            }}
+            className={`group flex size-11 cursor-pointer items-center justify-center rounded-full border bg-zinc-800/70 shadow-[inset_0_0_0_1px_rgba(24,24,27,0.75)] transition-all duration-300 ease-out ${
+              database.id === selectedDatabaseId
+                ? 'border-emerald-300/95 text-emerald-100 shadow-[0_0_18px_rgba(52,211,153,0.45),inset_0_0_0_1px_rgba(16,185,129,0.4)]'
+                : 'border-emerald-500/55 text-emerald-200 hover:border-emerald-300/90 hover:bg-zinc-800/95 hover:text-emerald-100 hover:shadow-[0_0_18px_rgba(52,211,153,0.38),inset_0_0_0_1px_rgba(16,185,129,0.4)]'
+            }`}
           >
             <span className="transition-transform duration-300 group-hover:scale-105">
-              {item.icon}
+              {getDatabaseIcon(database.engine)}
             </span>
           </button>
         ))}

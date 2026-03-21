@@ -255,18 +255,23 @@ const buildWidgetMessage = (widgetType: PreviewWidgetType): Message => {
   }
 }
 
-export const getInitialMessages = async (): Promise<Message[]> => {
+export const getInitialMessages = async (
+  databaseId: string,
+): Promise<Message[]> => {
   await waitForLatency()
 
   return [
     buildTextMessage(
-      'KubePath listo. Pide un esquema, una métrica o una tabla y te respondo con un widget en el feed.',
+      `KubePath listo para ${databaseId}. Pide un esquema, una metrica o una tabla y te respondo con un widget en el feed.`,
     ),
     buildWidgetMessage('schema'),
   ]
 }
 
-export const getAssistantResponse = async (query: string): Promise<Message> => {
+export const getAssistantResponse = async (
+  query: string,
+  databaseId: string,
+): Promise<Message> => {
   await waitForLatency()
 
   const normalizedQuery = query.toLowerCase()
@@ -308,7 +313,7 @@ export const getAssistantResponse = async (query: string): Promise<Message> => {
   }
 
   return buildTextMessage(
-    'Base inicial lista. Prueba con: "muéstrame el schema", "enséñame un KPI" o "quiero una tabla".',
+    `Base ${databaseId} lista. Prueba con: "muestrame el schema", "ensename un KPI" o "quiero una tabla".`,
   )
 }
 

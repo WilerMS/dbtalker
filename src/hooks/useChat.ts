@@ -29,16 +29,18 @@ const isPreviewWidgetType = (type: MessageType): type is PreviewWidgetType => {
   return type !== 'text'
 }
 
-export const useChat = (): UseChatResult => {
+export const useChat = (databaseId: string): UseChatResult => {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     let isMounted = true
+    setIsLoading(true)
+    setMessages([])
 
     const initialize = async (): Promise<void> => {
       try {
-        const initialMessages = await getInitialMessages()
+        const initialMessages = await getInitialMessages(databaseId)
 
         if (isMounted) {
           setMessages(initialMessages)
@@ -55,7 +57,7 @@ export const useChat = (): UseChatResult => {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [databaseId])
 
   const sendMessage = async (text: string): Promise<void> => {
     const nextText = text.trim()
@@ -71,7 +73,7 @@ export const useChat = (): UseChatResult => {
     setIsLoading(true)
 
     try {
-      const responseMessage = await getAssistantResponse(nextText)
+      const responseMessage = await getAssistantResponse(nextText, databaseId)
 
       setMessages((currentMessages) => [...currentMessages, responseMessage])
     } finally {

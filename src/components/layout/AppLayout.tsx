@@ -4,18 +4,30 @@ import { RightSidebar } from './RightSidebar'
 import { MainChat } from '../chat/MainChat'
 import { SidePanel } from '../sidepanel/SidePanel'
 import type { UseChatResult } from '../../hooks/useChat'
+import type { DatabaseRecord } from '../../types/database'
 
-type AppLayoutProps = UseChatResult
+interface AppLayoutProps extends UseChatResult {
+  databases: DatabaseRecord[]
+  selectedDatabaseId: string
+  onSelectDatabase: (databaseId: string) => void
+}
 
 export const AppLayout = ({
+  databases,
   injectWidget,
   isLoading,
   messages,
+  onSelectDatabase,
+  selectedDatabaseId,
   sendMessage,
 }: AppLayoutProps): JSX.Element => {
   return (
     <div className="relative h-screen overflow-hidden bg-zinc-950 text-zinc-100">
-      <SidePanel />
+      <SidePanel
+        databases={databases}
+        onSelectDatabase={onSelectDatabase}
+        selectedDatabaseId={selectedDatabaseId}
+      />
       <div className="h-full pl-16 sm:pl-20">
         <MainChat
           isLoading={isLoading}
