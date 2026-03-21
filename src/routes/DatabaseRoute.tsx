@@ -2,7 +2,7 @@ import type { JSX } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import type { DatabaseRecord } from '../types/database'
 import { useChat } from '../hooks/useChat'
-import { AppLayout } from '../components/layout/AppLayout'
+import { ChatLayout } from '../components/layout/ChatLayout'
 
 interface DatabaseRouteProps {
   databases: DatabaseRecord[]
@@ -20,6 +20,7 @@ export const DatabaseRoute = ({
   )
   const selectedDatabaseId =
     hasMatchingDatabase && id_db ? id_db : fallbackDatabaseId
+
   const chat = useChat(selectedDatabaseId)
 
   if (!hasMatchingDatabase || !id_db) {
@@ -27,7 +28,7 @@ export const DatabaseRoute = ({
   }
 
   return (
-    <AppLayout
+    <ChatLayout
       {...chat}
       databases={databases}
       selectedDatabaseId={selectedDatabaseId}

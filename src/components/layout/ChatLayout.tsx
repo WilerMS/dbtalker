@@ -6,13 +6,13 @@ import { SidePanel } from '../sidepanel/SidePanel'
 import type { UseChatResult } from '../../hooks/useChat'
 import type { DatabaseRecord } from '../../types/database'
 
-interface AppLayoutProps extends UseChatResult {
+interface ChatLayoutProps extends UseChatResult {
   databases: DatabaseRecord[]
   selectedDatabaseId: string
   onSelectDatabase: (databaseId: string) => void
 }
 
-export const AppLayout = ({
+export const ChatLayout = ({
   databases,
   injectWidget,
   isLoading,
@@ -20,7 +20,7 @@ export const AppLayout = ({
   onSelectDatabase,
   selectedDatabaseId,
   sendMessage,
-}: AppLayoutProps): JSX.Element => {
+}: ChatLayoutProps): JSX.Element => {
   return (
     <div className="relative h-screen overflow-hidden bg-zinc-950 text-zinc-100">
       <SidePanel
