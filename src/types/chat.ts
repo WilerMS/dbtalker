@@ -66,6 +66,7 @@ export interface TableRow {
 }
 
 export interface TableData {
+  title: string
   columns: string[]
   rows: TableRow[]
 }

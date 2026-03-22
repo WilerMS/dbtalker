@@ -211,6 +211,7 @@ const linePreviewData: LineData = {
 }
 
 const tablePreviewData: TableData = {
+  title: 'Service Health',
   columns: ['service', 'status', 'latency_ms'],
   rows: [
     { service: 'auth-api', status: 'healthy', latency_ms: 83 },
