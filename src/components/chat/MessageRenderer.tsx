@@ -1,11 +1,6 @@
 import type { JSX } from 'react'
 
 import { ExpandableWidget } from '../ui/ExpandableWidget'
-import { BarChartWidget } from '../widgets/BarChartWidget'
-import { KpiWidget } from '../widgets/KpiWidget'
-import { LineChartWidget } from '../widgets/LineChartWidget'
-import { SchemaWidget } from '../widgets/SchemaWidget'
-import { TableWidget } from '../widgets/TableWidget'
 import type {
   BarData,
   KpiData,
@@ -15,6 +10,11 @@ import type {
   TextData,
   LineData,
 } from '../../types/chat'
+import { SchemaWidget } from './widgets/SchemaWidget'
+import { KpiWidget } from './widgets/KpiWidget'
+import { BarChartWidget } from './widgets/BarChartWidget'
+import { LineChartWidget } from './widgets/LineChartWidget'
+import { TableWidget } from './widgets/TableWidget'
 
 interface MessageRendererProps {
   message: Message

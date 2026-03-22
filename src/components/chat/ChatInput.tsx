@@ -1,18 +1,18 @@
 import { Send, Sparkles } from 'lucide-react'
 import { type JSX, type ChangeEvent, type KeyboardEvent, useState } from 'react'
-import './ChatComposer.css'
+import './ChatInput.css'
 
-interface ChatComposerProps {
+interface ChatInputProps {
   isLoading: boolean
   onValueChange?: (value: string) => void
   onSubmit: (value: string) => Promise<void>
 }
 
-export const ChatComposer = ({
+export const ChatInput = ({
   isLoading,
   onSubmit,
   onValueChange,
-}: ChatComposerProps): JSX.Element => {
+}: ChatInputProps): JSX.Element => {
   const [draft, setDraft] = useState<string>('')
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>): void => {

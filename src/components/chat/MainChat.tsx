@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef, type JSX } from 'react'
-
-import { ChatComposer } from './ChatComposer'
 import { LoadingMessage } from './LoadingMessage'
 import { SpeakerAvatar } from './SpeakerAvatar'
 import type { Message } from '../../types/chat'
 import { UserMessage } from './UserMessage'
 import { AIMessage } from './AIMessage'
 import { groupMessagesByRole } from '../../utils/groupMessagesByRole'
+import { ChatInput } from './ChatInput'
 
 interface MainChatProps {
   isLoading: boolean
@@ -78,7 +77,7 @@ export const MainChat = ({
         </div>
       </div>
 
-      <ChatComposer isLoading={isLoading} onSubmit={handleSubmit} />
+      <ChatInput isLoading={isLoading} onSubmit={handleSubmit} />
     </section>
   )
 }
