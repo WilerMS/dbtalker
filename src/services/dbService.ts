@@ -3,37 +3,13 @@ import type {
   DatabaseRecord,
   UpdateDatabaseInput,
 } from '../types/database'
+import { getDatabases } from './mocks/databasesMock'
 
 const waitForLatency = async (): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, 800))
 }
 
-let databases: DatabaseRecord[] = [
-  {
-    id: 'db-postgres',
-    name: 'PostgreSQL',
-    engine: 'postgresql',
-    description: 'Operational commerce data',
-    createdAt: new Date('2026-01-10T10:00:00.000Z'),
-    updatedAt: new Date('2026-01-10T10:00:00.000Z'),
-  },
-  {
-    id: 'db-mongodb',
-    name: 'MongoDB',
-    engine: 'mongodb',
-    description: 'Event stream and audit logs',
-    createdAt: new Date('2026-01-12T14:00:00.000Z'),
-    updatedAt: new Date('2026-01-12T14:00:00.000Z'),
-  },
-  {
-    id: 'db-sqlite',
-    name: 'SQLite',
-    engine: 'sqlite',
-    description: 'Local analytics snapshot',
-    createdAt: new Date('2026-01-14T09:00:00.000Z'),
-    updatedAt: new Date('2026-01-14T09:00:00.000Z'),
-  },
-]
+let databases: DatabaseRecord[] = getDatabases()
 
 const cloneDatabase = (database: DatabaseRecord): DatabaseRecord => {
   return {
