@@ -1,9 +1,5 @@
 import type { JSX } from 'react'
 
-interface SchemaWidgetSkeletonProps {
-  isExpanded?: boolean
-}
-
 const schemaSkeletonNodes = [
   { left: '6%', top: '16%', width: '22%', height: '34%' },
   { left: '34%', top: '10%', width: '20%', height: '32%' },
@@ -12,18 +8,14 @@ const schemaSkeletonNodes = [
   { left: '58%', top: '58%', width: '22%', height: '28%' },
 ]
 
-export const SchemaWidgetSkeleton = ({
-  isExpanded = false,
-}: SchemaWidgetSkeletonProps): JSX.Element => {
+export const SchemaWidgetSkeleton = (): JSX.Element => {
   return (
-    <div
-      className={`flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/35 ${isExpanded ? 'h-[78vh]' : 'h-80'}`}
-    >
+    <div className="flex h-80 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/35">
       <div className="shrink-0 px-6 py-4">
         <div className="h-3 w-44 animate-pulse rounded-full bg-zinc-800" />
       </div>
 
-      <div className="relative min-h-0 flex-1 overflow-hidden border-t border-zinc-800/70 bg-[radial-gradient(circle_at_20%_20%,rgba(24,24,27,0.72),transparent_35%),radial-gradient(circle_at_80%_75%,rgba(39,39,42,0.74),transparent_40%)]">
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-[radial-gradient(circle_at_20%_20%,rgba(24,24,27,0.72),transparent_35%),radial-gradient(circle_at_80%_75%,rgba(39,39,42,0.74),transparent_40%)]">
         {schemaSkeletonNodes.map((node, index) => (
           <div
             key={`schema-node-${index}`}

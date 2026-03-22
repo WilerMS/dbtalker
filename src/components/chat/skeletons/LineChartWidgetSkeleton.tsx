@@ -1,20 +1,10 @@
 import type { JSX } from 'react'
 
-interface LineChartWidgetSkeletonProps {
-  isExpanded?: boolean
-}
-
-export const LineChartWidgetSkeleton = ({
-  isExpanded = false,
-}: LineChartWidgetSkeletonProps): JSX.Element => {
-  const chartHeight = isExpanded ? 'h-[460px]' : 'h-[280px]'
-
+export const LineChartWidgetSkeleton = (): JSX.Element => {
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/35 p-6 shadow-[0_0_30px_rgba(16,185,129,0.08)]">
       <div className="h-3 w-44 animate-pulse rounded-full bg-zinc-800" />
-      <div
-        className={`relative mt-6 overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900/55 ${chartHeight}`}
-      >
+      <div className="relative mt-4 h-70 overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900/55">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(52,211,153,0.18),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(16,185,129,0.14),transparent_42%)]" />
         <svg viewBox="0 0 800 360" className="absolute inset-0 h-full w-full">
           <path
