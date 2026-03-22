@@ -35,11 +35,11 @@ export const ChatLayout = ({
         messages={messages}
         sendMessage={sendMessage}
       />
-      <RightSidebar
+      {/* <RightSidebar
         injectWidget={injectWidget}
         isLoading={isLoading || isStreaming}
         messages={messages}
-      />
+      /> */}
     </div>
   )
 }
