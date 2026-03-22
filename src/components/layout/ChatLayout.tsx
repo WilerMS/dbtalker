@@ -22,24 +22,22 @@ export const ChatLayout = ({
   sendMessage,
 }: ChatLayoutProps): JSX.Element => {
   return (
-    <div className="relative h-screen overflow-hidden text-zinc-100">
+    <div className="relative flex h-screen overflow-hidden text-zinc-100">
       <SidePanel
         databases={databases}
         onSelectDatabase={onSelectDatabase}
         selectedDatabaseId={selectedDatabaseId}
       />
-      <div className="h-full">
-        <MainChat
-          isLoading={isLoading}
-          messages={messages}
-          sendMessage={sendMessage}
-        />
-        <RightSidebar
-          injectWidget={injectWidget}
-          isLoading={isLoading}
-          messages={messages}
-        />
-      </div>
+      <MainChat
+        isLoading={isLoading}
+        messages={messages}
+        sendMessage={sendMessage}
+      />
+      <RightSidebar
+        injectWidget={injectWidget}
+        isLoading={isLoading}
+        messages={messages}
+      />
     </div>
   )
 }
