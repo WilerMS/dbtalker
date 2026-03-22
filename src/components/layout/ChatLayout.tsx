@@ -16,6 +16,7 @@ export const ChatLayout = ({
   databases,
   injectWidget,
   isLoading,
+  isStreaming,
   messages,
   onSelectDatabase,
   selectedDatabaseId,
@@ -30,12 +31,13 @@ export const ChatLayout = ({
       />
       <MainChat
         isLoading={isLoading}
+        isStreaming={isStreaming}
         messages={messages}
         sendMessage={sendMessage}
       />
       <RightSidebar
         injectWidget={injectWidget}
-        isLoading={isLoading}
+        isLoading={isLoading || isStreaming}
         messages={messages}
       />
     </div>

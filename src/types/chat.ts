@@ -78,10 +78,39 @@ export type MessageData =
   | LineData
   | TableData
 
-export interface Message {
+export interface PendingMessage {
   id: string
   role: MessageRole
   type: MessageType
+  status: 'pending'
+  timestamp: Date
+}
+
+export interface CompleteMessage {
+  id: string
+  role: MessageRole
+  type: MessageType
+  status: 'complete'
   data: MessageData
   timestamp: Date
 }
+
+export type Message = PendingMessage | CompleteMessage
+
+// SSE chunk types emitted by the mock streaming service
+export interface SSEChunkIncoming {
+  event: 'incoming'
+  type: MessageType
+}
+
+export interface SSEChunkData {
+  event: 'data'
+  type: MessageType
+  data: MessageData
+}
+
+export interface SSEChunkFinished {
+  event: 'finished'
+}
+
+export type SSEChunk = SSEChunkIncoming | SSEChunkData | SSEChunkFinished

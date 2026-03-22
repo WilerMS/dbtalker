@@ -3,6 +3,7 @@ import type { JSX } from 'react'
 import { ExpandableWidget } from '../ui/ExpandableWidget'
 import type {
   BarData,
+  CompleteMessage,
   KpiData,
   Message,
   SchemaData,
@@ -15,6 +16,12 @@ import { KpiWidget } from './widgets/KpiWidget'
 import { BarChartWidget } from './widgets/BarChartWidget'
 import { LineChartWidget } from './widgets/LineChartWidget'
 import { TableWidget } from './widgets/TableWidget'
+import { TextMessageSkeleton } from './skeletons/TextMessageSkeleton'
+import { SchemaWidgetSkeleton } from './skeletons/SchemaWidgetSkeleton'
+import { KpiWidgetSkeleton } from './skeletons/KpiWidgetSkeleton'
+import { BarChartWidgetSkeleton } from './skeletons/BarChartWidgetSkeleton'
+import { LineChartWidgetSkeleton } from './skeletons/LineChartWidgetSkeleton'
+import { TableWidgetSkeleton } from './skeletons/TableWidgetSkeleton'
 
 interface MessageRendererProps {
   message: Message
@@ -45,16 +52,36 @@ const expandedWidgetSizes = {
 export const MessageRenderer = ({
   message,
 }: MessageRendererProps): JSX.Element => {
-  switch (message.type) {
+  // Render the appropriate skeleton while waiting for the real data
+  if (message.status === 'pending') {
+    switch (message.type) {
+      case 'text':
+        return <TextMessageSkeleton />
+      case 'schema':
+        return <SchemaWidgetSkeleton />
+      case 'kpi':
+        return <KpiWidgetSkeleton />
+      case 'bar':
+        return <BarChartWidgetSkeleton />
+      case 'line':
+        return <LineChartWidgetSkeleton />
+      case 'table':
+        return <TableWidgetSkeleton />
+    }
+  }
+
+  const complete = message as CompleteMessage
+
+  switch (complete.type) {
     case 'schema':
       return (
         <ExpandableWidget
-          widgetId={message.id}
+          widgetId={complete.id}
           expandedSize={expandedWidgetSizes.schema}
         >
           {({ isExpanded }) => (
             <SchemaWidget
-              data={message.data as SchemaData}
+              data={complete.data as SchemaData}
               isExpanded={isExpanded}
             />
           )}
@@ -63,23 +90,26 @@ export const MessageRenderer = ({
     case 'kpi':
       return (
         <ExpandableWidget
-          widgetId={message.id}
+          widgetId={complete.id}
           expandedSize={expandedWidgetSizes.kpi}
         >
           {({ isExpanded }) => (
-            <KpiWidget data={message.data as KpiData} isExpanded={isExpanded} />
+            <KpiWidget
+              data={complete.data as KpiData}
+              isExpanded={isExpanded}
+            />
           )}
         </ExpandableWidget>
       )
     case 'bar':
       return (
         <ExpandableWidget
-          widgetId={message.id}
+          widgetId={complete.id}
           expandedSize={expandedWidgetSizes.bar}
         >
           {({ isExpanded }) => (
             <BarChartWidget
-              data={message.data as BarData}
+              data={complete.data as BarData}
               isExpanded={isExpanded}
             />
           )}
@@ -88,12 +118,12 @@ export const MessageRenderer = ({
     case 'line':
       return (
         <ExpandableWidget
-          widgetId={message.id}
+          widgetId={complete.id}
           expandedSize={expandedWidgetSizes.line}
         >
           {({ isExpanded }) => (
             <LineChartWidget
-              data={message.data as LineData}
+              data={complete.data as LineData}
               isExpanded={isExpanded}
             />
           )}
@@ -102,15 +132,15 @@ export const MessageRenderer = ({
     case 'table':
       return (
         <ExpandableWidget
-          widgetId={message.id}
+          widgetId={complete.id}
           expandedSize={{
             width: 'min(96vw, 1320px)',
-            height: `${(message.data as TableData).rows.length * 45 + 50}px`,
+            height: `${(complete.data as TableData).rows.length * 45 + 50}px`,
           }}
         >
           {({ isExpanded }) => (
             <TableWidget
-              data={message.data as TableData}
+              data={complete.data as TableData}
               isExpanded={isExpanded}
             />
           )}
@@ -120,7 +150,7 @@ export const MessageRenderer = ({
     default:
       return (
         <p className="text-sm leading-7 text-zinc-100">
-          {(message.data as TextData).text}
+          {(complete.data as TextData).text}
         </p>
       )
   }

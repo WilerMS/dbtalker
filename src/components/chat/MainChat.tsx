@@ -9,12 +9,14 @@ import { ChatInput } from './ChatInput'
 
 interface MainChatProps {
   isLoading: boolean
+  isStreaming: boolean
   messages: Message[]
   sendMessage: (text: string) => Promise<void>
 }
 
 export const MainChat = ({
   isLoading,
+  isStreaming,
   messages,
   sendMessage,
 }: MainChatProps): JSX.Element => {
@@ -77,7 +79,7 @@ export const MainChat = ({
         </div>
       </div>
 
-      <ChatInput isLoading={isLoading} onSubmit={handleSubmit} />
+      <ChatInput isLoading={isLoading || isStreaming} onSubmit={handleSubmit} />
     </section>
   )
 }

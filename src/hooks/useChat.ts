@@ -1,26 +1,44 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import type {
+  CompleteMessage,
+  Message,
+  MessageType,
+  PendingMessage,
+  PreviewWidgetType,
+} from '../types/chat'
 import {
-  getAssistantResponse,
   getInitialMessages,
   getPreviewTextMessage,
   getPreviewWidget,
+  streamAssistantResponse,
 } from '../services/chatService'
-import type { Message, MessageType, PreviewWidgetType } from '../types/chat'
 
 export interface UseChatResult {
   messages: Message[]
   isLoading: boolean
+  isStreaming: boolean
   sendMessage: (text: string) => Promise<void>
   injectWidget: (type: MessageType) => Promise<void>
 }
 
-const buildUserMessage = (text: string): Message => {
+const buildUserMessage = (text: string): CompleteMessage => {
   return {
     id: crypto.randomUUID(),
     role: 'user',
     type: 'text',
+    status: 'complete',
     data: { text },
+    timestamp: new Date(),
+  }
+}
+
+const buildPendingMessage = (type: MessageType): PendingMessage => {
+  return {
+    id: crypto.randomUUID(),
+    role: 'bot',
+    type,
+    status: 'pending',
     timestamp: new Date(),
   }
 }
@@ -32,10 +50,14 @@ const isPreviewWidgetType = (type: MessageType): type is PreviewWidgetType => {
 export const useChat = (databaseId: string): UseChatResult => {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isStreaming, setIsStreaming] = useState<boolean>(false)
+  // Tracks the id of the current PendingMessage so we can replace it on 'data'
+  const pendingIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     let isMounted = true
     setIsLoading(true)
+    setIsStreaming(false)
     setMessages([])
 
     const initialize = async (): Promise<void> => {
@@ -66,18 +88,44 @@ export const useChat = (databaseId: string): UseChatResult => {
       return
     }
 
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      buildUserMessage(nextText),
-    ])
+    setMessages((prev) => [...prev, buildUserMessage(nextText)])
     setIsLoading(true)
+    pendingIdRef.current = null
 
     try {
-      const responseMessage = await getAssistantResponse(nextText, databaseId)
+      for await (const chunk of streamAssistantResponse(nextText, databaseId)) {
+        if (chunk.event === 'incoming') {
+          // Thinking phase is over — switch from generic loading to skeleton
+          setIsLoading(false)
+          setIsStreaming(true)
 
-      setMessages((currentMessages) => [...currentMessages, responseMessage])
+          const pending = buildPendingMessage(chunk.type)
+          pendingIdRef.current = pending.id
+          setMessages((prev) => [...prev, pending])
+        } else if (chunk.event === 'data') {
+          // Replace the pending skeleton with the real complete message
+          const completedId = pendingIdRef.current
+          pendingIdRef.current = null
+
+          const complete: CompleteMessage = {
+            id: completedId ?? crypto.randomUUID(),
+            role: 'bot',
+            type: chunk.type,
+            status: 'complete',
+            data: chunk.data,
+            timestamp: new Date(),
+          }
+
+          setMessages((prev) =>
+            prev.map((m) => (m.id === completedId ? complete : m)),
+          )
+        } else if (chunk.event === 'finished') {
+          setIsStreaming(false)
+        }
+      }
     } finally {
       setIsLoading(false)
+      setIsStreaming(false)
     }
   }
 
@@ -89,7 +137,7 @@ export const useChat = (databaseId: string): UseChatResult => {
         ? await getPreviewWidget(type)
         : await getPreviewTextMessage()
 
-      setMessages((currentMessages) => [...currentMessages, widgetMessage])
+      setMessages((prev) => [...prev, widgetMessage])
     } finally {
       setIsLoading(false)
     }
@@ -98,6 +146,7 @@ export const useChat = (databaseId: string): UseChatResult => {
   return {
     messages,
     isLoading,
+    isStreaming,
     sendMessage,
     injectWidget,
   }
