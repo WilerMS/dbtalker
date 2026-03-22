@@ -118,6 +118,12 @@ wheels = [
 ]
 
 [[package]]
+name = "jsonwebtoken"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/50/c5e43db3514c5394d9e38a699abefd59fdbf45365d8452538cdca77f2c68/jsonwebtoken-1.0.0.tar.gz", hash = "sha256:5e069b83919b49f7348fa630027408da94e2a2ec1adc2652f16ec00d4b772e01", size = 59326, upload-time = "2023-03-30T18:59:32.56Z" }
+
+[[package]]
 name = "pydantic"
 version = "2.12.5"
 source = { registry = "https://pypi.org/simple" }
@@ -264,6 +270,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },
+    { name = "jsonwebtoken" },
     { name = "sse-starlette" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -271,6 +278,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.135.1" },
+    { name = "jsonwebtoken", specifier = ">=1.0.0" },
     { name = "sse-starlette", specifier = ">=3.3.3" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.42.0" },
 ]
