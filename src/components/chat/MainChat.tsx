@@ -3,7 +3,7 @@ import { LoadingMessage } from './LoadingMessage'
 import { SpeakerAvatar } from './SpeakerAvatar'
 import type { Message } from '../../types/chat'
 import { UserMessage } from './UserMessage'
-import { AIMessage } from './AIMessage'
+import { AiMessage } from './AiMessage'
 import { groupMessagesByRole } from '../../utils/groupMessagesByRole'
 import { ChatInput } from './ChatInput'
 
@@ -67,7 +67,7 @@ export const MainChat = ({
                       group.role === 'user' ? (
                         <UserMessage key={message.id} message={message} />
                       ) : (
-                        <AIMessage key={message.id} message={message} />
+                        <AiMessage key={message.id} message={message} />
                       ),
                     )}
                   </div>

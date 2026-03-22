@@ -1,5 +1,3 @@
-import type { JSX } from 'react'
-
 import { ExpandableWidget } from '../ui/ExpandableWidget'
 import type {
   BarData,
@@ -23,7 +21,7 @@ import { BarChartWidgetSkeleton } from './skeletons/BarChartWidgetSkeleton'
 import { LineChartWidgetSkeleton } from './skeletons/LineChartWidgetSkeleton'
 import { TableWidgetSkeleton } from './skeletons/TableWidgetSkeleton'
 
-interface MessageRendererProps {
+interface AiMessageProps {
   message: Message
 }
 
@@ -49,9 +47,7 @@ const expandedWidgetSizes = {
   },
 } as const
 
-export const MessageRenderer = ({
-  message,
-}: MessageRendererProps): JSX.Element => {
+export const AiMessage = ({ message }: AiMessageProps) => {
   // Render the appropriate skeleton while waiting for the real data
   if (message.status === 'pending') {
     switch (message.type) {
