@@ -1,8 +1,7 @@
 import { KeyRound } from 'lucide-react'
 import type { JSX } from 'react'
 import { Handle, Position, type NodeProps } from 'reactflow'
-
-import type { SchemaNodeData } from '../../types/chat'
+import type { SchemaNodeData } from '../../../types/chat'
 
 export const SchemaTableNode = ({
   data,
