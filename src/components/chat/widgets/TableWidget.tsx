@@ -14,15 +14,26 @@ export const TableWidget = ({
     <div
       className={`rounded-2xl border border-zinc-800 bg-zinc-900/50 ${isExpanded ? 'max-h-[72vh] overflow-auto' : 'overflow-hidden'}`}
     >
+      <div className="h-12 shrink-0 px-6 py-4">
+        <div className="flex h-full items-center">
+          <p className="text-xs leading-3 tracking-[0.3em] text-zinc-400 uppercase">
+            {data.title}
+          </p>
+        </div>
+      </div>
       <table className="w-full text-sm">
         <thead>
           <tr>
             {data.columns.map((column) => (
               <th
                 key={column}
-                className="border-b border-zinc-800 px-4 py-3 text-left text-xs tracking-widest text-zinc-400 uppercase"
+                className="h-11.25 border-b border-zinc-800 px-6 py-0 text-left"
               >
-                {column}
+                <div className="flex h-full items-center">
+                  <span className="block text-xs tracking-widest text-zinc-400 uppercase">
+                    {column}
+                  </span>
+                </div>
               </th>
             ))}
           </tr>
@@ -34,8 +45,10 @@ export const TableWidget = ({
               className="border-b border-zinc-800/50 text-zinc-200 transition-colors hover:bg-emerald-900/20"
             >
               {data.columns.map((column) => (
-                <td key={`${rowIndex}-${column}`} className="px-4 py-3">
-                  {row[column]}
+                <td key={`${rowIndex}-${column}`} className="h-11.25 px-6 py-0">
+                  <div className="flex h-full items-center">
+                    <span className="block">{row[column]}</span>
+                  </div>
                 </td>
               ))}
             </tr>
