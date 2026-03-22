@@ -1,5 +1,5 @@
 import type { JSX } from 'react'
-import { Database, Leaf, HardDrive, Settings, LogOut } from 'lucide-react'
+import { Database, Leaf, HardDrive, Settings, LogOut, Plus } from 'lucide-react'
 import type { DatabaseEngine, DatabaseRecord } from '../../types/database'
 import { SidePanelItemButton } from './SidePanelItemButton'
 
@@ -27,10 +27,10 @@ export const SidePanel = ({
   selectedDatabaseId,
 }: SidePanelProps): JSX.Element => {
   return (
-    <aside className="pointer-events-none fixed top-4 bottom-4 left-4 z-30">
+    <aside className="pointer-events-none z-30">
       <nav
         aria-label="Database menu"
-        className="pointer-events-auto flex h-full w-20 flex-col items-center gap-3 rounded-2xl border border-zinc-700/40 bg-linear-to-b from-zinc-900/62 via-emerald-950/48 to-zinc-900/58 py-4 shadow-[0_0_28px_rgba(16,185,129,0.1)] backdrop-blur-md"
+        className="pointer-events-auto flex h-full w-20 flex-col items-center gap-3 border-r border-zinc-700/40 bg-linear-to-b from-zinc-900/62 via-emerald-950/48 to-zinc-900/58 py-4 shadow-[0_0_28px_rgba(16,185,129,0.1)] backdrop-blur-md"
       >
         <header className="mb-1 flex flex-col items-center gap-2 border-b border-zinc-800/85 pb-3">
           <span className="grid size-9 place-items-center rounded-full border border-emerald-500/60 bg-zinc-900/85 text-[11px] font-semibold tracking-[0.08em] text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.2)]">
@@ -56,7 +56,7 @@ export const SidePanel = ({
         ))}
 
         <SidePanelItemButton ariaLabel="Add database" title="Add database">
-          +
+          <Plus size={20} />
         </SidePanelItemButton>
 
         <div className="grow" />

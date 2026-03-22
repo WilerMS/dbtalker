@@ -40,7 +40,7 @@ export const MainChat = ({
   )
 
   return (
-    <section className="relative flex h-full min-h-0 flex-col overflow-hidden">
+    <section className="relative flex h-full min-h-0 w-full flex-col overflow-hidden">
       <div
         ref={scrollContainerRef}
         className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 min-h-0 flex-1 overflow-y-auto pt-4 pb-45"
