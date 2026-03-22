@@ -1,4 +1,4 @@
-import { Maximize2 } from 'lucide-react'
+import { Maximize, Minimize } from 'lucide-react'
 import { LayoutGroup, motion } from 'framer-motion'
 import { useState, type JSX, type ReactNode } from 'react'
 
@@ -48,11 +48,11 @@ export const ExpandableWidget = ({
           <button
             type="button"
             onClick={() => setIsExpanded(true)}
-            className={`absolute top-3 right-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900/90 text-zinc-200 transition-all duration-300 hover:border-emerald-400/70 hover:text-emerald-300 hover:shadow-[0_0_25px_rgba(52,211,153,0.45)] ${isExpanded ? 'pointer-events-none opacity-0' : ''}`}
+            className={`absolute top-6 right-6 z-10 cursor-pointer text-zinc-300 transition-all duration-200 ease-out hover:scale-125 hover:text-emerald-400 active:scale-90 ${isExpanded ? 'pointer-events-none opacity-0' : ''}`}
             aria-label="Maximizar widget"
             tabIndex={isExpanded ? -1 : 0}
           >
-            <Maximize2 className="h-4 w-4" />
+            <Maximize className="h-5 w-5" />
           </button>
         </motion.div>
 
@@ -67,6 +67,14 @@ export const ExpandableWidget = ({
             className="relative"
           >
             {renderedChildren}
+            <button
+              type="button"
+              onClick={() => setIsExpanded(false)}
+              className="absolute top-6 right-6 z-10 cursor-pointer text-zinc-300 transition-all duration-200 ease-out hover:scale-125 hover:text-emerald-400 active:scale-90"
+              aria-label="Minimizar widget"
+            >
+              <Minimize className="h-5 w-5" />
+            </button>
           </motion.div>
         </WidgetModal>
       </div>
