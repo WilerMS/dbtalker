@@ -48,7 +48,7 @@ export const ExpandableWidget = ({
           <button
             type="button"
             onClick={() => setIsExpanded(true)}
-            className={`absolute top-6 right-6 z-10 cursor-pointer text-zinc-300 transition-all duration-200 ease-out hover:scale-125 hover:text-emerald-400 active:scale-90 ${isExpanded ? 'pointer-events-none opacity-0' : ''}`}
+            className={`absolute top-4 right-6 z-10 cursor-pointer text-zinc-300 transition-all duration-200 ease-out hover:scale-125 hover:text-emerald-400 active:scale-90 ${isExpanded ? 'pointer-events-none opacity-0' : ''}`}
             aria-label="Maximizar widget"
             tabIndex={isExpanded ? -1 : 0}
           >
@@ -70,7 +70,7 @@ export const ExpandableWidget = ({
             <button
               type="button"
               onClick={() => setIsExpanded(false)}
-              className="absolute top-6 right-6 z-10 cursor-pointer text-zinc-300 transition-all duration-200 ease-out hover:scale-125 hover:text-emerald-400 active:scale-90"
+              className="absolute top-4 right-6 z-10 cursor-pointer text-zinc-300 transition-all duration-200 ease-out hover:scale-125 hover:text-emerald-400 active:scale-90"
               aria-label="Minimizar widget"
             >
               <Minimize className="h-5 w-5" />
