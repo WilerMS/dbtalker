@@ -9,7 +9,7 @@ import {
 } from 'reactflow'
 
 import { SchemaTableNode } from './SchemaTableNode'
-import type { SchemaData, SchemaNodeData } from '../../types/chat'
+import type { SchemaData, SchemaNodeData } from '../../../types/chat'
 
 interface SchemaWidgetProps {
   data: SchemaData
