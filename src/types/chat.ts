@@ -34,6 +34,7 @@ export interface SchemaEdge {
 }
 
 export interface SchemaData {
+  title: string
   nodes: SchemaNode[]
   edges: SchemaEdge[]
 }

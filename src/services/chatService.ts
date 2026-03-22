@@ -19,6 +19,7 @@ const loremIpsumPreviewText =
   'El esquema de su base de datos incluye tablas para usuarios, órdenes, productos, pagos y envíos, con relaciones claras entre ellas. Por ejemplo, la tabla de órdenes se relaciona con usuarios a través de user_id y con productos a través de order_items. Esto permite consultas complejas para obtener insights valiosos sobre el comportamiento de los clientes y el rendimiento del negocio.'
 
 const schemaPreviewData: SchemaData = {
+  title: 'Database Schema',
   nodes: [
     {
       id: 'users',
