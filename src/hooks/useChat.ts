@@ -130,16 +130,26 @@ export const useChat = (databaseId: string): UseChatResult => {
   }
 
   const injectWidget = async (type: MessageType): Promise<void> => {
-    setIsLoading(true)
+    const pending = buildPendingMessage(type)
+    setIsStreaming(true)
+    setMessages((prev) => [...prev, pending])
 
     try {
       const widgetMessage = isPreviewWidgetType(type)
         ? await getPreviewWidget(type)
         : await getPreviewTextMessage()
 
-      setMessages((prev) => [...prev, widgetMessage])
+      const complete: CompleteMessage = {
+        ...widgetMessage,
+        id: pending.id,
+        timestamp: new Date(),
+      }
+
+      setMessages((prev) =>
+        prev.map((message) => (message.id === pending.id ? complete : message)),
+      )
     } finally {
-      setIsLoading(false)
+      setIsStreaming(false)
     }
   }
 
