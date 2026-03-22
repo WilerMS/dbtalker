@@ -1,0 +1,36 @@
+.apexcharts-canvas,
+.apexcharts-svg,
+.apexcharts-inner,
+.apexcharts-graphical {
+  overflow: visible;
+}
+
+.apexcharts-tooltip,
+.apexcharts-xaxistooltip {
+  border: 1px solid rgba(63, 63, 70, 0.9) !important;
+  background: rgba(24, 24, 27, 0.94) !important;
+  color: #f4f4f5 !important;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.18) !important;
+  backdrop-filter: blur(12px);
+}
+
+.apexcharts-tooltip-title,
+.apexcharts-xaxistooltip-text {
+  border-bottom: 1px solid rgba(63, 63, 70, 0.8) !important;
+  background: rgba(39, 39, 42, 0.88) !important;
+  color: #d4d4d8 !important;
+}
+
+.apexcharts-tooltip-series-group.apexcharts-active {
+  background: transparent !important;
+}
+
+.apexcharts-gridline {
+  opacity: 0.55;
+}
+
+.apexcharts-xcrosshairs,
+.apexcharts-ycrosshairs {
+  fill: rgba(52, 211, 153, 0.08);
+  stroke: rgba(52, 211, 153, 0.2);
+}

@@ -8,6 +8,7 @@ import {
   type Node,
 } from 'reactflow'
 
+import './SchemaWidget.css'
 import { SchemaTableNode } from './SchemaTableNode'
 import type { SchemaData, SchemaNodeData } from '../../../types/chat'
 
@@ -104,10 +105,10 @@ export const SchemaWidget = ({
           <Background color="#27272a" gap={20} />
           {isExpanded ? (
             <Controls
-              position="top-right"
+              position="bottom-left"
               showInteractive
               onInteractiveChange={setIsInteractive}
-              className="rounded-xl border border-zinc-800 bg-zinc-900/90 text-zinc-200 shadow-[0_0_18px_rgba(52,211,153,0.18)] backdrop-blur-sm"
+              className="schema-flow__controls"
             />
           ) : null}
         </ReactFlow>

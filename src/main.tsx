@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@fontsource-variable/fira-code/index.css'
 import 'reactflow/dist/style.css'
 import './index.css'
+import './main.css'
 import App from './App.tsx'
 
 const rootElement = document.getElementById('root')

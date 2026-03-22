@@ -1,5 +1,7 @@
 import type { ApexOptions } from 'apexcharts'
 
+import './chartTheme.css'
+
 const chartFontFamily = 'Space Grotesk, Segoe UI, sans-serif'
 
 interface BuildBaseChartOptionsArgs {
