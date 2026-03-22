@@ -3,8 +3,8 @@ import type { JSX } from 'react'
 import type { ApexOptions } from 'apexcharts'
 import ReactApexChart from 'react-apexcharts'
 
-import type { LineData } from '../../types/chat'
 import { buildBaseChartOptions } from './chartTheme'
+import type { LineData } from '../../../types/chat'
 
 interface LineChartWidgetProps {
   data: LineData

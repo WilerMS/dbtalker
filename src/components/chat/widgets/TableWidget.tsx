@@ -1,6 +1,5 @@
 import type { JSX } from 'react'
-
-import type { TableData } from '../../types/chat'
+import type { TableData } from '../../../types/chat'
 
 interface TableWidgetProps {
   data: TableData

@@ -1,6 +1,5 @@
 import type { JSX } from 'react'
-
-import type { KpiData } from '../../types/chat'
+import type { KpiData } from '../../../types/chat'
 
 interface KpiWidgetProps {
   data: KpiData

@@ -3,8 +3,8 @@ import type { JSX } from 'react'
 import type { ApexOptions } from 'apexcharts'
 import ReactApexChart from 'react-apexcharts'
 
-import type { BarData } from '../../types/chat'
 import { buildBaseChartOptions } from './chartTheme'
+import type { BarData } from '../../../types/chat'
 
 interface BarChartWidgetProps {
   data: BarData
