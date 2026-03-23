@@ -55,7 +55,7 @@ export const SidePanelItemButton = ({
       title={title}
       aria-current={isActive}
       onClick={onClick}
-      className={`${baseButtonClassName} ${stateClassName}`}
+      className={`shrink-0 ${baseButtonClassName} ${stateClassName}`}
     >
       <span
         aria-hidden
