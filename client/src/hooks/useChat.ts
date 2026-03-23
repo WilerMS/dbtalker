@@ -5,7 +5,6 @@ import type {
   Message,
   MessageType,
   PendingMessage,
-  PreviewWidgetType,
 } from '../types/chat'
 import {
   getInitialMessages,
@@ -38,10 +37,6 @@ const buildPendingMessage = (type: MessageType): PendingMessage => {
     status: 'pending',
     timestamp: new Date(),
   }
-}
-
-const isPreviewWidgetType = (type: MessageType): type is PreviewWidgetType => {
-  return type !== 'text'
 }
 
 export const useChat = (databaseId: string): UseChatResult => {
