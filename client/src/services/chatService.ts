@@ -7,7 +7,7 @@ const chatServiceImplementations = {
   mock: mockChatService,
 } satisfies Record<string, ChatService>
 
-const chatService: ChatService = chatServiceImplementations.mock
+const chatService: ChatService = chatServiceImplementations.api
 
 export const getInitialMessages = chatService.getInitialMessages
 export const streamAssistantResponse = chatService.streamAssistantResponse

@@ -3,117 +3,126 @@ import type {
   DatabaseRecord,
   UpdateDatabaseInput,
 } from '../types/database'
-import { getDatabases } from './mocks/databasesMock'
 
-const waitForLatency = async (): Promise<void> => {
-  await new Promise((resolve) => setTimeout(resolve, 800))
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
+
+interface ApiDatabaseRecord {
+  id: string
+  name: string
+  engine: DatabaseRecord['engine']
+  description?: string
+  created_at: string
+  updated_at: string
 }
 
-let databases: DatabaseRecord[] = getDatabases()
-
-const cloneDatabase = (database: DatabaseRecord): DatabaseRecord => {
+const mapDatabaseRecord = (database: ApiDatabaseRecord): DatabaseRecord => {
   return {
-    ...database,
-    createdAt: new Date(database.createdAt),
-    updatedAt: new Date(database.updatedAt),
+    id: database.id,
+    name: database.name,
+    engine: database.engine,
+    description: database.description,
+    createdAt: new Date(database.created_at),
+    updatedAt: new Date(database.updated_at),
   }
-}
-
-const buildDatabaseId = (name: string): string => {
-  const normalized = name
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-
-  const fallbackId = `db-${crypto.randomUUID().slice(0, 8)}`
-
-  if (!normalized) {
-    return fallbackId
-  }
-
-  const prefixedId = normalized.startsWith('db-')
-    ? normalized
-    : `db-${normalized}`
-
-  const alreadyExists = databases.some((database) => database.id === prefixedId)
-
-  return alreadyExists
-    ? `${prefixedId}-${crypto.randomUUID().slice(0, 4)}`
-    : prefixedId
 }
 
 export const listDatabases = async (): Promise<DatabaseRecord[]> => {
-  await waitForLatency()
+  const response = await fetch(`${API_BASE_URL}/databases`)
+  if (!response.ok) {
+    throw new Error(
+      `Failed to list databases. Status: ${response.status} ${response.statusText}`,
+    )
+  }
 
-  return databases.map(cloneDatabase)
+  const payload = (await response.json()) as ApiDatabaseRecord[]
+  return payload.map(mapDatabaseRecord)
 }
 
 export const getDatabaseById = async (
   id: string,
 ): Promise<DatabaseRecord | null> => {
-  await waitForLatency()
-
-  const database = databases.find(
-    (currentDatabase) => currentDatabase.id === id,
+  const response = await fetch(
+    `${API_BASE_URL}/databases/${encodeURIComponent(id)}`,
   )
 
-  return database ? cloneDatabase(database) : null
+  if (response.status === 404) {
+    return null
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to load database '${id}'. Status: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  const payload = (await response.json()) as ApiDatabaseRecord
+  return mapDatabaseRecord(payload)
 }
 
 export const createDatabase = async (
   input: CreateDatabaseInput,
 ): Promise<DatabaseRecord> => {
-  await waitForLatency()
+  const response = await fetch(`${API_BASE_URL}/databases`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
 
-  const now = new Date()
-  const createdDatabase: DatabaseRecord = {
-    id: buildDatabaseId(input.name),
-    name: input.name,
-    engine: input.engine,
-    description: input.description,
-    createdAt: now,
-    updatedAt: now,
+  if (!response.ok) {
+    throw new Error(
+      `Failed to create database. Status: ${response.status} ${response.statusText}`,
+    )
   }
 
-  databases = [...databases, createdDatabase]
-
-  return cloneDatabase(createdDatabase)
+  const payload = (await response.json()) as ApiDatabaseRecord
+  return mapDatabaseRecord(payload)
 }
 
 export const updateDatabase = async (
   id: string,
   input: UpdateDatabaseInput,
 ): Promise<DatabaseRecord | null> => {
-  await waitForLatency()
+  const response = await fetch(
+    `${API_BASE_URL}/databases/${encodeURIComponent(id)}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    },
+  )
 
-  const databaseIndex = databases.findIndex((database) => database.id === id)
-
-  if (databaseIndex === -1) {
+  if (response.status === 404) {
     return null
   }
 
-  const currentDatabase = databases[databaseIndex]
-  const updatedDatabase: DatabaseRecord = {
-    ...currentDatabase,
-    ...input,
-    updatedAt: new Date(),
+  if (!response.ok) {
+    throw new Error(
+      `Failed to update database '${id}'. Status: ${response.status} ${response.statusText}`,
+    )
   }
 
-  databases = [
-    ...databases.slice(0, databaseIndex),
-    updatedDatabase,
-    ...databases.slice(databaseIndex + 1),
-  ]
-
-  return cloneDatabase(updatedDatabase)
+  const payload = (await response.json()) as ApiDatabaseRecord
+  return mapDatabaseRecord(payload)
 }
 
 export const deleteDatabase = async (id: string): Promise<boolean> => {
-  await waitForLatency()
+  const response = await fetch(
+    `${API_BASE_URL}/databases/${encodeURIComponent(id)}`,
+    {
+      method: 'DELETE',
+    },
+  )
 
-  const previousLength = databases.length
-  databases = databases.filter((database) => database.id !== id)
+  if (response.status === 404) {
+    return false
+  }
 
-  return databases.length < previousLength
+  if (!response.ok) {
+    throw new Error(
+      `Failed to delete database '${id}'. Status: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  return true
 }
