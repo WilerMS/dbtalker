@@ -1,5 +1,12 @@
 import { Send, Sparkles } from 'lucide-react'
-import { type JSX, type ChangeEvent, type KeyboardEvent, useState } from 'react'
+import {
+  type JSX,
+  type ChangeEvent,
+  type KeyboardEvent,
+  useState,
+  useRef,
+  useEffect,
+} from 'react'
 import './ChatInput.css'
 
 interface ChatInputProps {
@@ -14,6 +21,18 @@ export const ChatInput = ({
   onValueChange,
 }: ChatInputProps): JSX.Element => {
   const [draft, setDraft] = useState<string>('')
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const prevLoadingRef = useRef<boolean>(isLoading)
+
+  useEffect(() => {
+    // When isLoading changes from true to false, focus the textarea
+    if (prevLoadingRef.current && !isLoading && textareaRef.current) {
+      setTimeout(() => {
+        textareaRef.current?.focus()
+      }, 100)
+    }
+    prevLoadingRef.current = isLoading
+  }, [isLoading])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>): void => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -48,6 +67,7 @@ export const ChatInput = ({
                 </div>
 
                 <textarea
+                  ref={textareaRef}
                   value={draft}
                   onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
                     setDraft(event.target.value)
