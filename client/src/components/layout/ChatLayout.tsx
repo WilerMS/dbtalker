@@ -1,6 +1,5 @@
 import type { JSX } from 'react'
 
-import { RightSidebar } from './RightSidebar'
 import { MainChat } from '../chat/MainChat'
 import { SidePanel } from '../sidepanel/SidePanel'
 import type { UseChatResult } from '../../hooks/useChat'
@@ -14,7 +13,6 @@ interface ChatLayoutProps extends UseChatResult {
 
 export const ChatLayout = ({
   databases,
-  injectWidget,
   isLoading,
   isStreaming,
   messages,
@@ -35,11 +33,6 @@ export const ChatLayout = ({
         messages={messages}
         sendMessage={sendMessage}
       />
-      {/* <RightSidebar
-        injectWidget={injectWidget}
-        isLoading={isLoading || isStreaming}
-        messages={messages}
-      /> */}
     </div>
   )
 }

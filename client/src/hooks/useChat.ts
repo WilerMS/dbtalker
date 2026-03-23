@@ -9,8 +9,6 @@ import type {
 } from '../types/chat'
 import {
   getInitialMessages,
-  getPreviewTextMessage,
-  getPreviewWidget,
   streamAssistantResponse,
 } from '../services/chatService'
 
@@ -19,7 +17,6 @@ export interface UseChatResult {
   isLoading: boolean
   isStreaming: boolean
   sendMessage: (text: string) => Promise<void>
-  injectWidget: (type: MessageType) => Promise<void>
 }
 
 const buildUserMessage = (text: string): CompleteMessage => {
@@ -129,35 +126,10 @@ export const useChat = (databaseId: string): UseChatResult => {
     }
   }
 
-  const injectWidget = async (type: MessageType): Promise<void> => {
-    const pending = buildPendingMessage(type)
-    setIsStreaming(true)
-    setMessages((prev) => [...prev, pending])
-
-    try {
-      const widgetMessage = isPreviewWidgetType(type)
-        ? await getPreviewWidget(type)
-        : await getPreviewTextMessage()
-
-      const complete: CompleteMessage = {
-        ...widgetMessage,
-        id: pending.id,
-        timestamp: new Date(),
-      }
-
-      setMessages((prev) =>
-        prev.map((message) => (message.id === pending.id ? complete : message)),
-      )
-    } finally {
-      setIsStreaming(false)
-    }
-  }
-
   return {
     messages,
     isLoading,
     isStreaming,
     sendMessage,
-    injectWidget,
   }
 }
