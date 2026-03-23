@@ -145,8 +145,6 @@ event: message
 data: {"event": "finished"}
 ```
 
-A single query may emit **two sequences** (text first, then optionally a widget), with `finished` sent only once at the end — identical to how `chatService.mock.ts` behaves.
-
 ### MessageType values
 
 `"text" | "schema" | "kpi" | "bar" | "line" | "table"`

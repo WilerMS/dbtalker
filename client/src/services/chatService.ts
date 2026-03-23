@@ -1,5 +1,4 @@
 import type {
-  ChatService,
   CompleteMessage,
   MessageData,
   MessageType,
@@ -59,7 +58,7 @@ const parseChunk = (rawData: string): SSEChunk => {
   throw new Error('Invalid SSE chunk shape received from server.')
 }
 
-const getInitialMessages = async (
+export const getInitialMessages = async (
   databaseId: string,
 ): Promise<CompleteMessage[]> => {
   const url = new URL(`${API_BASE_URL}/chat/messages`)
@@ -76,7 +75,7 @@ const getInitialMessages = async (
   return payload.map(toCompleteMessage)
 }
 
-async function* streamAssistantResponse(
+export async function* streamAssistantResponse(
   query: string,
   databaseId: string,
 ): AsyncGenerator<SSEChunk> {
@@ -185,9 +184,4 @@ async function* streamAssistantResponse(
     abortController.abort()
     await streamRequest
   }
-}
-
-export const apiChatService: ChatService = {
-  getInitialMessages,
-  streamAssistantResponse,
 }

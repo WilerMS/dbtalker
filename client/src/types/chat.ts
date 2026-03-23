@@ -115,11 +115,3 @@ export interface SSEChunkFinished {
 }
 
 export type SSEChunk = SSEChunkIncoming | SSEChunkData | SSEChunkFinished
-
-export interface ChatService {
-  getInitialMessages: (databaseId: string) => Promise<CompleteMessage[]>
-  streamAssistantResponse: (
-    query: string,
-    databaseId: string,
-  ) => AsyncGenerator<SSEChunk>
-}

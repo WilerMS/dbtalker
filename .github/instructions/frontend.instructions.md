@@ -33,27 +33,9 @@ These rules apply to **all files under `client/`**. Read them in full before wri
 
 ---
 
-## Mock Service Layer
-
-All data access goes through `src/services/`. Services must:
-
-- Return `Promise<T>` with a minimum simulated latency of ~800 ms (`waitForLatency()`).
-- Keep in-memory state for the current session (no real HTTP calls while the backend is not connected).
-- Be structured as named exports, not default exports.
-- Be fully typed with no `any`.
-
-The service files are:
-
-- `src/services/dbService.ts` — CRUD for `DatabaseRecord` (databases registered by the user).
-- `src/services/chatService.ts` — Router that selects between `mock` and `api` implementations.
-- `src/services/chatService.api.ts` — API implementation (uses real SSE from the backend).
-- `src/services/mocks/chatService.mock.ts` — Mock implementation (offline/development).
-
----
-
 ## Client–Server Communication
 
-When the API layer is active (`chatService.api.ts`), the client communicates with the server using two protocols:
+When the API layer is active (`chatService.ts`), the client communicates with the server using two protocols:
 
 ### REST (database management)
 
