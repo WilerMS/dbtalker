@@ -15,7 +15,7 @@ export const LandingPage = (): JSX.Element => {
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400 sm:text-xl">
-          DBTalker is an AI-powered Text-to-SQL assistant. Connect your
+          DBTalkie is an AI-powered Text-to-SQL assistant. Connect your
           database, ask questions in plain English, and get instant queries,
           charts, and schema visualizations.
         </p>
@@ -25,7 +25,7 @@ export const LandingPage = (): JSX.Element => {
           className="mt-10 inline-flex animate-[pulse_2.8s_ease-in-out_infinite] items-center gap-3 rounded-full border border-emerald-500/50 bg-zinc-900/80 px-8 py-4 text-sm font-semibold tracking-[0.08em] text-emerald-200 uppercase shadow-[0_0_16px_rgba(52,211,153,0.22)] transition-all duration-300 hover:bg-emerald-950/30 hover:text-emerald-100 hover:shadow-[0_0_30px_rgba(52,211,153,0.6)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
         >
           <Terminal className="size-5" aria-hidden="true" />
-          Launch DBTalker
+          Launch DBTalkie
         </Link>
       </section>
     </main>
