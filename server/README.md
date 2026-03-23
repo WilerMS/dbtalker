@@ -1,4 +1,4 @@
-# DBTalker Backend
+# DBTalkie Backend
 
 FastAPI backend scaffolded with `uv`.
 

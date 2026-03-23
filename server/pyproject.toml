@@ -1,7 +1,7 @@
 [project]
 name = "server"
 version = "0.1.0"
-description = "DBTalker FastAPI backend"
+description = "DBTalkie FastAPI backend"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
