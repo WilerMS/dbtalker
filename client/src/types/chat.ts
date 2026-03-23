@@ -122,6 +122,4 @@ export interface ChatService {
     query: string,
     databaseId: string,
   ) => AsyncGenerator<SSEChunk>
-  getPreviewWidget: (widgetType: PreviewWidgetType) => Promise<CompleteMessage>
-  getPreviewTextMessage: () => Promise<CompleteMessage>
 }
