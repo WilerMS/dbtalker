@@ -1,12 +1,12 @@
-# DBTalker — Prime Directive
+# DBTalkie — Prime Directive
 
-**Project Identity:** DBTalker is a futuristic, cyberpunk-minimal, dark-mode AI chat assistant. At its core it is a **Text-to-SQL** application: users connect SQL databases and query them using natural language. The application transforms natural language into SQL, executes queries, and returns results as rich, animated widgets (tables, charts, schema diagrams, KPI cards) alongside natural-language explanations.
+**Project Identity:** DBTalkie is a futuristic, cyberpunk-minimal, dark-mode AI chat assistant. At its core it is a **Text-to-SQL** application: users connect SQL databases and query them using natural language. The application transforms natural language into SQL, executes queries, and returns results as rich, animated widgets (tables, charts, schema diagrams, KPI cards) alongside natural-language explanations.
 
 ---
 
 ## Application Architecture
 
-DBTalker is a **full-stack application** split into two workspaces:
+DBTalkie is a **full-stack application** split into two workspaces:
 
 | Layer             | Location  | Stack                                         |
 | ----------------- | --------- | --------------------------------------------- |

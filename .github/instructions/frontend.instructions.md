@@ -2,7 +2,7 @@
 applyTo: "client/**"
 ---
 
-# DBTalker — Frontend Instructions
+# DBTalkie — Frontend Instructions
 
 These rules apply to **all files under `client/`**. Read them in full before writing or modifying any frontend code. For the overall project context, flow, and SSE contract, refer to [`copilot-instructions.md`](../copilot-instructions.md).
 

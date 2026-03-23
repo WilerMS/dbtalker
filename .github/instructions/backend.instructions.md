@@ -2,7 +2,7 @@
 applyTo: "server/**"
 ---
 
-# DBTalker — Backend Instructions
+# DBTalkie — Backend Instructions
 
 These rules apply to **all files under `server/`**. Read them in full before writing or modifying any backend code. For the overall project context, flow, and SSE contract, refer to [`copilot-instructions.md`](../copilot-instructions.md).
 
