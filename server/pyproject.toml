@@ -13,3 +13,17 @@ dependencies = [
 
 [tool.uv]
 package = false
+
+[tool.ruff]
+# Longitud de línea (como el printWidth de Prettier)
+line-length = 100
+
+[tool.ruff.lint]
+# Selecciona las reglas (E = Errores, F = Pyflakes, I = Isort, B = Bugbear)
+select = ["E", "F", "I", "B"]
+# Ignora reglas específicas si te molestan
+ignore = []
+
+[tool.ruff.format]
+# Usa comillas dobles (estilo Black)
+quote-style = "double"
