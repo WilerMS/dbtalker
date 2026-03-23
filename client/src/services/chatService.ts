@@ -18,170 +18,220 @@ interface ApiCompleteMessage {
   timestamp: string
 }
 
-const toCompleteMessage = (message: ApiCompleteMessage): CompleteMessage => {
-  return {
-    ...message,
-    timestamp: new Date(message.timestamp),
-  }
+interface StreamState {
+  queue: SSEChunk[]
+  notifyNextChunk: (() => void) | null
+  isStreamDone: boolean
+  streamError: Error | null
 }
 
-const parseChunk = (rawData: string): SSEChunk => {
-  const chunk = JSON.parse(rawData) as unknown
+export class ChatService {
+  private readonly apiBaseUrl: string
 
-  if (typeof chunk !== 'object' || chunk === null || !('event' in chunk)) {
-    throw new Error('Malformed SSE chunk from server.')
+  constructor(apiBaseUrl: string = API_BASE_URL) {
+    this.apiBaseUrl = apiBaseUrl
   }
 
-  if (chunk.event === 'finished') return { event: 'finished' }
+  public async getDatabaseMessages(
+    databaseId: string,
+  ): Promise<CompleteMessage[]> {
+    const url = this.buildDatabaseMessagesUrl(databaseId)
+    const response = await fetch(url)
 
-  if (
-    (chunk.event === 'incoming' || chunk.event === 'data') &&
-    'type' in chunk &&
-    typeof chunk.type === 'string'
-  ) {
-    if (chunk.event === 'incoming') {
-      return {
-        event: 'incoming',
-        type: chunk.type as MessageType,
-      }
+    if (!response.ok) {
+      throw new Error(
+        `Failed to load chat messages. Status: ${response.status} ${response.statusText}`,
+      )
     }
 
-    if ('data' in chunk) {
-      return {
-        event: 'data',
-        type: chunk.type as MessageType,
-        data: chunk.data as MessageData,
-      }
-    }
+    const payload = (await response.json()) as ApiCompleteMessage[]
+    return payload.map((message) => this.toCompleteMessage(message))
   }
 
-  throw new Error('Invalid SSE chunk shape received from server.')
-}
+  public async *streamAiResponse(
+    query: string,
+    databaseId: string,
+  ): AsyncGenerator<SSEChunk> {
+    const url = this.buildChatStreamUrl(query, databaseId)
+    const abortController = new AbortController()
+    const state = this.createStreamState()
 
-export const getInitialMessages = async (
-  databaseId: string,
-): Promise<CompleteMessage[]> => {
-  const url = new URL(`${API_BASE_URL}/chat/messages`)
-  url.searchParams.set('database_id', databaseId)
-
-  const response = await fetch(url)
-  if (!response.ok) {
-    throw new Error(
-      `Failed to load chat messages. Status: ${response.status} ${response.statusText}`,
-    )
-  }
-
-  const payload = (await response.json()) as ApiCompleteMessage[]
-  return payload.map(toCompleteMessage)
-}
-
-export async function* streamAssistantResponse(
-  query: string,
-  databaseId: string,
-): AsyncGenerator<SSEChunk> {
-  const url = new URL(`${API_BASE_URL}/chat/stream`)
-  url.searchParams.set('query', query)
-  url.searchParams.set('database_id', databaseId)
-
-  const abortController = new AbortController()
-  const queue: SSEChunk[] = []
-
-  let notifyNextChunk: (() => void) | null = null
-  let isStreamDone = false
-  let streamError: Error | null = null
-
-  const wakeUpReader = (): void => {
-    if (!notifyNextChunk) {
-      return
-    }
-
-    notifyNextChunk()
-    notifyNextChunk = null
-  }
-
-  const pushChunk = (chunk: SSEChunk): void => {
-    queue.push(chunk)
-    wakeUpReader()
-  }
-
-  const streamRequest = fetchEventSource(url.toString(), {
-    method: 'GET',
-    signal: abortController.signal,
-    onmessage: (event) => {
-      try {
-        const chunk = parseChunk(event.data)
-        pushChunk(chunk)
-
-        if (chunk.event === 'finished') {
-          isStreamDone = true
-          abortController.abort()
-          wakeUpReader()
+    const streamRequest = fetchEventSource(url.toString(), {
+      method: 'GET',
+      signal: abortController.signal,
+      onmessage: (event) => {
+        this.handleMessageEvent(event.data, state, abortController)
+      },
+      onerror: (error) => {
+        if (state.isStreamDone) {
+          return
         }
-      } catch (error) {
-        streamError =
-          error instanceof Error
-            ? error
-            : new Error('Unexpected SSE parse error.')
-        isStreamDone = true
-        abortController.abort()
-        wakeUpReader()
-      }
-    },
-    onerror: (error) => {
-      if (isStreamDone) {
+
+        throw this.handleStreamFailure(
+          error,
+          state,
+          'SSE stream connection was interrupted.',
+        )
+      },
+      onclose: () => {
+        this.finishStream(state)
+      },
+    }).catch((error) => {
+      if (abortController.signal.aborted && state.isStreamDone) {
         return
       }
 
-      streamError =
-        error instanceof Error
-          ? error
-          : new Error('SSE stream connection was interrupted.')
-      isStreamDone = true
-      wakeUpReader()
+      this.handleStreamFailure(
+        error,
+        state,
+        'SSE stream connection was interrupted.',
+      )
+    })
 
-      throw streamError
-    },
-    onclose: () => {
-      isStreamDone = true
-      wakeUpReader()
-    },
-  }).catch((error) => {
-    if (abortController.signal.aborted && isStreamDone) {
+    try {
+      while (!state.isStreamDone || state.queue.length > 0) {
+        if (state.queue.length === 0) {
+          await this.waitForNextChunk(state)
+        }
+
+        if (state.streamError) {
+          throw state.streamError
+        }
+
+        while (state.queue.length > 0) {
+          const chunk = state.queue.shift()
+
+          if (!chunk) {
+            continue
+          }
+
+          yield chunk
+        }
+      }
+    } finally {
+      abortController.abort()
+      await streamRequest
+    }
+  }
+
+  private buildDatabaseMessagesUrl(databaseId: string): URL {
+    const url = new URL(`${this.apiBaseUrl}/chat/messages`)
+    url.searchParams.set('database_id', databaseId)
+    return url
+  }
+
+  private buildChatStreamUrl(query: string, databaseId: string): URL {
+    const url = new URL(`${this.apiBaseUrl}/chat/stream`)
+    url.searchParams.set('query', query)
+    url.searchParams.set('database_id', databaseId)
+    return url
+  }
+
+  private toCompleteMessage(message: ApiCompleteMessage): CompleteMessage {
+    return {
+      ...message,
+      timestamp: new Date(message.timestamp),
+    }
+  }
+
+  private parseChunk(rawData: string): SSEChunk {
+    const chunk = JSON.parse(rawData) as unknown
+
+    if (typeof chunk !== 'object' || chunk === null || !('event' in chunk)) {
+      throw new Error('Malformed SSE chunk from server.')
+    }
+
+    if (chunk.event === 'finished') {
+      return { event: 'finished' }
+    }
+
+    if (
+      (chunk.event === 'incoming' || chunk.event === 'data') &&
+      'type' in chunk &&
+      typeof chunk.type === 'string'
+    ) {
+      if (chunk.event === 'incoming') {
+        return {
+          event: 'incoming',
+          type: chunk.type as MessageType,
+        }
+      }
+
+      if ('data' in chunk) {
+        return {
+          event: 'data',
+          type: chunk.type as MessageType,
+          data: chunk.data as MessageData,
+        }
+      }
+    }
+
+    throw new Error('Invalid SSE chunk shape received from server.')
+  }
+
+  private createStreamState(): StreamState {
+    return {
+      queue: [],
+      notifyNextChunk: null,
+      isStreamDone: false,
+      streamError: null,
+    }
+  }
+
+  private waitForNextChunk(state: StreamState): Promise<void> {
+    return new Promise<void>((resolve) => {
+      state.notifyNextChunk = resolve
+    })
+  }
+
+  private wakeUpReader(state: StreamState): void {
+    if (!state.notifyNextChunk) {
       return
     }
 
-    streamError =
-      error instanceof Error
-        ? error
-        : new Error('SSE stream connection was interrupted.')
-    isStreamDone = true
-    wakeUpReader()
-  })
+    state.notifyNextChunk()
+    state.notifyNextChunk = null
+  }
 
-  try {
-    while (!isStreamDone || queue.length > 0) {
-      if (queue.length === 0) {
-        await new Promise<void>((resolve) => {
-          notifyNextChunk = resolve
-        })
+  private pushChunk(state: StreamState, chunk: SSEChunk): void {
+    state.queue.push(chunk)
+    this.wakeUpReader(state)
+  }
+
+  private finishStream(state: StreamState): void {
+    state.isStreamDone = true
+    this.wakeUpReader(state)
+  }
+
+  private handleMessageEvent(
+    rawData: string,
+    state: StreamState,
+    abortController: AbortController,
+  ): void {
+    try {
+      const chunk = this.parseChunk(rawData)
+      this.pushChunk(state, chunk)
+
+      if (chunk.event === 'finished') {
+        this.finishStream(state)
+        abortController.abort()
       }
-
-      if (streamError) {
-        throw streamError
-      }
-
-      while (queue.length > 0) {
-        const chunk = queue.shift()
-
-        if (!chunk) {
-          continue
-        }
-
-        yield chunk
-      }
+    } catch (error) {
+      this.handleStreamFailure(error, state, 'Unexpected SSE parse error.')
+      abortController.abort()
     }
-  } finally {
-    abortController.abort()
-    await streamRequest
+  }
+
+  private handleStreamFailure(
+    error: unknown,
+    state: StreamState,
+    fallbackMessage: string,
+  ): Error {
+    const normalizedError =
+      error instanceof Error ? error : new Error(fallbackMessage)
+
+    state.streamError = normalizedError
+    this.finishStream(state)
+    return normalizedError
   }
 }

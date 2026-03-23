@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useMemo, useEffect, useRef, useState } from 'react'
 
 import type {
   CompleteMessage,
@@ -6,10 +6,7 @@ import type {
   MessageType,
   PendingMessage,
 } from '../types/chat'
-import {
-  getInitialMessages,
-  streamAssistantResponse,
-} from '../services/chatService'
+import { ChatService } from '../services/chatService'
 
 export interface UseChatResult {
   messages: Message[]
@@ -40,6 +37,7 @@ const buildPendingMessage = (type: MessageType): PendingMessage => {
 }
 
 export const useChat = (databaseId: string): UseChatResult => {
+  const chatService = useMemo(() => new ChatService(), [])
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
@@ -54,7 +52,8 @@ export const useChat = (databaseId: string): UseChatResult => {
 
     const initialize = async (): Promise<void> => {
       try {
-        const initialMessages = await getInitialMessages(databaseId)
+        const initialMessages =
+          await chatService.getDatabaseMessages(databaseId)
 
         if (isMounted) {
           setMessages(initialMessages)
@@ -71,7 +70,7 @@ export const useChat = (databaseId: string): UseChatResult => {
     return () => {
       isMounted = false
     }
-  }, [databaseId])
+  }, [chatService, databaseId])
 
   const sendMessage = async (text: string): Promise<void> => {
     const nextText = text.trim()
@@ -85,7 +84,10 @@ export const useChat = (databaseId: string): UseChatResult => {
     pendingIdRef.current = null
 
     try {
-      for await (const chunk of streamAssistantResponse(nextText, databaseId)) {
+      for await (const chunk of chatService.streamAiResponse(
+        nextText,
+        databaseId,
+      )) {
         if (chunk.event === 'incoming') {
           // Thinking phase is over — switch from generic loading to skeleton
           setIsLoading(false)
