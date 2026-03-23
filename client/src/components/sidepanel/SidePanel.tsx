@@ -37,7 +37,7 @@ export const SidePanel = ({
             ◉
           </span>
           <span className="text-[9px] tracking-[0.14em] text-zinc-300 uppercase">
-            KubePath
+            DBTalker
           </span>
         </header>
 
