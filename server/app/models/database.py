@@ -1,8 +1,3 @@
-"""
-Pydantic models for DBTalker backend.
-Mirrors TypeScript types from client/src/types/chat.ts and client/src/types/database.ts
-"""
-
 from __future__ import annotations
 
 from datetime import datetime
