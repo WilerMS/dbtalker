@@ -18,6 +18,7 @@ class DatabaseRecord(BaseModel):
     id: str
     name: str
     engine: DatabaseEngine
+    icon: str
     description: str | None = None
     created_at: datetime
     updated_at: datetime
