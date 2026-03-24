@@ -1,32 +1,18 @@
 import type { JSX } from 'react'
 
 import { MainChat } from '../chat/MainChat'
-import { SidePanel } from '../sidepanel/SidePanel'
 import type { UseChatResult } from '../../hooks/useChat'
-import type { DatabaseRecord } from '../../types/database'
 
-interface ChatLayoutProps extends UseChatResult {
-  databases: DatabaseRecord[]
-  selectedDatabaseId: string
-  onSelectDatabase: (databaseId: string) => void
-}
+type ChatLayoutProps = UseChatResult
 
 export const ChatLayout = ({
-  databases,
   isLoading,
   isStreaming,
   messages,
-  onSelectDatabase,
-  selectedDatabaseId,
   sendMessage,
 }: ChatLayoutProps): JSX.Element => {
   return (
-    <div className="relative flex h-screen overflow-hidden text-zinc-100">
-      <SidePanel
-        databases={databases}
-        onSelectDatabase={onSelectDatabase}
-        selectedDatabaseId={selectedDatabaseId}
-      />
+    <div className="relative flex h-full overflow-hidden text-zinc-100">
       <MainChat
         isLoading={isLoading}
         isStreaming={isStreaming}
