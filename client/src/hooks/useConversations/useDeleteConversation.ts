@@ -10,7 +10,7 @@ interface DeleteConversationMutationInput {
 export const useDeleteConversation = () => {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const query = useMutation({
     mutationFn: async ({
       databaseId,
       conversationId,
@@ -23,4 +23,9 @@ export const useDeleteConversation = () => {
       })
     },
   })
+
+  return {
+    deleteConversation: query.mutateAsync,
+    ...query,
+  }
 }

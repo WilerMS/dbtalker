@@ -10,7 +10,7 @@ interface CreateConversationMutationInput extends CreateConversationInput {
 export const useCreateConversation = () => {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const query = useMutation({
     mutationFn: async ({
       databaseId,
       ...input
@@ -23,4 +23,9 @@ export const useCreateConversation = () => {
       })
     },
   })
+
+  return {
+    createConversation: query.mutateAsync,
+    ...query,
+  }
 }
