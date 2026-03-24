@@ -14,7 +14,10 @@ const App = (): JSX.Element => {
       <Route path="/app" element={<AppLayout />}>
         <Route index element={<MainPage />} />
         <Route path="settings" element={<SettingsPage />} />
-        <Route path=":id_db" element={<MainPage />} />
+        <Route
+          path=":id_db/conversations/:id_conversation"
+          element={<MainPage />}
+        />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

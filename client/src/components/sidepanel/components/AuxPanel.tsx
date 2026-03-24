@@ -35,6 +35,17 @@ export const AuxPanel = ({
   const { deleteConversation } = useDeleteConversation()
   const { conversations = [], isLoading } = useGetConversations(database?.id)
 
+  const handleCreateConversation = async (databaseId: string) => {
+    onMouseLeave()
+
+    const newConversation = await createConversation({
+      databaseId,
+      title: 'Nueva conversacion',
+    })
+
+    navigate(`/app/${databaseId}/conversations/${newConversation.id}`)
+  }
+
   // Database handlers here
   // TODO: Esto se implementará cuando tenga el panel de add database
 
@@ -76,7 +87,7 @@ export const AuxPanel = ({
                 conversations={conversations}
                 onClickConversation={(conversationId) =>
                   void navigate(
-                    `/${database.id}/conversations/${conversationId}`,
+                    `/app/${database.id}/conversations/${conversationId}`,
                   )
                 }
                 onDeleteConversation={(conversationId) => {
@@ -92,12 +103,7 @@ export const AuxPanel = ({
           <div className="border-t border-zinc-800/80 p-3">
             <button
               type="button"
-              onClick={() =>
-                void createConversation({
-                  databaseId: database.id,
-                  title: 'Nueva conversacion',
-                })
-              }
+              onClick={() => handleCreateConversation(database.id)}
               className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-zinc-700/80 bg-zinc-900/50 px-3 py-2 text-xs font-medium text-zinc-300 transition-all duration-300 ease-out hover:border-emerald-400/25 hover:bg-emerald-400/8 hover:text-zinc-100 hover:shadow-[0_0_14px_rgba(52,211,153,0.1)] focus-visible:border-emerald-400/25 focus-visible:bg-emerald-400/8 focus-visible:text-zinc-100 focus-visible:shadow-[0_0_14px_rgba(52,211,153,0.1)] focus-visible:outline-none"
             >
               <Plus size={14} />
