@@ -1,80 +1,29 @@
-import { useEffect, useRef, useState } from 'react'
-import type { JSX } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Database, Leaf, HardDrive, Settings, LogOut, Plus } from 'lucide-react'
+import { useState } from 'react'
+import type { FC } from 'react'
+import { Settings, LogOut, Plus } from 'lucide-react'
 import type { DatabaseRecord } from '../../types/database'
-import { getConversationsByDatabaseId } from '../../services/dbService'
 import { SidePanelAuxPanel } from './components/SidePanelAuxPanel'
-import type { ConversationItem } from './components/SidePanelConversationList'
 import { SidePanelItemButton } from './components/SidePanelItemButton'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useGetDatabases } from '../../hooks/useDatabases/useGetDatabases'
+import { useGetConversations } from '../../hooks/useConversations'
+import { DynamicIcon } from '../ui/DynamicIcon'
+import { useDelayedHide } from './hooks/useDelayedHide'
 
-interface SidePanelProps {
-  databases: DatabaseRecord[]
-  selectedDatabaseId: string
-  onSelectDatabase: (databaseId: string) => void
-}
+export const SidePanel: FC = () => {
+  const navigate = useNavigate()
 
-const getDatabaseIcon = (engine: DatabaseRecord['engine']): JSX.Element => {
-  switch (engine) {
-    case 'mongodb':
-      return <Leaf size={20} />
-    case 'sqlite':
-      return <HardDrive size={20} />
-    case 'postgresql':
-    default:
-      return <Database size={20} />
-  }
-}
+  const { id_db: selectedDatabaseId } = useParams<{ id_db: string }>()
+  const { data: databases = [] } = useGetDatabases()
 
-export const SidePanel = ({
-  databases,
-  onSelectDatabase,
-  selectedDatabaseId,
-}: SidePanelProps): JSX.Element => {
-  const [hoveredRect, setHoveredRect] = useState<DOMRect | null>(null)
-  const [hoveredDatabase, setHoveredDatabase] = useState<DatabaseRecord | null>(
-    null,
+  const [hoveredDb, setHoveredDb] = useState<DatabaseRecord>()
+  const [hoveredRect, setHoveredRect] = useState<DOMRect>()
+  const { conversations = [], isLoadingConversations } = useGetConversations(
+    hoveredDb?.id,
   )
-  const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (hideTimeout.current !== null) {
-        clearTimeout(hideTimeout.current)
-      }
-    }
-  }, [])
-
-  // Fetch conversations for the hovered database
-  const { data: conversations = [], isLoading: isLoadingConversations } =
-    useQuery({
-      queryKey: ['conversations', hoveredDatabase?.id],
-      queryFn: () => {
-        if (!hoveredDatabase) return Promise.resolve([])
-        return getConversationsByDatabaseId(hoveredDatabase.id)
-      },
-      enabled: !!hoveredDatabase,
-    })
-
-  const conversationItems: ConversationItem[] = conversations.map((conv) => ({
-    id: conv.id,
-    title: conv.title,
-  }))
-
-  const cancelHide = () => {
-    if (hideTimeout.current !== null) {
-      clearTimeout(hideTimeout.current)
-      hideTimeout.current = null
-    }
-  }
-
-  const scheduleHide = () => {
-    cancelHide()
-    hideTimeout.current = setTimeout(() => {
-      setHoveredRect(null)
-      setHoveredDatabase(null)
-    }, 120)
-  }
+  const { cancelHide, scheduleHide } = useDelayedHide(() => {
+    setHoveredDb(undefined)
+  })
 
   return (
     <aside className="pointer-events-none z-30">
@@ -94,23 +43,21 @@ export const SidePanel = ({
         {databases.map((database) => (
           <div
             key={database.id}
+            onMouseLeave={scheduleHide}
             onMouseEnter={(e) => {
               cancelHide()
-              setHoveredRect(
-                (e.currentTarget as HTMLDivElement).getBoundingClientRect(),
-              )
-              setHoveredDatabase(database)
+              setHoveredDb(database)
+              setHoveredRect(e.currentTarget.getBoundingClientRect())
             }}
-            onMouseLeave={scheduleHide}
           >
             <SidePanelItemButton
               ariaLabel={database.name}
               isActive={database.id === selectedDatabaseId}
               onClick={() => {
-                onSelectDatabase(database.id)
+                void navigate(`/${database.id}`)
               }}
             >
-              {getDatabaseIcon(database.engine)}
+              <DynamicIcon name={database.icon} size={20} />
             </SidePanelItemButton>
           </div>
         ))}
@@ -135,45 +82,42 @@ export const SidePanel = ({
       </nav>
 
       <SidePanelAuxPanel
-        anchorRect={hoveredRect}
-        database={hoveredDatabase}
-        conversations={conversationItems}
+        anchorRect={hoveredRect || null}
+        database={hoveredDb || null}
+        conversations={conversations}
         isLoading={isLoadingConversations}
-        isVisible={hoveredRect !== null && hoveredDatabase !== null}
+        isVisible={hoveredRect !== null && hoveredDb !== null}
         onMouseEnter={cancelHide}
         onMouseLeave={scheduleHide}
         onEditDatabase={() => {
-          if (!hoveredDatabase) return
-          console.log('Editar base de datos', hoveredDatabase.id)
+          if (!hoveredDb) return
+          console.log('Editar base de datos', hoveredDb.id)
         }}
         onDeleteDatabase={() => {
-          if (!hoveredDatabase) return
-          console.log('Eliminar base de datos', hoveredDatabase.id)
+          if (!hoveredDb) return
+          console.log('Eliminar base de datos', hoveredDb.id)
         }}
         onDeleteConversation={(conversationId) => {
-          if (!hoveredDatabase) return
+          if (!hoveredDb) return
           console.log(
             'Eliminar conversacion',
             conversationId,
             'de la base de datos',
-            hoveredDatabase.id,
+            hoveredDb.id,
           )
         }}
         onClickConversation={(conversationId) => {
-          if (!hoveredDatabase) return
+          if (!hoveredDb) return
           console.log(
             'Abrir conversacion',
             conversationId,
             'de la base de datos',
-            hoveredDatabase.id,
+            hoveredDb.id,
           )
         }}
         onClickNewConversation={() => {
-          if (!hoveredDatabase) return
-          console.log(
-            'Nueva conversacion para la base de datos',
-            hoveredDatabase.id,
-          )
+          if (!hoveredDb) return
+          console.log('Nueva conversacion para la base de datos', hoveredDb.id)
         }}
       />
     </aside>

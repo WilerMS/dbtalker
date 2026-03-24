@@ -4,6 +4,7 @@ export interface DatabaseRecord {
   id: string
   name: string
   engine: DatabaseEngine
+  icon: string
   description?: string
   createdAt: Date
   updatedAt: Date
@@ -25,8 +26,8 @@ export interface ConversationRecord {
   id: string
   database_id: string
   title: string
-  created_at: Date
-  updated_at: Date
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface CreateConversationInput {

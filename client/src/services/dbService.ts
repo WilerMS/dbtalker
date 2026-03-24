@@ -13,6 +13,7 @@ interface ApiDatabaseRecord {
   id: string
   name: string
   engine: DatabaseRecord['engine']
+  icon: string
   description?: string
   created_at: string
   updated_at: string
@@ -31,6 +32,7 @@ const mapDatabaseRecord = (database: ApiDatabaseRecord): DatabaseRecord => {
     id: database.id,
     name: database.name,
     engine: database.engine,
+    icon: database.icon,
     description: database.description,
     createdAt: new Date(database.created_at),
     updatedAt: new Date(database.updated_at),
@@ -44,8 +46,8 @@ const mapConversationRecord = (
     id: conversation.id,
     database_id: conversation.database_id,
     title: conversation.title,
-    created_at: new Date(conversation.created_at),
-    updated_at: new Date(conversation.updated_at),
+    createdAt: new Date(conversation.created_at),
+    updatedAt: new Date(conversation.updated_at),
   }
 }
 

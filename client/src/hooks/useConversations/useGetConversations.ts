@@ -8,7 +8,7 @@ export const getConversationsQueryKey = (databaseId: string) =>
   [...CONVERSATIONS_QUERY_KEY, databaseId] as const
 
 export const useGetConversations = (databaseId?: string) => {
-  return useQuery<ConversationRecord[]>({
+  const query = useQuery<ConversationRecord[]>({
     queryKey: getConversationsQueryKey(databaseId ?? ''),
     queryFn: () => {
       if (!databaseId) {
@@ -19,4 +19,11 @@ export const useGetConversations = (databaseId?: string) => {
     },
     enabled: Boolean(databaseId),
   })
+
+  return {
+    conversations: query.data,
+    isLoadingConversations: query.isLoading,
+    isErrorConversations: query.isError,
+    refetchConversations: query.refetch,
+  }
 }

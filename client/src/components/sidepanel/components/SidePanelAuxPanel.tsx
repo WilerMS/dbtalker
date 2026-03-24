@@ -2,11 +2,11 @@ import type { JSX } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
-import type { DatabaseRecord } from '../../../types/database'
-import {
-  SidePanelConversationList,
-  type ConversationItem,
-} from './SidePanelConversationList'
+import type {
+  ConversationRecord,
+  DatabaseRecord,
+} from '../../../types/database'
+import { SidePanelConversationList } from './SidePanelConversationList'
 import { SidePanelDatabaseActions } from './SidePanelDatabaseActions'
 
 const PANEL_MIN_HEIGHT = 350
@@ -21,7 +21,7 @@ const PANEL_GLOW_SHADOW =
 interface SidePanelAuxPanelProps {
   anchorRect: DOMRect | null
   database: DatabaseRecord | null
-  conversations: ConversationItem[]
+  conversations: ConversationRecord[]
   isLoading?: boolean
   isVisible: boolean
   onMouseEnter: () => void
