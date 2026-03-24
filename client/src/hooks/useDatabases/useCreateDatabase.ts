@@ -6,10 +6,15 @@ import { DATABASES_QUERY_KEY } from './useGetDatabases'
 export const useCreateDatabase = () => {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const query = useMutation({
     mutationFn: (input: CreateDatabaseInput) => createDatabase(input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: DATABASES_QUERY_KEY })
     },
   })
+
+  return {
+    createDatabase: query.mutateAsync,
+    ...query,
+  }
 }

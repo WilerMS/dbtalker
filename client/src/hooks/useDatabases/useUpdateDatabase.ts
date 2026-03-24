@@ -11,11 +11,16 @@ interface UpdateDatabaseVariables {
 export const useUpdateDatabase = () => {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const query = useMutation({
     mutationFn: ({ id, input }: UpdateDatabaseVariables) =>
       updateDatabase(id, input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: DATABASES_QUERY_KEY })
     },
   })
+
+  return {
+    updateDatabase: query.mutateAsync,
+    ...query,
+  }
 }
