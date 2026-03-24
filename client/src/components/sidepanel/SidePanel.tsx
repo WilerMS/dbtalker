@@ -41,7 +41,6 @@ export const SidePanel: FC = () => {
           <SidePanelItemButton
             key={database.id}
             isActive={database.id === selectedDatabaseId}
-            onClick={() => void navigate(`/app/${database.id}`)}
             onMouseLeave={scheduleHide}
             onMouseEnter={(e) => {
               cancelHide()
