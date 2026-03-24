@@ -38,8 +38,10 @@ export const SidePanel: FC = () => {
         </header>
 
         {databases.map((database) => (
-          <div
+          <SidePanelItemButton
             key={database.id}
+            isActive={database.id === selectedDatabaseId}
+            onClick={() => void navigate(`/${database.id}`)}
             onMouseLeave={scheduleHide}
             onMouseEnter={(e) => {
               cancelHide()
@@ -47,13 +49,8 @@ export const SidePanel: FC = () => {
               setHoveredRect(e.currentTarget.getBoundingClientRect())
             }}
           >
-            <SidePanelItemButton
-              isActive={database.id === selectedDatabaseId}
-              onClick={() => void navigate(`/${database.id}`)}
-            >
-              <DynamicIcon name={database.icon} size={20} />
-            </SidePanelItemButton>
-          </div>
+            <DynamicIcon name={database.icon} size={20} />
+          </SidePanelItemButton>
         ))}
 
         <SidePanelItemButton title="Add database">
@@ -62,7 +59,10 @@ export const SidePanel: FC = () => {
 
         <div className="grow" />
 
-        <SidePanelItemButton title="Settings">
+        <SidePanelItemButton
+          onClick={() => void navigate('/app/settings')}
+          title="Settings"
+        >
           <Settings size={20} />
         </SidePanelItemButton>
 

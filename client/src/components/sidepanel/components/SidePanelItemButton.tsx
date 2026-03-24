@@ -1,11 +1,12 @@
-import type { JSX, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, JSX, ReactNode } from 'react'
 
-interface SidePanelItemButtonProps {
-  title?: string
+interface SidePanelItemButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children' | 'type'
+> {
   children: ReactNode
   isActive?: boolean
   variant?: 'default' | 'danger'
-  onClick?: () => void
 }
 
 const baseButtonClassName =
@@ -25,7 +26,8 @@ export const SidePanelItemButton = ({
   children,
   isActive = false,
   variant = 'default',
-  onClick,
+  className = '',
+  ...buttonProps
 }: SidePanelItemButtonProps): JSX.Element => {
   const accentHighlightClassName =
     variant === 'danger' ? 'to-rose-300/12' : 'to-emerald-300/10'
@@ -51,8 +53,8 @@ export const SidePanelItemButton = ({
       type="button"
       title={title}
       aria-current={isActive}
-      onClick={onClick}
-      className={`shrink-0 ${baseButtonClassName} ${stateClassName}`}
+      className={`shrink-0 ${baseButtonClassName} ${stateClassName} ${className}`}
+      {...buttonProps}
     >
       <span
         aria-hidden
