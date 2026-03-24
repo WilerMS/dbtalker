@@ -60,3 +60,16 @@ class ConversationController:
         if not self._database_service.get_database_by_id(database_id):
             raise ResourceNotFoundError(f"Database '{database_id}' not found.")
         return self._service.create_conversation(database_id, title)
+
+    def delete_conversation(self, database_id: str, conversation_id: str) -> bool:
+        """Delete a conversation that belongs to the specified database."""
+        if not self._database_service.get_database_by_id(database_id):
+            raise ResourceNotFoundError(f"Database '{database_id}' not found.")
+
+        was_deleted = self._service.delete_conversation(database_id, conversation_id)
+        if not was_deleted:
+            raise ResourceNotFoundError(
+                f"Conversation '{conversation_id}' not found for database '{database_id}'."
+            )
+
+        return True

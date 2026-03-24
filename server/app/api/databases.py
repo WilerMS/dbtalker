@@ -89,3 +89,16 @@ async def create_conversation_endpoint(
 ) -> ConversationRecord:
     """Create a new conversation for a database."""
     return conversation_controller.create_conversation(database_id, input_data.title)
+
+
+@router.delete(
+    "/{database_id}/conversations/{conversation_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_conversation_endpoint(
+    database_id: str,
+    conversation_id: str,
+    conversation_controller: ConversationControllerDep,
+) -> None:
+    """Delete a conversation for a database."""
+    conversation_controller.delete_conversation(database_id, conversation_id)

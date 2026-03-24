@@ -9,6 +9,7 @@ from __future__ import annotations
 from app.mocks.conversations import (
     create_conversation as mock_create_conversation,
 )
+from app.mocks.conversations import delete_conversation as mock_delete_conversation
 from app.mocks.conversations import (
     get_conversations_by_database as mock_get_conversations_by_database,
 )
@@ -25,3 +26,6 @@ class ConversationService:
 
     def create_conversation(self, database_id: str, title: str) -> ConversationRecord:
         return mock_create_conversation(database_id, title)
+
+    def delete_conversation(self, database_id: str, conversation_id: str) -> bool:
+        return mock_delete_conversation(database_id, conversation_id)

@@ -92,3 +92,13 @@ def create_conversation(database_id: str, title: str) -> ConversationRecord:
     )
     _conversations.append(new_conv)
     return new_conv
+
+
+def delete_conversation(database_id: str, conversation_id: str) -> bool:
+    """Delete a conversation if it belongs to the specified database."""
+    for index, conversation in enumerate(_conversations):
+        if conversation.id == conversation_id and conversation.database_id == database_id:
+            del _conversations[index]
+            return True
+
+    return False
