@@ -1,7 +1,12 @@
+import { useEffect, useRef, useState } from 'react'
 import type { JSX } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Database, Leaf, HardDrive, Settings, LogOut, Plus } from 'lucide-react'
-import type { DatabaseEngine, DatabaseRecord } from '../../types/database'
-import { SidePanelItemButton } from './SidePanelItemButton'
+import type { DatabaseRecord } from '../../types/database'
+import { getConversationsByDatabaseId } from '../../services/dbService'
+import { SidePanelAuxPanel } from './components/SidePanelAuxPanel'
+import type { ConversationItem } from './components/SidePanelConversationList'
+import { SidePanelItemButton } from './components/SidePanelItemButton'
 
 interface SidePanelProps {
   databases: DatabaseRecord[]
@@ -9,7 +14,7 @@ interface SidePanelProps {
   onSelectDatabase: (databaseId: string) => void
 }
 
-const getDatabaseIcon = (engine: DatabaseEngine): JSX.Element => {
+const getDatabaseIcon = (engine: DatabaseRecord['engine']): JSX.Element => {
   switch (engine) {
     case 'mongodb':
       return <Leaf size={20} />
@@ -26,6 +31,51 @@ export const SidePanel = ({
   onSelectDatabase,
   selectedDatabaseId,
 }: SidePanelProps): JSX.Element => {
+  const [hoveredRect, setHoveredRect] = useState<DOMRect | null>(null)
+  const [hoveredDatabase, setHoveredDatabase] = useState<DatabaseRecord | null>(
+    null,
+  )
+  const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (hideTimeout.current !== null) {
+        clearTimeout(hideTimeout.current)
+      }
+    }
+  }, [])
+
+  // Fetch conversations for the hovered database
+  const { data: conversations = [], isLoading: isLoadingConversations } =
+    useQuery({
+      queryKey: ['conversations', hoveredDatabase?.id],
+      queryFn: () => {
+        if (!hoveredDatabase) return Promise.resolve([])
+        return getConversationsByDatabaseId(hoveredDatabase.id)
+      },
+      enabled: !!hoveredDatabase,
+    })
+
+  const conversationItems: ConversationItem[] = conversations.map((conv) => ({
+    id: conv.id,
+    title: conv.title,
+  }))
+
+  const cancelHide = () => {
+    if (hideTimeout.current !== null) {
+      clearTimeout(hideTimeout.current)
+      hideTimeout.current = null
+    }
+  }
+
+  const scheduleHide = () => {
+    cancelHide()
+    hideTimeout.current = setTimeout(() => {
+      setHoveredRect(null)
+      setHoveredDatabase(null)
+    }, 120)
+  }
+
   return (
     <aside className="pointer-events-none z-30">
       <nav
@@ -42,17 +92,27 @@ export const SidePanel = ({
         </header>
 
         {databases.map((database) => (
-          <SidePanelItemButton
+          <div
             key={database.id}
-            ariaLabel={database.name}
-            title={database.name}
-            isActive={database.id === selectedDatabaseId}
-            onClick={() => {
-              onSelectDatabase(database.id)
+            onMouseEnter={(e) => {
+              cancelHide()
+              setHoveredRect(
+                (e.currentTarget as HTMLDivElement).getBoundingClientRect(),
+              )
+              setHoveredDatabase(database)
             }}
+            onMouseLeave={scheduleHide}
           >
-            {getDatabaseIcon(database.engine)}
-          </SidePanelItemButton>
+            <SidePanelItemButton
+              ariaLabel={database.name}
+              isActive={database.id === selectedDatabaseId}
+              onClick={() => {
+                onSelectDatabase(database.id)
+              }}
+            >
+              {getDatabaseIcon(database.engine)}
+            </SidePanelItemButton>
+          </div>
         ))}
 
         <SidePanelItemButton ariaLabel="Add database" title="Add database">
@@ -73,6 +133,49 @@ export const SidePanel = ({
           <LogOut size={20} />
         </SidePanelItemButton>
       </nav>
+
+      <SidePanelAuxPanel
+        anchorRect={hoveredRect}
+        database={hoveredDatabase}
+        conversations={conversationItems}
+        isLoading={isLoadingConversations}
+        isVisible={hoveredRect !== null && hoveredDatabase !== null}
+        onMouseEnter={cancelHide}
+        onMouseLeave={scheduleHide}
+        onEditDatabase={() => {
+          if (!hoveredDatabase) return
+          console.log('Editar base de datos', hoveredDatabase.id)
+        }}
+        onDeleteDatabase={() => {
+          if (!hoveredDatabase) return
+          console.log('Eliminar base de datos', hoveredDatabase.id)
+        }}
+        onDeleteConversation={(conversationId) => {
+          if (!hoveredDatabase) return
+          console.log(
+            'Eliminar conversacion',
+            conversationId,
+            'de la base de datos',
+            hoveredDatabase.id,
+          )
+        }}
+        onClickConversation={(conversationId) => {
+          if (!hoveredDatabase) return
+          console.log(
+            'Abrir conversacion',
+            conversationId,
+            'de la base de datos',
+            hoveredDatabase.id,
+          )
+        }}
+        onClickNewConversation={() => {
+          if (!hoveredDatabase) return
+          console.log(
+            'Nueva conversacion para la base de datos',
+            hoveredDatabase.id,
+          )
+        }}
+      />
     </aside>
   )
 }
