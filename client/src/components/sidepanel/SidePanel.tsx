@@ -77,14 +77,6 @@ export const SidePanel: FC = () => {
         isVisible={Boolean(hoveredRect && hoveredDb)}
         onMouseEnter={cancelHide}
         onMouseLeave={scheduleHide}
-        onEditDatabase={() => {
-          if (!hoveredDb) return
-          console.log('Editar base de datos', hoveredDb.id)
-        }}
-        onDeleteDatabase={() => {
-          if (!hoveredDb) return
-          console.log('Eliminar base de datos', hoveredDb.id)
-        }}
       />
     </aside>
   )

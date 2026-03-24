@@ -17,8 +17,6 @@ interface AuxPanelProps {
   isVisible: boolean
   onMouseEnter: () => void
   onMouseLeave: () => void
-  onEditDatabase: () => void
-  onDeleteDatabase: () => void
 }
 
 export const AuxPanel = ({
@@ -27,16 +25,18 @@ export const AuxPanel = ({
   isVisible,
   onMouseEnter,
   onMouseLeave,
-  onEditDatabase,
-  onDeleteDatabase,
 }: AuxPanelProps) => {
   const isOpen = isVisible && Boolean(anchorRect && database)
 
   const navigate = useNavigate()
 
+  // Conversations handlers
   const { createConversation } = useCreateConversation()
   const { deleteConversation } = useDeleteConversation()
   const { conversations = [], isLoading } = useGetConversations(database?.id)
+
+  // Database handlers here
+  // TODO: Esto se implementará cuando tenga el panel de add database
 
   return (
     <AuxPanelWrapper
@@ -57,10 +57,11 @@ export const AuxPanel = ({
               </h3>
             </div>
 
+            {/* // TODO: Esto se implementará cuando tenga el panel de add database */}
             <SidePanelDatabaseActions
               compact
-              onEdit={onEditDatabase}
-              onDelete={onDeleteDatabase}
+              onEdit={() => {}} // TODO: Implementar edición de base de datos
+              onDelete={() => {}} // TODO: Implementar eliminación de base de datos
             />
           </header>
 
