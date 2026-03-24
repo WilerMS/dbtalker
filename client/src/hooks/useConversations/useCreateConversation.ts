@@ -3,24 +3,23 @@ import { createConversation } from '../../services/dbService'
 import type { CreateConversationInput } from '../../types/database'
 import { getConversationsQueryKey } from './useGetConversations'
 
-export const useCreateConversation = (databaseId?: string) => {
+interface CreateConversationMutationInput extends CreateConversationInput {
+  databaseId: string
+}
+
+export const useCreateConversation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (input: CreateConversationInput) => {
-      if (!databaseId) {
-        throw new Error('A databaseId is required to create a conversation.')
-      }
-
+    mutationFn: async ({
+      databaseId,
+      ...input
+    }: CreateConversationMutationInput) => {
       return createConversation(databaseId, input)
     },
-    onSuccess: async () => {
-      if (!databaseId) {
-        return
-      }
-
+    onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: getConversationsQueryKey(databaseId),
+        queryKey: getConversationsQueryKey(variables.databaseId),
       })
     },
   })

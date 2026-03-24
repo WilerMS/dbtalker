@@ -11,10 +11,7 @@ export const useGetConversations = (databaseId?: string) => {
   const query = useQuery<ConversationRecord[]>({
     queryKey: getConversationsQueryKey(databaseId ?? ''),
     queryFn: () => {
-      if (!databaseId) {
-        return Promise.resolve([])
-      }
-
+      if (!databaseId) return Promise.resolve([])
       return getConversationsByDatabaseId(databaseId)
     },
     enabled: Boolean(databaseId),
