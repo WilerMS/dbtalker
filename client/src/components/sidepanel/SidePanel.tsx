@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useGetDatabases } from '../../hooks/useDatabases/useGetDatabases'
 import { DynamicIcon } from '../ui/DynamicIcon'
 import { useDelayedHide } from './hooks/useDelayedHide'
+import { Logo } from '../ui/Logo'
 
 export const SidePanel: FC = () => {
   const navigate = useNavigate()
@@ -29,12 +30,15 @@ export const SidePanel: FC = () => {
         className="pointer-events-auto flex h-full w-20 flex-col items-center gap-3 border-r border-zinc-700/40 bg-linear-to-b from-zinc-900/62 via-emerald-950/48 to-zinc-900/58 py-4 shadow-[0_0_28px_rgba(16,185,129,0.1)] backdrop-blur-md"
       >
         <header className="mb-1 flex flex-col items-center gap-2 border-b border-zinc-800/85 pb-3">
-          <div className="size-10 bg-emerald-800/70 opacity-70">
-            {/* <img src={logo} alt="DBTalkie logo" className="" /> */}
-          </div>
-          <span className="text-[9px] tracking-[0.14em] text-zinc-300">
-            DBTalkie
-          </span>
+          <button
+            className="flex cursor-pointer flex-col items-center justify-center gap-2"
+            onClick={() => void navigate('/app')}
+          >
+            <Logo className="w-10 rounded-lg! p-2! [&>svg]:size-5" />
+            <span className="text-[9px] tracking-[0.14em] text-zinc-300">
+              DBTalkie
+            </span>
+          </button>
         </header>
 
         {databases.map((database) => (
