@@ -15,12 +15,16 @@ export const useGetConversations = (databaseId?: string) => {
       return getConversationsByDatabaseId(databaseId)
     },
     enabled: Boolean(databaseId),
+    // Keep cached conversations fresh for the entire app session.
+    // This prevents refetches when the aux panel re-mounts on hover.
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 
   return {
     conversations: query.data,
-    isLoadingConversations: query.isLoading,
-    isErrorConversations: query.isError,
-    refetchConversations: query.refetch,
+    ...query,
   }
 }
