@@ -20,3 +20,15 @@ export interface UpdateDatabaseInput {
   engine?: DatabaseEngine
   description?: string
 }
+
+export interface ConversationRecord {
+  id: string
+  database_id: string
+  title: string
+  created_at: Date
+  updated_at: Date
+}
+
+export interface CreateConversationInput {
+  title: string
+}

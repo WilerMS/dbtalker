@@ -1,4 +1,6 @@
 import type {
+  ConversationRecord,
+  CreateConversationInput,
   CreateDatabaseInput,
   DatabaseRecord,
   UpdateDatabaseInput,
@@ -16,6 +18,14 @@ interface ApiDatabaseRecord {
   updated_at: string
 }
 
+interface ApiConversationRecord {
+  id: string
+  database_id: string
+  title: string
+  created_at: string
+  updated_at: string
+}
+
 const mapDatabaseRecord = (database: ApiDatabaseRecord): DatabaseRecord => {
   return {
     id: database.id,
@@ -24,6 +34,18 @@ const mapDatabaseRecord = (database: ApiDatabaseRecord): DatabaseRecord => {
     description: database.description,
     createdAt: new Date(database.created_at),
     updatedAt: new Date(database.updated_at),
+  }
+}
+
+const mapConversationRecord = (
+  conversation: ApiConversationRecord,
+): ConversationRecord => {
+  return {
+    id: conversation.id,
+    database_id: conversation.database_id,
+    title: conversation.title,
+    created_at: new Date(conversation.created_at),
+    updated_at: new Date(conversation.updated_at),
   }
 }
 
@@ -125,4 +147,44 @@ export const deleteDatabase = async (id: string): Promise<boolean> => {
   }
 
   return true
+}
+
+export const getConversationsByDatabaseId = async (
+  databaseId: string,
+): Promise<ConversationRecord[]> => {
+  const response = await fetch(
+    `${API_BASE_URL}/databases/${encodeURIComponent(databaseId)}/conversations`,
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to load conversations for database '${databaseId}'. Status: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  const payload = (await response.json()) as ApiConversationRecord[]
+  return payload.map(mapConversationRecord)
+}
+
+export const createConversation = async (
+  databaseId: string,
+  input: CreateConversationInput,
+): Promise<ConversationRecord> => {
+  const response = await fetch(
+    `${API_BASE_URL}/databases/${encodeURIComponent(databaseId)}/conversations`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to create conversation. Status: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  const payload = (await response.json()) as ApiConversationRecord
+  return mapConversationRecord(payload)
 }
