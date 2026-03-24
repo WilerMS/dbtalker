@@ -2,11 +2,10 @@ import { useState } from 'react'
 import type { FC } from 'react'
 import { Settings, LogOut, Plus } from 'lucide-react'
 import type { DatabaseRecord } from '../../types/database'
-import { SidePanelAuxPanel } from './components/SidePanelAuxPanel'
+import { AuxPanel } from './components/AuxPanel'
 import { SidePanelItemButton } from './components/SidePanelItemButton'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useGetDatabases } from '../../hooks/useDatabases/useGetDatabases'
-import { useGetConversations } from '../../hooks/useConversations'
 import { DynamicIcon } from '../ui/DynamicIcon'
 import { useDelayedHide } from './hooks/useDelayedHide'
 
@@ -14,13 +13,11 @@ export const SidePanel: FC = () => {
   const navigate = useNavigate()
 
   const { id_db: selectedDatabaseId } = useParams<{ id_db: string }>()
-  const { data: databases = [] } = useGetDatabases()
+  const { databases = [] } = useGetDatabases()
 
   const [hoveredDb, setHoveredDb] = useState<DatabaseRecord>()
   const [hoveredRect, setHoveredRect] = useState<DOMRect>()
-  const { conversations = [], isLoadingConversations } = useGetConversations(
-    hoveredDb?.id,
-  )
+
   const { cancelHide, scheduleHide } = useDelayedHide(() => {
     setHoveredDb(undefined)
   })
@@ -51,42 +48,33 @@ export const SidePanel: FC = () => {
             }}
           >
             <SidePanelItemButton
-              ariaLabel={database.name}
               isActive={database.id === selectedDatabaseId}
-              onClick={() => {
-                void navigate(`/${database.id}`)
-              }}
+              onClick={() => void navigate(`/${database.id}`)}
             >
               <DynamicIcon name={database.icon} size={20} />
             </SidePanelItemButton>
           </div>
         ))}
 
-        <SidePanelItemButton ariaLabel="Add database" title="Add database">
+        <SidePanelItemButton title="Add database">
           <Plus size={20} />
         </SidePanelItemButton>
 
         <div className="grow" />
 
-        <SidePanelItemButton ariaLabel="Settings" title="Settings">
+        <SidePanelItemButton title="Settings">
           <Settings size={20} />
         </SidePanelItemButton>
 
-        <SidePanelItemButton
-          ariaLabel="Log out"
-          title="Log out"
-          variant="danger"
-        >
+        <SidePanelItemButton title="Log out" variant="danger">
           <LogOut size={20} />
         </SidePanelItemButton>
       </nav>
 
-      <SidePanelAuxPanel
-        anchorRect={hoveredRect || null}
-        database={hoveredDb || null}
-        conversations={conversations}
-        isLoading={isLoadingConversations}
-        isVisible={hoveredRect !== null && hoveredDb !== null}
+      <AuxPanel
+        anchorRect={hoveredRect}
+        database={hoveredDb}
+        isVisible={Boolean(hoveredRect && hoveredDb)}
         onMouseEnter={cancelHide}
         onMouseLeave={scheduleHide}
         onEditDatabase={() => {
@@ -96,28 +84,6 @@ export const SidePanel: FC = () => {
         onDeleteDatabase={() => {
           if (!hoveredDb) return
           console.log('Eliminar base de datos', hoveredDb.id)
-        }}
-        onDeleteConversation={(conversationId) => {
-          if (!hoveredDb) return
-          console.log(
-            'Eliminar conversacion',
-            conversationId,
-            'de la base de datos',
-            hoveredDb.id,
-          )
-        }}
-        onClickConversation={(conversationId) => {
-          if (!hoveredDb) return
-          console.log(
-            'Abrir conversacion',
-            conversationId,
-            'de la base de datos',
-            hoveredDb.id,
-          )
-        }}
-        onClickNewConversation={() => {
-          if (!hoveredDb) return
-          console.log('Nueva conversacion para la base de datos', hoveredDb.id)
         }}
       />
     </aside>
