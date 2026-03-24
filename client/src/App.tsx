@@ -5,7 +5,6 @@ import { AppLayout } from './components/layout/AppLayout'
 import { LandingPage } from './components/layout/LandingPage'
 import { MainPage } from './pages/MainPage'
 import { SettingsPage } from './pages/SettingsPage'
-import { DatabaseRoute } from './routes/DatabaseRoute'
 
 const App = (): JSX.Element => {
   return (
@@ -15,7 +14,7 @@ const App = (): JSX.Element => {
       <Route path="/app" element={<AppLayout />}>
         <Route index element={<MainPage />} />
         <Route path="settings" element={<SettingsPage />} />
-        <Route path=":id_db" element={<DatabaseRoute />} />
+        <Route path=":id_db" element={<MainPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

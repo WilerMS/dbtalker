@@ -2,17 +2,17 @@ import type { JSX } from 'react'
 import { Trash2 } from 'lucide-react'
 import type { ConversationRecord } from '../../../types/database'
 
-interface SidePanelConversationListProps {
+interface ConversationListProps {
   conversations: ConversationRecord[]
   onDeleteConversation: (conversationId: string) => void
   onClickConversation: (conversationId: string) => void
 }
 
-export const SidePanelConversationList = ({
+export const ConversationList = ({
   conversations,
   onDeleteConversation,
   onClickConversation,
-}: SidePanelConversationListProps): JSX.Element => {
+}: ConversationListProps): JSX.Element => {
   return (
     <div className="flex max-h-72 w-full flex-1 flex-col overflow-y-auto px-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {conversations.map((conversation) => (

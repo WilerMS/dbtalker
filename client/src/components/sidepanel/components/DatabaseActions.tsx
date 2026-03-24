@@ -1,7 +1,7 @@
 import type { JSX } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 
-interface SidePanelDatabaseActionsProps {
+interface DatabaseActionsProps {
   onEdit: () => void
   onDelete: () => void
   compact?: boolean
@@ -10,11 +10,11 @@ interface SidePanelDatabaseActionsProps {
 const actionButtonClassName =
   'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-800/90 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-300 transition-all duration-300 ease-out hover:scale-105 hover:border-emerald-300/65 hover:text-emerald-200'
 
-export const SidePanelDatabaseActions = ({
+export const DatabaseActions = ({
   onEdit,
   onDelete,
   compact = false,
-}: SidePanelDatabaseActionsProps): JSX.Element => {
+}: DatabaseActionsProps): JSX.Element => {
   if (compact) {
     return (
       <div className="flex items-center justify-center gap-2 self-center">

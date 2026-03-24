@@ -1,7 +1,7 @@
 import { Plus } from 'lucide-react'
 import type { DatabaseRecord } from '../../../types/database'
-import { SidePanelConversationList } from './SidePanelConversationList'
-import { SidePanelDatabaseActions } from './SidePanelDatabaseActions'
+import { ConversationList } from './ConversationList'
+import { DatabaseActions } from './DatabaseActions'
 import { AuxPanelWrapper } from './AuxPanelWrapper'
 import {
   useCreateConversation,
@@ -58,7 +58,7 @@ export const AuxPanel = ({
             </div>
 
             {/* // TODO: Esto se implementará cuando tenga el panel de add database */}
-            <SidePanelDatabaseActions
+            <DatabaseActions
               compact
               onEdit={() => {}} // TODO: Implementar edición de base de datos
               onDelete={() => {}} // TODO: Implementar eliminación de base de datos
@@ -72,7 +72,7 @@ export const AuxPanel = ({
             {isLoading ? (
               <LoadingState label="Cargando..." />
             ) : (
-              <SidePanelConversationList
+              <ConversationList
                 conversations={conversations}
                 onClickConversation={(conversationId) =>
                   void navigate(
