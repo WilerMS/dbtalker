@@ -36,7 +36,39 @@ const buildPendingMessage = (type: MessageType): PendingMessage => {
   }
 }
 
-export const useChat = (databaseId: string): UseChatResult => {
+const buildBotCompleteMessage = (
+  type: MessageType,
+  data: CompleteMessage['data'],
+  completedId: string | null,
+): CompleteMessage => {
+  return {
+    id: completedId ?? crypto.randomUUID(),
+    role: 'bot',
+    type,
+    status: 'complete',
+    data,
+    timestamp: new Date(),
+  }
+}
+
+const replacePendingMessage = (
+  messages: Message[],
+  completedId: string | null,
+  completeMessage: CompleteMessage,
+): Message[] => {
+  if (!completedId) {
+    return [...messages, completeMessage]
+  }
+
+  return messages.map((message) =>
+    message.id === completedId ? completeMessage : message,
+  )
+}
+
+export const useChat = (
+  databaseId: string,
+  conversationId: string,
+): UseChatResult => {
   const chatService = useMemo(() => new ChatService(), [])
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -45,21 +77,25 @@ export const useChat = (databaseId: string): UseChatResult => {
   const pendingIdRef = useRef<string | null>(null)
 
   useEffect(() => {
-    let isMounted = true
+    const abortController = new AbortController()
+
     setIsLoading(true)
     setIsStreaming(false)
     setMessages([])
 
     const initialize = async (): Promise<void> => {
       try {
-        const initialMessages =
-          await chatService.getDatabaseMessages(databaseId)
+        const initialMessages = await chatService.getDatabaseMessages(
+          databaseId,
+          conversationId,
+          abortController.signal,
+        )
 
-        if (isMounted) {
+        if (!abortController.signal.aborted) {
           setMessages(initialMessages)
         }
       } finally {
-        if (isMounted) {
+        if (!abortController.signal.aborted) {
           setIsLoading(false)
         }
       }
@@ -68,9 +104,9 @@ export const useChat = (databaseId: string): UseChatResult => {
     void initialize()
 
     return () => {
-      isMounted = false
+      abortController.abort()
     }
-  }, [chatService, databaseId])
+  }, [chatService, conversationId, databaseId])
 
   const sendMessage = async (text: string): Promise<void> => {
     const nextText = text.trim()
@@ -87,6 +123,7 @@ export const useChat = (databaseId: string): UseChatResult => {
       for await (const chunk of chatService.streamAiResponse(
         nextText,
         databaseId,
+        conversationId,
       )) {
         if (chunk.event === 'incoming') {
           // Thinking phase is over — switch from generic loading to skeleton
@@ -101,17 +138,14 @@ export const useChat = (databaseId: string): UseChatResult => {
           const completedId = pendingIdRef.current
           pendingIdRef.current = null
 
-          const complete: CompleteMessage = {
-            id: completedId ?? crypto.randomUUID(),
-            role: 'bot',
-            type: chunk.type,
-            status: 'complete',
-            data: chunk.data,
-            timestamp: new Date(),
-          }
+          const complete = buildBotCompleteMessage(
+            chunk.type,
+            chunk.data,
+            completedId,
+          )
 
           setMessages((prev) =>
-            prev.map((m) => (m.id === completedId ? complete : m)),
+            replacePendingMessage(prev, completedId, complete),
           )
         } else if (chunk.event === 'finished') {
           setIsStreaming(false)

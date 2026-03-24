@@ -34,9 +34,11 @@ export class ChatService {
 
   public async getDatabaseMessages(
     databaseId: string,
+    conversationId: string,
+    signal?: AbortSignal,
   ): Promise<CompleteMessage[]> {
-    const url = this.buildDatabaseMessagesUrl(databaseId)
-    const response = await fetch(url)
+    const url = this.buildDatabaseMessagesUrl(databaseId, conversationId)
+    const response = await fetch(url, { signal })
 
     if (!response.ok) {
       throw new Error(
@@ -51,8 +53,9 @@ export class ChatService {
   public async *streamAiResponse(
     query: string,
     databaseId: string,
+    conversationId: string,
   ): AsyncGenerator<SSEChunk> {
-    const url = this.buildChatStreamUrl(query, databaseId)
+    const url = this.buildChatStreamUrl(query, databaseId, conversationId)
     const abortController = new AbortController()
     const state = this.createStreamState()
 
@@ -114,16 +117,25 @@ export class ChatService {
     }
   }
 
-  private buildDatabaseMessagesUrl(databaseId: string): URL {
+  private buildDatabaseMessagesUrl(
+    databaseId: string,
+    conversationId: string,
+  ): URL {
     const url = new URL(`${this.apiBaseUrl}/chat/messages`)
     url.searchParams.set('database_id', databaseId)
+    url.searchParams.set('conversation_id', conversationId)
     return url
   }
 
-  private buildChatStreamUrl(query: string, databaseId: string): URL {
+  private buildChatStreamUrl(
+    query: string,
+    databaseId: string,
+    conversationId: string,
+  ): URL {
     const url = new URL(`${this.apiBaseUrl}/chat/stream`)
     url.searchParams.set('query', query)
     url.searchParams.set('database_id', databaseId)
+    url.searchParams.set('conversation_id', conversationId)
     return url
   }
 

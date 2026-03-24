@@ -1,25 +1,25 @@
 import { useEffect, useMemo, useRef, type JSX } from 'react'
 import { LoadingMessage } from './LoadingMessage'
 import { SpeakerAvatar } from './SpeakerAvatar'
-import type { Message } from '../../types/chat'
 import { UserMessage } from './UserMessage'
 import { AiMessage } from './AiMessage'
 import { groupMessagesByRole } from '../../utils/groupMessagesByRole'
 import { ChatInput } from './ChatInput'
+import { useChat } from '../../hooks/useChat'
 
 interface MainChatProps {
-  isLoading: boolean
-  isStreaming: boolean
-  messages: Message[]
-  sendMessage: (text: string) => Promise<void>
+  databaseId: string
+  conversationId: string
 }
 
 export const MainChat = ({
-  isLoading,
-  isStreaming,
-  messages,
-  sendMessage,
+  databaseId,
+  conversationId,
 }: MainChatProps): JSX.Element => {
+  const { isLoading, isStreaming, messages, sendMessage } = useChat(
+    databaseId,
+    conversationId,
+  )
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const MainChat = ({
 
   const handleSubmit = async (value: string) => {
     const nextDraft = value.trim()
-    if (!nextDraft || isLoading) return
+    if (!nextDraft || isLoading || isStreaming) return
     await sendMessage(nextDraft)
   }
 
