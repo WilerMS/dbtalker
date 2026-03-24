@@ -7,7 +7,7 @@ from app.models.database import CreateDatabaseInput, DatabaseRecord, UpdateDatab
 
 _databases: list[DatabaseRecord] = [
     DatabaseRecord(
-        id="db-postgres",
+        id="83d48401c6f4447283184ebd610148f5",
         name="PostgreSQL",
         engine="postgresql",
         icon="Database",
@@ -16,7 +16,7 @@ _databases: list[DatabaseRecord] = [
         updated_at=datetime(2026, 1, 10, 10, 0, 0),
     ),
     DatabaseRecord(
-        id="db-mongodb",
+        id="83d48401c6f4447283184ebd610148f6",
         name="MongoDB",
         engine="mongodb",
         icon="Leaf",
@@ -25,7 +25,7 @@ _databases: list[DatabaseRecord] = [
         updated_at=datetime(2026, 1, 12, 14, 0, 0),
     ),
     DatabaseRecord(
-        id="db-sqlite",
+        id="83d48401c6f4447283184ebd610148f7",
         name="SQLite",
         engine="sqlite",
         icon="HardDrive",

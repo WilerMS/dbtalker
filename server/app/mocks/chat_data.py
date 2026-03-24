@@ -285,7 +285,7 @@ def generate_closing_text(shown_widget_type: MessageType) -> str:
 
 
 _WELCOME_MESSAGES: dict[str, str] = {
-    "db-postgres": (
+    "83d48401c6f4447283184ebd610148f5": (
         "¡Bienvenido a tu base de datos PostgreSQL! 🚀 "
         "Estoy listo para ayudarte a explorar tus datos operacionales de comercio. "
         "Prueba los diferentes tipos de widgets que puedo generar para ti: "
@@ -296,7 +296,7 @@ _WELCOME_MESSAGES: dict[str, str] = {
         'o "tabla" para explorar filas de datos directamente. '
         "Solo escríbelo en lenguaje natural — sin SQL."
     ),
-    "db-mongodb": (
+    "83d48401c6f4447283184ebd610148f6": (
         "¡Bienvenido a tu base de datos MongoDB! "
         "Esta instancia contiene streams de eventos y registros de auditoría. "
         "Puedes testear todos los widgets disponibles: "
@@ -307,7 +307,7 @@ _WELCOME_MESSAGES: dict[str, str] = {
         'o "table" para inspeccionar registros individuales. '
         "Combínalos en la misma conversación para un análisis completo."
     ),
-    "db-sqlite": (
+    "83d48401c6f4447283184ebd610148f7": (
         "¡Bienvenido a tu snapshot local de analytics en SQLite! "
         "Este entorno es ideal para explorar los widgets de DBTalkie. "
         "Empieza por donde quieras: "

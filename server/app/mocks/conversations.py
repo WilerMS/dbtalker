@@ -9,28 +9,28 @@ _conversations: list[ConversationRecord] = [
     # PostgreSQL conversations
     ConversationRecord(
         id="conv-db-postgres-overview",
-        database_id="db-postgres",
+        database_id="83d48401c6f4447283184ebd610148f5",
         title="Resumen general de PostgreSQL",
         created_at=datetime(2026, 1, 15, 10, 0, 0),
         updated_at=datetime(2026, 1, 15, 10, 0, 0),
     ),
     ConversationRecord(
         id="conv-db-postgres-weekly-kpi",
-        database_id="db-postgres",
+        database_id="83d48401c6f4447283184ebd610148f5",
         title="KPIs semanales (PostgreSQL)",
         created_at=datetime(2026, 1, 16, 14, 0, 0),
         updated_at=datetime(2026, 1, 16, 14, 0, 0),
     ),
     ConversationRecord(
         id="conv-db-postgres-schema-check",
-        database_id="db-postgres",
+        database_id="83d48401c6f4447283184ebd610148f5",
         title="Revision de esquema y relaciones",
         created_at=datetime(2026, 1, 17, 9, 0, 0),
         updated_at=datetime(2026, 1, 17, 9, 0, 0),
     ),
     ConversationRecord(
         id="conv-db-postgres-sales-breakdown",
-        database_id="db-postgres",
+        database_id="83d48401c6f4447283184ebd610148f5",
         title="Analisis de ventas por categoria",
         created_at=datetime(2026, 1, 18, 15, 30, 0),
         updated_at=datetime(2026, 1, 18, 15, 30, 0),
@@ -38,21 +38,21 @@ _conversations: list[ConversationRecord] = [
     # MongoDB conversations
     ConversationRecord(
         id="conv-db-mongodb-events-overview",
-        database_id="db-mongodb",
+        database_id="83d48401c6f4447283184ebd610148f6",
         title="Resumen de eventos y logs",
         created_at=datetime(2026, 1, 15, 11, 0, 0),
         updated_at=datetime(2026, 1, 15, 11, 0, 0),
     ),
     ConversationRecord(
         id="conv-db-mongodb-audit-analysis",
-        database_id="db-mongodb",
+        database_id="83d48401c6f4447283184ebd610148f6",
         title="Analisis de auditor'ia y seguridad",
         created_at=datetime(2026, 1, 16, 16, 0, 0),
         updated_at=datetime(2026, 1, 16, 16, 0, 0),
     ),
     ConversationRecord(
         id="conv-db-mongodb-performance-check",
-        database_id="db-mongodb",
+        database_id="83d48401c6f4447283184ebd610148f6",
         title="Rendimiento y optimizacion",
         created_at=datetime(2026, 1, 17, 10, 30, 0),
         updated_at=datetime(2026, 1, 17, 10, 30, 0),
@@ -60,14 +60,14 @@ _conversations: list[ConversationRecord] = [
     # SQLite conversations
     ConversationRecord(
         id="conv-db-sqlite-snapshot-overview",
-        database_id="db-sqlite",
+        database_id="83d48401c6f4447283184ebd610148f7",
         title="Resumen de snapshot local",
         created_at=datetime(2026, 1, 15, 12, 0, 0),
         updated_at=datetime(2026, 1, 15, 12, 0, 0),
     ),
     ConversationRecord(
         id="conv-db-sqlite-analytics",
-        database_id="db-sqlite",
+        database_id="83d48401c6f4447283184ebd610148f7",
         title="Analisis y estadisticas",
         created_at=datetime(2026, 1, 17, 11, 0, 0),
         updated_at=datetime(2026, 1, 17, 11, 0, 0),
