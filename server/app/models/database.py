@@ -40,6 +40,27 @@ class UpdateDatabaseInput(BaseModel):
 
 
 # ============================================================================
+# Conversation Types
+# ============================================================================
+
+
+class ConversationRecord(BaseModel):
+    """Represents a conversation/chat history for a database."""
+
+    id: str
+    database_id: str
+    title: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class CreateConversationInput(BaseModel):
+    """Request body for creating a new conversation."""
+
+    title: str
+
+
+# ============================================================================
 # Chat Message Types (mirroring client types)
 # ============================================================================
 
@@ -222,4 +243,6 @@ class ChatRequestBody(BaseModel):
     type: Literal["text"]
     status: Literal["complete"] = "complete"
     data: TextData
+    database_id: str
+    conversation_id: str
     timestamp: datetime
