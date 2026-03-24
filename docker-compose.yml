@@ -3,7 +3,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: dbtalker-backend
+    container_name: dbtalkie-backend
     working_dir: /app
     command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ports:
@@ -22,7 +22,7 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    container_name: dbtalker-frontend
+    container_name: dbtalkie-frontend
     working_dir: /app
     command: npm run dev -- --host 0.0.0.0 --port 5173
     ports:
