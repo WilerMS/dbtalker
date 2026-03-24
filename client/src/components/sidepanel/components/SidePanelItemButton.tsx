@@ -1,7 +1,6 @@
 import type { JSX, ReactNode } from 'react'
 
 interface SidePanelItemButtonProps {
-  ariaLabel: string
   title?: string
   children: ReactNode
   isActive?: boolean
@@ -22,7 +21,6 @@ const dangerButtonClassName =
   'border-zinc-800/90 text-rose-300 hover:border-rose-400/55 hover:bg-zinc-900/50 hover:text-rose-200 hover:shadow-[0_0_16px_rgba(244,63,94,0.3),inset_0_0_0_1px_rgba(225,29,72,0.22)]'
 
 export const SidePanelItemButton = ({
-  ariaLabel,
   title,
   children,
   isActive = false,
@@ -51,7 +49,6 @@ export const SidePanelItemButton = ({
   return (
     <button
       type="button"
-      aria-label={ariaLabel}
       title={title}
       aria-current={isActive}
       onClick={onClick}
