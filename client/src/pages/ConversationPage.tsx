@@ -1,7 +1,7 @@
 import { MainChat } from '../components/chat/MainChat'
 import { useParams } from 'react-router-dom'
 
-export const MainPage = () => {
+export const ConversationPage = () => {
   const { id_db, id_conversation } = useParams<{
     id_db: string
     id_conversation: string
