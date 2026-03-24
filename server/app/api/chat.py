@@ -1,96 +1,54 @@
-"""
-Chat streaming endpoint for DBTalker backend.
-Implements SSE streaming for query responses with mock data.
-"""
+"""Chat routes for DBTalkie backend."""
 
 from __future__ import annotations
 
-import asyncio
-from collections.abc import AsyncGenerator
-
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Query
 from sse_starlette.sse import EventSourceResponse
 
-from app.mocks.chat_data import (
-    detect_widget_type,
-    generate_text_for_widget,
-    get_widget_data_by_type,
-)
+from app.api.dependencies import get_chat_controller
+from app.controllers.chat_controller import ChatController
 from app.models.database import (
     ChatRequestBody,
-    SSEChunkData,
-    SSEChunkFinished,
-    SSEChunkIncoming,
-    TextData,
+    CompleteMessage,
 )
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
-async def chat_stream_generator(request: ChatRequestBody) -> AsyncGenerator[str, None]:
-    database_id = getattr(request, "database_id", "unknown")
-    query_text = request.data.text
-    primary_widget_type = detect_widget_type(query_text)
+@router.get("/messages", response_model=list[CompleteMessage])
+async def get_chat_messages(
+    database_id: str = Query(...),
+    conversation_id: str = Query(...),
+    chat_controller: ChatController = Depends(get_chat_controller),
+) -> list[CompleteMessage]:
+    return chat_controller.get_messages(conversation_id, database_id)
 
-    # SEQUENCE 1: Text Message
 
-    yield _serialize_sse_chunk(SSEChunkIncoming(event="incoming", type="text"))
-
-    await asyncio.sleep(0.5)
-
-    text_content = generate_text_for_widget(primary_widget_type, database_id)
-    text_chunk = SSEChunkData(
-        event="data",
-        type="text",
-        data=TextData(text=text_content),
+@router.get("/stream")
+async def stream_chat(
+    query: str = Query(..., min_length=1),
+    database_id: str = Query(...),
+    conversation_id: str = Query(...),
+    chat_controller: ChatController = Depends(get_chat_controller),
+) -> EventSourceResponse:
+    return EventSourceResponse(
+        chat_controller.stream_chat(
+            query=query,
+            database_id=database_id,
+            conversation_id=conversation_id,
+        )
     )
-    yield _serialize_sse_chunk(text_chunk)
-
-    # SEQUENCE 2: Primary Widget (if detected)
-
-    if primary_widget_type:
-        await asyncio.sleep(0.5)
-
-        yield _serialize_sse_chunk(SSEChunkIncoming(event="incoming", type=primary_widget_type))
-
-        await asyncio.sleep(0.5)
-
-        widget_data = get_widget_data_by_type(primary_widget_type)
-        widget_chunk = SSEChunkData(
-            event="data",
-            type=primary_widget_type,
-            data=widget_data,
-        )
-        yield _serialize_sse_chunk(widget_chunk)
-
-        # SEQUENCE 3: Secondary Widget (always bar chart as fallback)
-
-        secondary_widget_type = "bar" if primary_widget_type != "bar" else "line"
-
-        await asyncio.sleep(0.5)
-
-        yield _serialize_sse_chunk(SSEChunkIncoming(event="incoming", type=secondary_widget_type))
-
-        await asyncio.sleep(0.5)
-
-        secondary_widget_data = get_widget_data_by_type(secondary_widget_type)
-        secondary_chunk = SSEChunkData(
-            event="data",
-            type=secondary_widget_type,
-            data=secondary_widget_data,
-        )
-        yield _serialize_sse_chunk(secondary_chunk)
-
-    # END: Finished Signal
-
-    await asyncio.sleep(0.2)
-    yield _serialize_sse_chunk(SSEChunkFinished(event="finished"))
-
-
-def _serialize_sse_chunk(chunk) -> str:
-    return chunk.model_dump_json(by_alias=True)
 
 
 @router.post("/stream")
-async def stream_chat(request: ChatRequestBody) -> EventSourceResponse:
-    return EventSourceResponse(chat_stream_generator(request))
+async def stream_chat_post(
+    request: ChatRequestBody,
+    chat_controller: ChatController = Depends(get_chat_controller),
+) -> EventSourceResponse:
+    return EventSourceResponse(
+        chat_controller.stream_chat(
+            query=request.data.text,
+            database_id=request.database_id,
+            conversation_id=request.conversation_id,
+        )
+    )
