@@ -190,3 +190,27 @@ export const createConversation = async (
   const payload = (await response.json()) as ApiConversationRecord
   return mapConversationRecord(payload)
 }
+
+export const deleteConversation = async (
+  databaseId: string,
+  conversationId: string,
+): Promise<boolean> => {
+  const response = await fetch(
+    `${API_BASE_URL}/databases/${encodeURIComponent(databaseId)}/conversations/${encodeURIComponent(conversationId)}`,
+    {
+      method: 'DELETE',
+    },
+  )
+
+  if (response.status === 404) {
+    return false
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to delete conversation '${conversationId}'. Status: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  return true
+}
