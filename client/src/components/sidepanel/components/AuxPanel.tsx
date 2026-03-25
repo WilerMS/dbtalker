@@ -11,7 +11,10 @@ import {
 import { LoadingState } from '../../ui/LoadingState'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useModal } from '../../../hooks/useModal'
-import { UpdateDatabaseModalContent } from './database-manager'
+import {
+  DeleteDatabaseModalContent,
+  UpdateDatabaseModalContent,
+} from './database-manager'
 
 interface AuxPanelProps {
   anchorRect?: DOMRect
@@ -30,7 +33,10 @@ export const AuxPanel = ({
 }: AuxPanelProps) => {
   const isOpen = isVisible && Boolean(anchorRect && database)
 
-  const { id_conversation } = useParams<{ id_conversation: string }>()
+  const { id_conversation, id_db } = useParams<{
+    id_conversation: string
+    id_db: string
+  }>()
   const navigate = useNavigate()
   const { openModal } = useModal()
 
@@ -55,18 +61,29 @@ export const AuxPanel = ({
   const handleEditDatabase = (database: DatabaseRecord) => {
     onMouseLeave()
     openModal({
+      size: { width: 'min(94vw, 750px)', maxHeight: '90vh' },
       content: ({ closeModal }) => (
         <UpdateDatabaseModalContent database={database} onClose={closeModal} />
       ),
-      size: {
-        width: 'min(94vw, 750px)',
-        maxHeight: '90vh',
-      },
     })
   }
 
-  // Database handlers here
-  // TODO: Esto se implementará cuando tenga el panel de add database
+  const handleDeleteDatabase = (database: DatabaseRecord) => {
+    onMouseLeave()
+    openModal({
+      size: { width: 'min(94vw, 640px)', maxHeight: '90vh' },
+      content: ({ closeModal }) => (
+        <DeleteDatabaseModalContent
+          database={database}
+          onClose={closeModal}
+          onDeleteSuccess={(databaseId) => {
+            if (id_db !== databaseId) return
+            navigate('/app', { viewTransition: true })
+          }}
+        />
+      ),
+    })
+  }
 
   return (
     <AuxPanelWrapper
@@ -90,7 +107,7 @@ export const AuxPanel = ({
             <DatabaseActions
               compact
               onEdit={() => void handleEditDatabase(database)}
-              onDelete={() => {}} // TODO: Implementar eliminación de base de datos
+              onDelete={() => void handleDeleteDatabase(database)}
             />
           </header>
 
@@ -115,9 +132,8 @@ export const AuxPanel = ({
                     conversationId,
                   })
 
-                  if (id_conversation === conversationId) {
-                    navigate(`/app`, { viewTransition: true })
-                  }
+                  if (id_conversation !== conversationId) return
+                  navigate(`/app`, { viewTransition: true })
                 }}
               />
             )}
