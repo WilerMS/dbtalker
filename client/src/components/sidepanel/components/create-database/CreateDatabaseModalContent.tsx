@@ -198,27 +198,21 @@ export const CreateDatabaseModalContent = ({
               </span>
             </label>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-800/90 pt-5">
-              <p className="text-xs leading-5 text-zinc-500">
-                UI only. Submission and validation will be connected later.
-              </p>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="rounded-full border border-zinc-800 bg-zinc-950/70 px-4 py-2.5 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled
-                  className="rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase opacity-60"
-                >
-                  Create database
-                </button>
-              </div>
+            <div className="flex flex-wrap items-center justify-end gap-3 border-t border-zinc-800/90 pt-5">
+              <button
+                type="submit"
+                disabled
+                className="rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase opacity-60"
+              >
+                Add database
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full border border-zinc-800 bg-zinc-950/70 px-4 py-2.5 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+              >
+                Cancel
+              </button>
             </div>
           </form>
         </div>
