@@ -100,7 +100,7 @@ class ChatService:
                 ),
             )
 
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(1.5)
 
             widget_data = get_widget_data_by_type(primary_widget_type)
             widget_chunk = SSEChunkData(

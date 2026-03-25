@@ -20,8 +20,8 @@ interface CodeWidgetProps {
   isExpanded?: boolean
 }
 
-const expandedHeight = 'max-h-[72vh]'
-const collapsedHeight = 'max-h-[26rem]'
+const expandedHeight = 'h-[72vh]'
+const collapsedHeight = 'h-[26rem]'
 
 export const CodeWidget = ({
   data,
@@ -30,7 +30,7 @@ export const CodeWidget = ({
   return (
     <div
       className={[
-        'overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50',
+        'flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50',
         isExpanded ? expandedHeight : collapsedHeight,
       ].join(' ')}
     >
@@ -45,7 +45,7 @@ export const CodeWidget = ({
         ) : null}
       </div>
 
-      <div className="overflow-auto p-4">
+      <div className="flex-1 overflow-x-auto overflow-y-auto p-4">
         <ShikiHighlighter
           addDefaultStyles={false}
           className="m-0! min-w-max border-0 bg-transparent text-[13px] leading-6"

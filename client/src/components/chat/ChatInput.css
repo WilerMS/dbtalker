@@ -63,11 +63,11 @@
   animation: borderGlow 4s ease-in-out infinite;
   background: linear-gradient(
     130deg,
-    rgb(39 39 42 / 0.9),
-    rgb(63 63 70 / 0.92),
-    rgb(52 211 153 / 0.3),
-    rgb(63 63 70 / 0.92),
-    rgb(39 39 42 / 0.9)
+    rgb(39 39 42 / 0.8),
+    rgb(63 63 70 / 0.82),
+    rgb(52 211 153 / 0.2),
+    rgb(63 63 70 / 0.82),
+    rgb(39 39 42 / 0.8)
   );
   background-size: 220% 220%;
   box-shadow:
