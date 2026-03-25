@@ -128,6 +128,12 @@ export interface CompleteMessage {
   timestamp: Date
 }
 
+export interface UserMessage extends CompleteMessage {
+  role: 'user'
+  type: 'text'
+  data: TextData
+}
+
 export type Message = PendingMessage | CompleteMessage
 
 // SSE chunk types emitted by the mock streaming service

@@ -5,6 +5,7 @@ import type {
   Message,
   MessageType,
   PendingMessage,
+  UserMessage,
 } from '../types/chat'
 import { ChatService } from '../services/chatService'
 
@@ -15,7 +16,7 @@ export interface UseChatResult {
   sendMessage: (text: string) => Promise<void>
 }
 
-const buildUserMessage = (text: string): CompleteMessage => {
+const buildUserMessage = (text: string): UserMessage => {
   return {
     id: crypto.randomUUID(),
     role: 'user',
@@ -113,13 +114,15 @@ export const useChat = (
 
     if (!nextText) return
 
-    setMessages((prev) => [...prev, buildUserMessage(nextText)])
+    const userMessage = buildUserMessage(nextText)
+
+    setMessages((prev) => [...prev, userMessage])
     setIsLoading(true)
     pendingIdRef.current = null
 
     try {
       for await (const chunk of chatService.streamAiResponse(
-        nextText,
+        userMessage,
         databaseId,
         conversationId,
       )) {

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncGenerator
 
-from app.models.database import CompleteMessage
+from app.models.database import CompleteMessage, UserMessage
 from app.services.chat_service import ChatService
 from app.services.conversation_service import ConversationService
 from app.services.database_service import DatabaseService
@@ -49,7 +49,7 @@ class ChatController:
 
     async def stream_chat(
         self,
-        query: str,
+        user_message: UserMessage,
         database_id: str,
         conversation_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
@@ -58,7 +58,7 @@ class ChatController:
         Validates database and conversation exist before streaming.
 
         Args:
-            query: The user's query text.
+            user_message: The complete user message payload from the frontend.
             database_id: The database context (must exist).
             conversation_id: The conversation context (validated if provided).
 
@@ -72,7 +72,7 @@ class ChatController:
 
         # Delegate to chat service for streaming
         async for chunk in self._chat_service.generate_response_stream(
-            query, database_id, conversation_id
+            user_message, database_id, conversation_id
         ):
             yield chunk
 

@@ -25,6 +25,7 @@ from app.models.database import (
     SSEChunkFinished,
     SSEChunkIncoming,
     TextData,
+    UserMessage,
 )
 
 
@@ -34,15 +35,15 @@ class ChatService:
 
     def generate_response_stream(
         self,
-        query_text: str,
+        user_message: UserMessage,
         database_id: str,
         conversation_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
-        return self._stream_generator(query_text, database_id, conversation_id)
+        return self._stream_generator(user_message, database_id, conversation_id)
 
     async def _stream_generator(
         self,
-        query_text: str,
+        user_message: UserMessage,
         database_id: str,
         conversation_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
@@ -50,16 +51,8 @@ class ChatService:
         Internal generator for SSE sequences.
         Implements exact timing and event order from original spec.
         """
-        # Record user message
-        user_message = CompleteMessage(
-            id=f"user-{datetime.now().timestamp()}",
-            role="user",
-            type="text",
-            status="complete",
-            data=TextData(text=query_text),
-            timestamp=datetime.now(),
-        )
         append_message_to_conversation(conversation_id, user_message)
+        query_text = user_message.data.text
 
         primary_widget_type = self.detect_widget_type(query_text)
 
@@ -100,7 +93,7 @@ class ChatService:
                 ),
             )
 
-            await asyncio.sleep(1.5)
+            await asyncio.sleep(2.9)
 
             widget_data = get_widget_data_by_type(primary_widget_type)
             widget_chunk = SSEChunkData(

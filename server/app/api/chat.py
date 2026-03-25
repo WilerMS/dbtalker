@@ -24,22 +24,6 @@ async def get_chat_messages(
     return chat_controller.get_messages(conversation_id, database_id)
 
 
-@router.get("/stream")
-async def stream_chat(
-    query: str = Query(..., min_length=1),
-    database_id: str = Query(...),
-    conversation_id: str = Query(...),
-    chat_controller: ChatController = Depends(get_chat_controller),
-) -> EventSourceResponse:
-    return EventSourceResponse(
-        chat_controller.stream_chat(
-            query=query,
-            database_id=database_id,
-            conversation_id=conversation_id,
-        )
-    )
-
-
 @router.post("/stream")
 async def stream_chat_post(
     request: ChatRequestBody,
@@ -47,7 +31,7 @@ async def stream_chat_post(
 ) -> EventSourceResponse:
     return EventSourceResponse(
         chat_controller.stream_chat(
-            query=request.data.text,
+            user_message=request.message,
             database_id=request.database_id,
             conversation_id=request.conversation_id,
         )

@@ -3,6 +3,7 @@ import type {
   MessageData,
   MessageType,
   SSEChunk,
+  UserMessage,
 } from '../types/chat'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 
@@ -16,6 +17,23 @@ interface ApiCompleteMessage {
   status: 'complete'
   data: MessageData
   timestamp: string
+}
+
+interface ApiUserMessage {
+  id: string
+  role: 'user'
+  type: 'text'
+  status: 'complete'
+  data: {
+    text: string
+  }
+  timestamp: string
+}
+
+interface StreamChatRequestBody {
+  message: ApiUserMessage
+  database_id: string
+  conversation_id: string
 }
 
 interface StreamState {
@@ -51,17 +69,26 @@ export class ChatService {
   }
 
   public async *streamAiResponse(
-    query: string,
+    userMessage: UserMessage,
     databaseId: string,
     conversationId: string,
   ): AsyncGenerator<SSEChunk> {
-    const url = this.buildChatStreamUrl(query, databaseId, conversationId)
+    const url = new URL(`${this.apiBaseUrl}/chat/stream`)
     const abortController = new AbortController()
     const state = this.createStreamState()
+    const requestBody = this.buildStreamRequestBody(
+      userMessage,
+      databaseId,
+      conversationId,
+    )
 
     const streamRequest = fetchEventSource(url.toString(), {
-      method: 'GET',
+      method: 'POST',
       signal: abortController.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
       onmessage: (event) => {
         this.handleMessageEvent(event.data, state, abortController)
       },
@@ -127,22 +154,29 @@ export class ChatService {
     return url
   }
 
-  private buildChatStreamUrl(
-    query: string,
+  private buildStreamRequestBody(
+    userMessage: UserMessage,
     databaseId: string,
     conversationId: string,
-  ): URL {
-    const url = new URL(`${this.apiBaseUrl}/chat/stream`)
-    url.searchParams.set('query', query)
-    url.searchParams.set('database_id', databaseId)
-    url.searchParams.set('conversation_id', conversationId)
-    return url
+  ): StreamChatRequestBody {
+    return {
+      message: this.toApiUserMessage(userMessage),
+      database_id: databaseId,
+      conversation_id: conversationId,
+    }
   }
 
   private toCompleteMessage(message: ApiCompleteMessage): CompleteMessage {
     return {
       ...message,
       timestamp: new Date(message.timestamp),
+    }
+  }
+
+  private toApiUserMessage(message: UserMessage): ApiUserMessage {
+    return {
+      ...message,
+      timestamp: message.timestamp.toISOString(),
     }
   }
 

@@ -248,6 +248,15 @@ class CompleteMessage(BaseModel):
     timestamp: datetime
 
 
+class UserMessage(CompleteMessage):
+    """A complete text message sent by the user."""
+
+    role: Literal["user"]
+    type: Literal["text"]
+    status: Literal["complete"] = "complete"
+    data: TextData
+
+
 Message = Union[PendingMessage, CompleteMessage]
 
 
@@ -286,13 +295,8 @@ SSEChunk = Union[SSEChunkIncoming, SSEChunkData, SSEChunkFinished]
 
 
 class ChatRequestBody(BaseModel):
-    """Request body for POST /api/chat endpoint."""
+    """Request body for POST /chat/stream endpoint."""
 
-    id: str
-    role: Literal["user"]
-    type: Literal["text"]
-    status: Literal["complete"] = "complete"
-    data: TextData
+    message: UserMessage
     database_id: str
     conversation_id: str
-    timestamp: datetime
