@@ -74,12 +74,11 @@ export const CreateDatabaseModalContent = ({
             <div className="space-y-3">
               <div className="space-y-2">
                 <h2 className="text-2xl font-semibold tracking-[0.02em] text-zinc-50">
-                  Create database connection
+                  Crear conexion de base de datos
                 </h2>
                 <p className="max-w-2xl text-xs leading-6 text-zinc-400">
-                  This screen is only the UI layer for now. You can define a
-                  generic SQL connection profile, but nothing will be sent to
-                  the backend yet.
+                  Configura los datos de conexion para registrar una base de
+                  datos y comenzar a consultar su informacion desde DBTalkie.
                 </p>
               </div>
             </div>
@@ -99,18 +98,18 @@ export const CreateDatabaseModalContent = ({
           >
             <div className="grid gap-5 md:grid-cols-2">
               <InputField
-                label="Display name"
+                label="Nombre para mostrar"
                 containerClassName="space-y-2"
                 labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
                 inputClassName={baseFieldClassName}
                 name="databaseName"
                 value={formState.databaseName}
                 onChange={handleChange}
-                placeholder="Analytics Warehouse"
+                placeholder="Almacen de analitica"
               />
 
               <SelectField
-                label="Engine"
+                label="Motor"
                 options={sqlEngineOptions}
                 containerClassName="space-y-2"
                 labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
@@ -121,7 +120,7 @@ export const CreateDatabaseModalContent = ({
               />
 
               <InputField
-                label="Host"
+                label="Servidor (host)"
                 containerClassName="space-y-2 md:col-span-2"
                 labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
                 inputClassName={baseFieldClassName}
@@ -132,7 +131,7 @@ export const CreateDatabaseModalContent = ({
               />
 
               <InputField
-                label="Port"
+                label="Puerto"
                 containerClassName="space-y-2"
                 labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
                 inputClassName={baseFieldClassName}
@@ -144,29 +143,29 @@ export const CreateDatabaseModalContent = ({
               />
 
               <InputField
-                label="Database name"
+                label="Nombre de la base de datos"
                 containerClassName="space-y-2"
                 labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
                 inputClassName={baseFieldClassName}
                 name="database"
                 value={formState.database}
                 onChange={handleChange}
-                placeholder="warehouse"
+                placeholder="almacen_datos"
               />
 
               <InputField
-                label="Username"
+                label="Usuario"
                 containerClassName="space-y-2"
                 labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
                 inputClassName={baseFieldClassName}
                 name="username"
                 value={formState.username}
                 onChange={handleChange}
-                placeholder="readonly_user"
+                placeholder="usuario_lectura"
               />
 
               <PasswordField
-                label="Password"
+                label="Contrasena"
                 containerClassName="space-y-2"
                 labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
                 inputClassName={baseFieldClassName}
@@ -178,8 +177,8 @@ export const CreateDatabaseModalContent = ({
             </div>
 
             <ToggleField
-              label="SSL enabled"
-              description="Reserve the secure transport flag as part of the connection profile."
+              label="SSL habilitado"
+              description="Usa una conexion cifrada para proteger el trafico entre la aplicacion y tu base de datos."
               name="useSsl"
               checked={formState.useSsl}
               onChange={handleChange}
@@ -191,14 +190,14 @@ export const CreateDatabaseModalContent = ({
                 disabled
                 className="cursor-not-allowed rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase opacity-60"
               >
-                Add database
+                Agregar base de datos
               </button>
               <button
                 type="button"
                 onClick={onClose}
                 className="cursor-pointer rounded-full border border-zinc-800 bg-zinc-950/70 px-4 py-2.5 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
               >
-                Cancel
+                Cancelar
               </button>
             </div>
           </form>
