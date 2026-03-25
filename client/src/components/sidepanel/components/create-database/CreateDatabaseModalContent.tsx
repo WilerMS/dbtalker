@@ -6,6 +6,7 @@ import { useCreateConversation } from '../../../../hooks/useConversations'
 import { useCreateDatabase } from '../../../../hooks/useDatabases'
 import type { DatabaseEngine } from '../../../../types/database'
 import { InputField } from '../../../ui/InputField'
+import { LoadingState } from '../../../ui/LoadingState'
 import { PasswordField } from '../../../ui/PasswordField'
 import { SelectField } from '../../../ui/SelectField'
 import { ToggleField } from '../../../ui/ToggleField'
@@ -138,6 +139,7 @@ export const CreateDatabaseModalContent = ({
                 label="Nombre para mostrar"
                 placeholder="Almacen de analitica"
                 error={errors.databaseName?.message}
+                disabled={isPending}
                 {...register('databaseName')}
               />
 
@@ -145,6 +147,7 @@ export const CreateDatabaseModalContent = ({
                 label="Motor"
                 options={sqlEngineOptions}
                 error={errors.engine?.message}
+                disabled={isPending}
                 {...register('engine')}
               />
 
@@ -153,6 +156,7 @@ export const CreateDatabaseModalContent = ({
                   label="Servidor (host)"
                   placeholder="db.company.internal"
                   error={errors.host?.message}
+                  disabled={isPending}
                   {...register('host')}
                 />
               </div>
@@ -162,6 +166,7 @@ export const CreateDatabaseModalContent = ({
                 inputMode="numeric"
                 placeholder="5432"
                 error={errors.port?.message}
+                disabled={isPending}
                 {...register('port')}
               />
 
@@ -169,6 +174,7 @@ export const CreateDatabaseModalContent = ({
                 label="Nombre de la base de datos"
                 placeholder="almacen_datos"
                 error={errors.database?.message}
+                disabled={isPending}
                 {...register('database')}
               />
 
@@ -176,6 +182,7 @@ export const CreateDatabaseModalContent = ({
                 label="Usuario"
                 placeholder="usuario_lectura"
                 error={errors.username?.message}
+                disabled={isPending}
                 {...register('username')}
               />
 
@@ -183,6 +190,7 @@ export const CreateDatabaseModalContent = ({
                 label="Contrasena"
                 placeholder="••••••••••••"
                 error={errors.password?.message}
+                disabled={isPending}
                 {...register('password')}
               />
             </div>
@@ -190,6 +198,7 @@ export const CreateDatabaseModalContent = ({
             <ToggleField
               label="SSL habilitado"
               description="Usa una conexion cifrada para proteger el trafico entre la aplicacion y tu base de datos."
+              disabled={isPending}
               {...register('useSsl')}
             />
 
@@ -199,7 +208,15 @@ export const CreateDatabaseModalContent = ({
                 disabled={isPending || !isValid}
                 className="cursor-pointer rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isPending ? 'Guardando...' : 'Agregar base de datos'}
+                {isPending ? (
+                  <LoadingState
+                    variant="inline"
+                    label="Guardando..."
+                    labelClassName="text-emerald-200"
+                  />
+                ) : (
+                  'Agregar base de datos'
+                )}
               </button>
               <button
                 type="button"
