@@ -32,7 +32,7 @@ export const SidePanel: FC = () => {
         <header className="mb-1 flex flex-col items-center gap-2 border-b border-zinc-800/85 pb-3">
           <button
             className="flex cursor-pointer flex-col items-center justify-center gap-2"
-            onClick={() => void navigate('/app')}
+            onClick={() => void navigate('/app', { viewTransition: true })}
           >
             <Logo className="w-10 rounded-lg! p-2! [&>svg]:size-5" />
             <span className="text-[9px] tracking-[0.14em] text-zinc-300">
@@ -63,7 +63,9 @@ export const SidePanel: FC = () => {
         <div className="grow" />
 
         <SidePanelItemButton
-          onClick={() => void navigate('/app/settings')}
+          onClick={() =>
+            void navigate('/app/settings', { viewTransition: true })
+          }
           title="Settings"
         >
           <Settings size={20} />

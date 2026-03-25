@@ -88,6 +88,7 @@ export const AuxPanel = ({
                 onClickConversation={(conversationId) =>
                   void navigate(
                     `/app/${database.id}/conversations/${conversationId}`,
+                    { viewTransition: true },
                   )
                 }
                 onDeleteConversation={(conversationId) => {
