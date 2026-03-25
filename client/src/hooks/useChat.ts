@@ -1,64 +1,18 @@
 import { useMemo, useEffect, useState } from 'react'
 
+import { ChatService } from '../services/chatService'
 import type {
   CompleteMessage,
   Message,
-  MessageType,
+  PendingMessage,
   UserMessage,
 } from '../types/chat'
-import { ChatService } from '../services/chatService'
 
 export interface UseChatResult {
   messages: Message[]
   isLoading: boolean
   isStreaming: boolean
   sendMessage: (text: string) => Promise<void>
-}
-
-const buildUserMessage = (text: string): UserMessage => {
-  return {
-    id: crypto.randomUUID(),
-    role: 'user',
-    type: 'text',
-    status: 'complete',
-    data: { text },
-    timestamp: new Date(),
-  }
-}
-
-const buildPendingMessage = (id: string, type: MessageType): Message => {
-  return {
-    id,
-    role: 'bot',
-    type,
-    status: 'pending',
-    timestamp: new Date(),
-  }
-}
-
-const buildBotCompleteMessage = (
-  id: string,
-  type: MessageType,
-  data: CompleteMessage['data'],
-): CompleteMessage => {
-  return {
-    id,
-    role: 'bot',
-    type,
-    status: 'complete',
-    data,
-    timestamp: new Date(),
-  }
-}
-
-const replacePendingMessage = (
-  messages: Message[],
-  completedId: string,
-  completeMessage: CompleteMessage,
-): Message[] => {
-  return messages.map((message) =>
-    message.id === completedId ? completeMessage : message,
-  )
 }
 
 export const useChat = (
@@ -107,7 +61,14 @@ export const useChat = (
 
     if (!nextText) return
 
-    const userMessage = buildUserMessage(nextText)
+    const userMessage: UserMessage = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      type: 'text',
+      status: 'complete',
+      data: { text: nextText },
+      timestamp: new Date(),
+    }
 
     setMessages((prev) => [...prev, userMessage])
     setIsLoading(true)
@@ -118,40 +79,41 @@ export const useChat = (
         databaseId,
         conversationId,
       )) {
+        if (chunk.event === 'finished') {
+          return setIsStreaming(false)
+        }
+
+        const baseChunk = { id: chunk.id, type: chunk.type, event: chunk.event }
+
         if (chunk.event === 'incoming') {
           // Thinking phase is over — switch from generic loading to skeleton
           setIsLoading(false)
           setIsStreaming(true)
 
-          const pending = buildPendingMessage(chunk.id, chunk.type)
-
-          const hasPendingMessage = messages.some(
-            (message) => message.id === chunk.id,
-          )
-
-          if (hasPendingMessage) continue
+          const pending: PendingMessage = {
+            ...baseChunk,
+            role: 'bot',
+            status: 'pending',
+            timestamp: new Date(),
+          }
 
           setMessages((prev) => [...prev, pending])
         } else if (chunk.event === 'data') {
-          const complete = buildBotCompleteMessage(
-            chunk.id,
-            chunk.type,
-            chunk.data,
-          )
-
           setMessages((prev) => {
-            const hasPendingMessage = prev.some(
-              (message) => message.id === chunk.id,
-            )
-
-            if (!hasPendingMessage) {
-              return [...prev, complete]
+            const complete: CompleteMessage = {
+              ...baseChunk,
+              role: 'bot',
+              status: 'complete',
+              data: chunk.data,
+              timestamp: new Date(),
             }
 
-            return replacePendingMessage(prev, chunk.id, complete)
+            const hasPending = prev.some((msg) => msg.id === chunk.id)
+
+            if (!hasPending) return [...prev, complete]
+
+            return prev.map((msg) => (msg.id === chunk.id ? complete : msg))
           })
-        } else if (chunk.event === 'finished') {
-          setIsStreaming(false)
         }
       }
     } finally {
@@ -160,10 +122,5 @@ export const useChat = (
     }
   }
 
-  return {
-    messages,
-    isLoading,
-    isStreaming,
-    sendMessage,
-  }
+  return { messages, isLoading, isStreaming, sendMessage }
 }
