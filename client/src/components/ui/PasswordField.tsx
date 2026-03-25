@@ -6,33 +6,31 @@ interface PasswordFieldProps extends Omit<
   'className' | 'type'
 > {
   label: string
-  containerClassName?: string
-  labelClassName?: string
-  inputClassName?: string
+  error?: string
 }
 
-const defaultInputClassName =
+const baseInputClassName =
   'w-full rounded-2xl border border-zinc-800 bg-zinc-950/75 px-4 py-3 pr-12 text-sm text-zinc-100 outline-none transition-[border-color,box-shadow,background-color] duration-300 placeholder:text-zinc-500 focus:border-emerald-400/60 focus:bg-zinc-950 focus:shadow-[0_0_0_1px_rgba(52,211,153,0.2),0_0_18px_rgba(52,211,153,0.12)]'
 
-const defaultLabelClassName =
-  'text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase'
+const errorInputClassName =
+  'w-full rounded-2xl border border-red-500/60 bg-zinc-950/75 px-4 py-3 pr-12 text-sm text-zinc-100 outline-none transition-[border-color,box-shadow,background-color] duration-300 placeholder:text-zinc-500 focus:border-red-500/80 focus:bg-zinc-950 focus:shadow-[0_0_0_1px_rgba(239,68,68,0.2),0_0_18px_rgba(239,68,68,0.12)]'
 
 export const PasswordField = ({
   label,
-  containerClassName = 'space-y-2',
-  labelClassName = defaultLabelClassName,
-  inputClassName = defaultInputClassName,
+  error,
   ...inputProps
 }: PasswordFieldProps): JSX.Element => {
   const [isVisible, setIsVisible] = useState(false)
 
   return (
-    <label className={containerClassName}>
-      <span className={labelClassName}>{label}</span>
+    <label className="flex h-21 flex-col gap-2">
+      <span className="ml-1 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase">
+        {label}
+      </span>
 
       <div className="relative">
         <input
-          className={inputClassName}
+          className={error ? errorInputClassName : baseInputClassName}
           type={isVisible ? 'text' : 'password'}
           {...inputProps}
         />
@@ -50,6 +48,10 @@ export const PasswordField = ({
           )}
         </button>
       </div>
+
+      {error && (
+        <p className="-mt-0.5 ml-0.5 px-1 text-xs text-red-400">{error}</p>
+      )}
     </label>
   )
 }

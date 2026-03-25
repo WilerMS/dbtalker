@@ -1,39 +1,41 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { X } from 'lucide-react'
-import { useState, type ChangeEvent, type SubmitEvent } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { useCreateConversation } from '../../../../hooks/useConversations'
 import { useCreateDatabase } from '../../../../hooks/useDatabases'
 import type { DatabaseEngine } from '../../../../types/database'
 import { InputField } from '../../../ui/InputField'
 import { PasswordField } from '../../../ui/PasswordField'
 import { SelectField } from '../../../ui/SelectField'
 import { ToggleField } from '../../../ui/ToggleField'
-import { useCreateConversation } from '../../../../hooks/useConversations'
 
 interface CreateDatabaseModalContentProps {
   onClose: () => void
   onCreationSuccess: (databaseId: string, conversationId: string) => void
 }
 
-interface CreateDatabaseFormState {
-  databaseName: string
-  engine: string
-  host: string
-  port: string
-  database: string
-  username: string
-  password: string
-  useSsl: boolean
-}
+const schema = z.object({
+  databaseName: z.string().min(1, 'El nombre es requerido'),
+  engine: z.string().min(1),
+  host: z.string().min(1, 'El servidor es requerido'),
+  port: z
+    .string()
+    .min(1, 'El puerto es requerido')
+    .refine(
+      (val) => {
+        const n = Number(val)
+        return Number.isInteger(n) && n >= 1 && n <= 65535
+      },
+      { message: 'Puerto inválido (1–65535)' },
+    ),
+  database: z.string().min(1, 'El nombre de la base de datos es requerido'),
+  username: z.string().min(1, 'El usuario es requerido'),
+  password: z.string().min(1, 'La contraseña es requerida'),
+  useSsl: z.boolean(),
+})
 
-const initialFormState: CreateDatabaseFormState = {
-  databaseName: '',
-  engine: 'postgresql',
-  host: '',
-  port: '5432',
-  database: '',
-  username: '',
-  password: '',
-  useSsl: true,
-}
+type CreateDatabaseFormState = z.infer<typeof schema>
 
 const sqlEngineOptions = [
   { label: 'PostgreSQL', value: 'postgresql' },
@@ -43,9 +45,6 @@ const sqlEngineOptions = [
   // { label: 'SQLite', value: 'sqlite' },
 ] as const
 
-const baseFieldClassName =
-  'w-full rounded-2xl border border-zinc-800 bg-zinc-950/75 px-4 py-3 text-sm text-zinc-100 outline-none transition-[border-color,box-shadow,background-color] duration-300 placeholder:text-zinc-500 focus:border-emerald-400/60 focus:bg-zinc-950 focus:shadow-[0_0_0_1px_rgba(52,211,153,0.2),0_0_18px_rgba(52,211,153,0.12)]'
-
 export const CreateDatabaseModalContent = ({
   onClose,
   onCreationSuccess,
@@ -54,41 +53,39 @@ export const CreateDatabaseModalContent = ({
   const { createConversation, isPending: isCreatingConversation } =
     useCreateConversation()
 
-  const [formState, setFormState] =
-    useState<CreateDatabaseFormState>(initialFormState)
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<CreateDatabaseFormState>({
+    resolver: zodResolver(schema),
+    mode: 'onTouched',
+    defaultValues: {
+      databaseName: '',
+      engine: 'postgresql',
+      host: '',
+      port: '5432',
+      database: '',
+      username: '',
+      password: '',
+      useSsl: true,
+    },
+  })
 
-  const handleChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ): void => {
-    const { name, value } = event.target
-    const nextValue =
-      event.target instanceof HTMLInputElement &&
-      event.target.type === 'checkbox'
-        ? event.target.checked
-        : value
+  const isPending = isCreatingDatabase || isCreatingConversation
 
-    setFormState((currentState) => ({
-      ...currentState,
-      [name]: nextValue,
-    }))
-  }
-
-  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const parsedPort = Number(formState.port)
-    if (!Number.isInteger(parsedPort) || parsedPort <= 0) return
-
+  const onSubmit = async (data: CreateDatabaseFormState) => {
     const databaseRecord = await createDatabase({
-      name: formState.databaseName.trim(),
-      engine: formState.engine as DatabaseEngine,
+      name: data.databaseName.trim(),
+      engine: data.engine as DatabaseEngine,
       connection: {
-        host: formState.host.trim(),
-        port: parsedPort,
-        database: formState.database.trim(),
-        username: formState.username.trim(),
-        password: formState.password,
-        useSsl: formState.useSsl,
+        host: data.host.trim(),
+        port: Number(data.port),
+        database: data.database.trim(),
+        username: data.username.trim(),
+        password: data.password,
+        useSsl: data.useSsl,
       },
     })
 
@@ -98,20 +95,9 @@ export const CreateDatabaseModalContent = ({
     })
 
     onCreationSuccess(databaseRecord.id, conversationRecord.id)
-    setFormState(initialFormState)
+    reset()
     onClose()
   }
-
-  const isPending = isCreatingDatabase || isCreatingConversation
-
-  const isSubmitDisabled =
-    isPending ||
-    formState.databaseName.trim().length === 0 ||
-    formState.host.trim().length === 0 ||
-    formState.port.trim().length === 0 ||
-    formState.database.trim().length === 0 ||
-    formState.username.trim().length === 0 ||
-    formState.password.trim().length === 0
 
   return (
     <section className="h-hull relative overflow-hidden">
@@ -144,108 +130,73 @@ export const CreateDatabaseModalContent = ({
           <form
             className="space-y-6"
             onSubmit={(event) => {
-              void handleSubmit(event)
+              void handleSubmit(onSubmit)(event)
             }}
           >
             <div className="grid gap-5 md:grid-cols-2">
               <InputField
                 label="Nombre para mostrar"
-                containerClassName="space-y-2"
-                labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
-                inputClassName={baseFieldClassName}
-                name="databaseName"
-                value={formState.databaseName}
-                required
-                onChange={handleChange}
                 placeholder="Almacen de analitica"
+                error={errors.databaseName?.message}
+                {...register('databaseName')}
               />
 
               <SelectField
                 label="Motor"
                 options={sqlEngineOptions}
-                containerClassName="space-y-2"
-                labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
-                selectClassName={baseFieldClassName}
-                name="engine"
-                value={formState.engine}
-                required
-                onChange={handleChange}
+                error={errors.engine?.message}
+                {...register('engine')}
               />
 
-              <InputField
-                label="Servidor (host)"
-                containerClassName="space-y-2 md:col-span-2"
-                labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
-                inputClassName={baseFieldClassName}
-                name="host"
-                value={formState.host}
-                onChange={handleChange}
-                required
-                placeholder="db.company.internal"
-              />
+              <div className="md:col-span-2">
+                <InputField
+                  label="Servidor (host)"
+                  placeholder="db.company.internal"
+                  error={errors.host?.message}
+                  {...register('host')}
+                />
+              </div>
 
               <InputField
                 label="Puerto"
-                containerClassName="space-y-2"
-                labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
-                inputClassName={baseFieldClassName}
-                name="port"
-                value={formState.port}
-                onChange={handleChange}
                 inputMode="numeric"
                 placeholder="5432"
-                required
+                error={errors.port?.message}
+                {...register('port')}
               />
 
               <InputField
                 label="Nombre de la base de datos"
-                containerClassName="space-y-2"
-                labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
-                inputClassName={baseFieldClassName}
-                name="database"
-                value={formState.database}
-                onChange={handleChange}
                 placeholder="almacen_datos"
-                required
+                error={errors.database?.message}
+                {...register('database')}
               />
 
               <InputField
                 label="Usuario"
-                containerClassName="space-y-2"
-                labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
-                inputClassName={baseFieldClassName}
-                name="username"
-                value={formState.username}
-                onChange={handleChange}
                 placeholder="usuario_lectura"
-                required
+                error={errors.username?.message}
+                {...register('username')}
               />
 
               <PasswordField
                 label="Contrasena"
-                containerClassName="space-y-2"
-                labelClassName="text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase"
-                inputClassName={baseFieldClassName}
-                name="password"
-                value={formState.password}
-                onChange={handleChange}
                 placeholder="••••••••••••"
-                required
+                error={errors.password?.message}
+                {...register('password')}
               />
             </div>
 
             <ToggleField
               label="SSL habilitado"
               description="Usa una conexion cifrada para proteger el trafico entre la aplicacion y tu base de datos."
-              name="useSsl"
-              checked={formState.useSsl}
-              onChange={handleChange}
+              {...register('useSsl')}
             />
 
             <div className="flex flex-wrap items-center justify-end gap-3 border-t border-zinc-800/90 pt-5">
               <button
                 type="submit"
-                disabled={isSubmitDisabled}
+                disabled={isPending || !isValid}
                 className="cursor-pointer rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPending ? 'Guardando...' : 'Agregar base de datos'}
