@@ -3,6 +3,7 @@ import { useState, type ChangeEvent } from 'react'
 import { InputField } from '../../../ui/InputField'
 import { PasswordField } from '../../../ui/PasswordField'
 import { SelectField } from '../../../ui/SelectField'
+import { ToggleField } from '../../../ui/ToggleField'
 
 interface CreateDatabaseModalContentProps {
   onClose: () => void
@@ -176,40 +177,26 @@ export const CreateDatabaseModalContent = ({
               />
             </div>
 
-            <label className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/55 px-4 py-3">
-              <div>
-                <p className="text-sm font-medium text-zinc-100">SSL enabled</p>
-                <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  Reserve the secure transport flag as part of the connection
-                  profile.
-                </p>
-              </div>
-
-              <span className="relative inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="useSsl"
-                  checked={formState.useSsl}
-                  onChange={handleChange}
-                  className="peer sr-only"
-                />
-                <span className="h-6 w-11 rounded-full border border-zinc-700 bg-zinc-900 transition-colors duration-300 peer-checked:border-emerald-400/50 peer-checked:bg-emerald-400/20" />
-                <span className="pointer-events-none absolute left-1 size-4 rounded-full bg-zinc-300 transition-transform duration-300 peer-checked:translate-x-5 peer-checked:bg-emerald-300" />
-              </span>
-            </label>
+            <ToggleField
+              label="SSL enabled"
+              description="Reserve the secure transport flag as part of the connection profile."
+              name="useSsl"
+              checked={formState.useSsl}
+              onChange={handleChange}
+            />
 
             <div className="flex flex-wrap items-center justify-end gap-3 border-t border-zinc-800/90 pt-5">
               <button
                 type="submit"
                 disabled
-                className="rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase opacity-60"
+                className="cursor-not-allowed rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase opacity-60"
               >
                 Add database
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full border border-zinc-800 bg-zinc-950/70 px-4 py-2.5 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                className="cursor-pointer rounded-full border border-zinc-800 bg-zinc-950/70 px-4 py-2.5 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
               >
                 Cancel
               </button>
