@@ -76,3 +76,16 @@
   z-index: 1;
   min-height: 100svh;
 }
+
+::view-transition-group(container-to-input) {
+  animation-duration: 0.35s;
+  animation-timing-function: ease-in-out;
+}
+
+::view-transition-old(container-to-input),
+::view-transition-new(container-to-input) {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  overflow: visible;
+}

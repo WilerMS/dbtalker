@@ -1,8 +1,10 @@
-import type { JSX } from 'react'
+import type { FC } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import { Database, Zap } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 import { Logo } from '../components/ui/Logo'
+import { useCreateConversation } from '../hooks/useConversations/useCreateConversation'
 
 const easeOut = [0.16, 1, 0.3, 1] as const
 const easeInOut = [0.45, 0, 0.55, 1] as const
@@ -42,7 +44,24 @@ const glowVariants: Variants = {
   },
 }
 
-export const MainPage = (): JSX.Element => {
+const DEFAULT_DATABASE_ID = '83d48401c6f4447283184ebd610148f5'
+
+export const MainPage: FC = () => {
+  const navigate = useNavigate()
+
+  const { createConversation, isPending } = useCreateConversation()
+
+  const handleGoToDemo = async () => {
+    const newConversation = await createConversation({
+      databaseId: DEFAULT_DATABASE_ID,
+      title: 'Nueva conversacion',
+    })
+
+    const newPath = `/app/${DEFAULT_DATABASE_ID}/conversations/${newConversation.id}`
+
+    await navigate(newPath, { viewTransition: true })
+  }
+
   return (
     <div className="relative flex h-full min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-12">
       <motion.section
@@ -81,6 +100,9 @@ export const MainPage = (): JSX.Element => {
         <motion.div
           className="mt-12 space-y-6 rounded-2xl border border-zinc-800/50 bg-zinc-900/30 p-8 backdrop-blur-md"
           variants={itemVariants}
+          style={{
+            viewTransitionName: 'container-to-input',
+          }}
         >
           <div className="text-left">
             <p className="text-sm font-semibold tracking-[0.14em] text-emerald-300/90 uppercase [text-shadow:0_0_12px_rgba(52,211,153,0.28)]">
@@ -134,16 +156,24 @@ export const MainPage = (): JSX.Element => {
           className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center"
           variants={itemVariants}
         >
-          <a
-            href="#try-demo"
-            className="group relative inline-flex items-center gap-2 rounded-full border border-emerald-500/50 bg-zinc-900/80 px-8 py-3 font-semibold text-emerald-200 backdrop-blur-md transition-all duration-300 hover:bg-emerald-950/30 hover:text-emerald-100 hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+          <button
+            onClick={(event) => {
+              event.preventDefault()
+              void handleGoToDemo()
+            }}
+            aria-disabled={isPending}
+            className="group relative inline-flex cursor-pointer items-center gap-2 rounded-full border border-emerald-500/50 bg-zinc-900/80 px-5 py-3 font-semibold text-emerald-200 backdrop-blur-md transition-all duration-300 hover:bg-emerald-950/30 hover:text-emerald-100 hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+            style={{
+              pointerEvents: isPending ? 'none' : 'auto',
+              opacity: isPending ? 0.6 : 1,
+            }}
           >
             <Database className="size-5" strokeWidth={1.5} />
-            <span>Usar Base de Prueba</span>
-          </a>
+            <span>Usar BD de Prueba</span>
+          </button>
 
           <button
-            className="group relative inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-900/50 px-8 py-3 font-semibold text-zinc-300 transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:text-emerald-200 hover:shadow-[0_0_20px_rgba(52,211,153,0.3)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+            className="group relative inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-900/50 px-5 py-3 font-semibold text-zinc-300 transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:text-emerald-200 hover:shadow-[0_0_20px_rgba(52,211,153,0.3)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
             disabled
           >
             <Zap className="size-5" strokeWidth={1.5} />
