@@ -1,68 +1,55 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { useCreateConversation } from '../../../../hooks/useConversations'
-import { useCreateDatabase } from '../../../../hooks/useDatabases'
-import type { DatabaseEngine } from '../../../../types/database'
+import { useUpdateDatabase } from '../../../../hooks/useDatabases'
+import type { DatabaseEngine, DatabaseRecord } from '../../../../types/database'
 import { InputField } from '../../../ui/InputField'
 import { LoadingState } from '../../../ui/LoadingState'
-import { PasswordField } from '../../../ui/PasswordField'
 import { SelectField } from '../../../ui/SelectField'
-import { ToggleField } from '../../../ui/ToggleField'
 import {
-  createDatabaseDefaultValues,
-  createDatabaseFormSchema,
+  databaseFormSchema,
+  getUpdateDatabaseDefaultValues,
   sqlEngineOptions,
-  type CreateDatabaseFormState,
+  type UpdateDatabaseFormState,
 } from './databaseFormSchema'
 
-interface CreateDatabaseModalContentProps {
+interface UpdateDatabaseModalContentProps {
+  database: DatabaseRecord
   onClose: () => void
-  onCreationSuccess: (databaseId: string, conversationId: string) => void
+  onUpdateSuccess?: (databaseId: string) => void
 }
 
-export const CreateDatabaseModalContent = ({
+export const UpdateDatabaseModalContent = ({
+  database,
   onClose,
-  onCreationSuccess,
-}: CreateDatabaseModalContentProps) => {
-  const { createDatabase, isPending: isCreatingDatabase } = useCreateDatabase()
-  const { createConversation, isPending: isCreatingConversation } =
-    useCreateConversation()
+  onUpdateSuccess,
+}: UpdateDatabaseModalContentProps) => {
+  const { updateDatabase, isPending } = useUpdateDatabase()
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors, isValid },
-  } = useForm<CreateDatabaseFormState>({
-    resolver: zodResolver(createDatabaseFormSchema),
+  } = useForm<UpdateDatabaseFormState>({
+    resolver: zodResolver(databaseFormSchema),
     mode: 'onTouched',
-    defaultValues: createDatabaseDefaultValues,
+    defaultValues: getUpdateDatabaseDefaultValues(database),
   })
 
-  const isPending = isCreatingDatabase || isCreatingConversation
-
-  const onSubmit = async (data: CreateDatabaseFormState) => {
-    const databaseRecord = await createDatabase({
-      name: data.databaseName.trim(),
-      engine: data.engine as DatabaseEngine,
-      connection: {
-        host: data.host.trim(),
-        port: Number(data.port),
-        database: data.database.trim(),
-        username: data.username.trim(),
-        password: data.password,
-        useSsl: data.useSsl,
+  const onSubmit = async (data: UpdateDatabaseFormState) => {
+    const updatedDatabase = await updateDatabase({
+      id: database.id,
+      input: {
+        name: data.databaseName.trim(),
+        engine: data.engine as DatabaseEngine,
       },
     })
 
-    const conversationRecord = await createConversation({
-      title: 'Conversacion inicial',
-      databaseId: databaseRecord.id,
-    })
+    if (!updatedDatabase) {
+      return
+    }
 
-    onCreationSuccess(databaseRecord.id, conversationRecord.id)
-    reset()
+    onUpdateSuccess?.(updatedDatabase.id)
     onClose()
   }
 
@@ -76,11 +63,11 @@ export const CreateDatabaseModalContent = ({
             <div className="space-y-3">
               <div className="space-y-2">
                 <h2 className="text-2xl font-semibold tracking-[0.02em] text-zinc-50">
-                  Crear conexion de base de datos
+                  Editar conexion de base de datos
                 </h2>
                 <p className="max-w-2xl text-xs leading-6 text-zinc-400">
-                  Configura los datos de conexion para registrar una base de
-                  datos y comenzar a consultar su informacion desde DBTalkie.
+                  Actualiza la configuracion basica de esta base de datos para
+                  mantener la informacion de DBTalkie al dia.
                 </p>
               </div>
             </div>
@@ -116,57 +103,7 @@ export const CreateDatabaseModalContent = ({
                 disabled={isPending}
                 {...register('engine')}
               />
-
-              <div className="md:col-span-2">
-                <InputField
-                  label="Servidor (host)"
-                  placeholder="db.company.internal"
-                  error={errors.host?.message}
-                  disabled={isPending}
-                  {...register('host')}
-                />
-              </div>
-
-              <InputField
-                label="Puerto"
-                inputMode="numeric"
-                placeholder="5432"
-                error={errors.port?.message}
-                disabled={isPending}
-                {...register('port')}
-              />
-
-              <InputField
-                label="Nombre de la base de datos"
-                placeholder="almacen_datos"
-                error={errors.database?.message}
-                disabled={isPending}
-                {...register('database')}
-              />
-
-              <InputField
-                label="Usuario"
-                placeholder="usuario_lectura"
-                error={errors.username?.message}
-                disabled={isPending}
-                {...register('username')}
-              />
-
-              <PasswordField
-                label="Contrasena"
-                placeholder="••••••••••••"
-                error={errors.password?.message}
-                disabled={isPending}
-                {...register('password')}
-              />
             </div>
-
-            <ToggleField
-              label="SSL habilitado"
-              description="Usa una conexion cifrada para proteger el trafico entre la aplicacion y tu base de datos."
-              disabled={isPending}
-              {...register('useSsl')}
-            />
 
             <div className="flex flex-wrap items-center justify-end gap-3 border-t border-zinc-800/90 pt-5">
               <button
@@ -181,7 +118,7 @@ export const CreateDatabaseModalContent = ({
                     labelClassName="text-emerald-200"
                   />
                 ) : (
-                  'Agregar base de datos'
+                  'Guardar cambios'
                 )}
               </button>
               <button

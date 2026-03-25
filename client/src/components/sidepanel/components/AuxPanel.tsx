@@ -10,6 +10,8 @@ import {
 } from '../../../hooks/useConversations'
 import { LoadingState } from '../../ui/LoadingState'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useModal } from '../../../hooks/useModal'
+import { UpdateDatabaseModalContent } from './create-database'
 
 interface AuxPanelProps {
   anchorRect?: DOMRect
@@ -30,6 +32,7 @@ export const AuxPanel = ({
 
   const { id_conversation } = useParams<{ id_conversation: string }>()
   const navigate = useNavigate()
+  const { openModal } = useModal()
 
   // Conversations handlers
   const { createConversation } = useCreateConversation()
@@ -46,6 +49,19 @@ export const AuxPanel = ({
 
     navigate(`/app/${databaseId}/conversations/${newConversation.id}`, {
       viewTransition: true,
+    })
+  }
+
+  const handleEditDatabase = (database: DatabaseRecord) => {
+    onMouseLeave()
+    openModal({
+      content: ({ closeModal }) => (
+        <UpdateDatabaseModalContent database={database} onClose={closeModal} />
+      ),
+      size: {
+        width: 'min(94vw, 750px)',
+        maxHeight: '90vh',
+      },
     })
   }
 
@@ -71,10 +87,9 @@ export const AuxPanel = ({
               </h3>
             </div>
 
-            {/* // TODO: Esto se implementará cuando tenga el panel de add database */}
             <DatabaseActions
               compact
-              onEdit={() => {}} // TODO: Implementar edición de base de datos
+              onEdit={() => void handleEditDatabase(database)}
               onDelete={() => {}} // TODO: Implementar eliminación de base de datos
             />
           </header>
