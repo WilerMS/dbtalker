@@ -73,14 +73,16 @@ The server emits chunks in three shapes. The client consumes them in `useChat.ts
 
 ```typescript
 // Phase 1 — server is starting to respond; client shows a skeleton
-{ event: 'incoming', type: MessageType }
+{ id: string, event: 'incoming', type: MessageType }
 
 // Phase 2 — full data is ready; client replaces skeleton with real widget/text
-{ event: 'data', type: MessageType,  data: MessageData }
+{ id: string, event: 'data', type: MessageType,  data: MessageData }
 
 // Phase 3 — stream is complete
 { event: 'finished' }
 ```
+
+For each streamed bot message, the `incoming` and `data` chunks must carry the same `id`. The client should use that id to replace the pending message with the completed one.
 
 The `type` field drives widget selection. Valid values: `'text' | 'schema' | 'kpi' | 'bar' | 'line' | 'table'`.
 

@@ -39,10 +39,12 @@ Understanding this flow is essential before making any change to either layer:
 The SSE chunk format is the **binding contract** between client and server. It must be identical on both sides. Never change it on one side without changing the other.
 
 ```
-incoming  →  { event: "incoming", type: MessageType }
-data      →  { event: "data",     type: MessageType,  data: MessageData }
+incoming  →  { id: string, event: "incoming", type: MessageType }
+data      →  { id: string, event: "data",     type: MessageType,  data: MessageData }
 finished  →  { event: "finished" }
 ```
+
+The `id` must be generated once per streamed bot message and reused for the matching `incoming` and `data` chunks, as well as the persisted final bot message.
 
 `MessageType` values: `"text" | "schema" | "kpi" | "bar" | "line" | "table"`
 

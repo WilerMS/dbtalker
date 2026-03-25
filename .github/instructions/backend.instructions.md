@@ -329,10 +329,12 @@ Every streamed response must follow this order:
 
 ```python
 class SSEChunkIncoming(BaseModel):
+    id: str
         event: Literal["incoming"]
         type: MessageType
 
 class SSEChunkData(BaseModel):
+    id: str
         event: Literal["data"]
         type: MessageType
         data: MessageData
@@ -356,6 +358,12 @@ To match the current mock behavior:
 - wait `0.5s` before closing text `incoming`
 - wait `0.7s` before closing text `data`
 - wait `0.2s` before `finished`
+
+### Chunk Identity Rules
+
+- every `incoming`/`data` pair must share the same UUID
+- the persisted bot message for that pair must reuse that same UUID
+- `finished` does not carry an id
 
 ---
 
