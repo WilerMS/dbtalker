@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useEffect, useEffectEvent, useState } from 'react'
 
 import { ChatService } from '../services/chatService'
 import type {
@@ -24,37 +24,33 @@ export const useChat = (
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
 
-  useEffect(() => {
-    const abortController = new AbortController()
-
+  const initializeChat = useEffectEvent(async (signal: AbortSignal) => {
     setIsLoading(true)
     setIsStreaming(false)
     setMessages([])
 
-    const initialize = async (): Promise<void> => {
-      try {
-        const initialMessages = await chatService.getDatabaseMessages(
-          databaseId,
-          conversationId,
-          abortController.signal,
-        )
+    try {
+      const initialMessages = await chatService.getDatabaseMessages(
+        databaseId,
+        conversationId,
+        signal,
+      )
 
-        if (!abortController.signal.aborted) {
-          setMessages(initialMessages)
-        }
-      } finally {
-        if (!abortController.signal.aborted) {
-          setIsLoading(false)
-        }
-      }
+      if (!signal.aborted) setMessages(initialMessages)
+    } finally {
+      if (!signal.aborted) setIsLoading(false)
     }
+  })
 
-    void initialize()
+  useEffect(() => {
+    const abortController = new AbortController()
+
+    void initializeChat(abortController.signal)
 
     return () => {
       abortController.abort()
     }
-  }, [chatService, conversationId, databaseId])
+  }, [conversationId, databaseId])
 
   const sendMessage = async (text: string): Promise<void> => {
     const nextText = text.trim()
