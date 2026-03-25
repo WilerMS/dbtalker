@@ -4,83 +4,53 @@ import { Database, Zap } from 'lucide-react'
 
 import { Logo } from '../components/ui/Logo'
 
+const easeOut = [0.16, 1, 0.3, 1] as const
+const easeInOut = [0.45, 0, 0.55, 1] as const
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.1,
+    },
+  },
+}
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: easeOut },
+  },
+}
+
+const glowVariants: Variants = {
+  animate: {
+    boxShadow: [
+      '0_0_20px_rgba(52,211,153,0.2)',
+      '0_0_35px_rgba(52,211,153,0.4)',
+      '0_0_20px_rgba(52,211,153,0.2)',
+    ],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: easeInOut,
+    },
+  },
+}
+
 export const MainPage = (): JSX.Element => {
-  const easeOut = [0.16, 1, 0.3, 1] as const
-  const easeInOut = [0.45, 0, 0.55, 1] as const
-
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
-    },
-  }
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: easeOut },
-    },
-  }
-
-  const glowVariants: Variants = {
-    animate: {
-      boxShadow: [
-        '0_0_20px_rgba(52,211,153,0.2)',
-        '0_0_35px_rgba(52,211,153,0.4)',
-        '0_0_20px_rgba(52,211,153,0.2)',
-      ],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: easeInOut,
-      },
-    },
-  }
-
   return (
     <div className="relative flex h-full min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-12">
-      {/* Animated background gradient glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <motion.div
-          className="absolute -top-40 right-0 size-80 rounded-full bg-emerald-500/10 blur-3xl"
-          animate={{
-            x: [0, 40, 0],
-            y: [0, -40, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: easeInOut,
-          }}
-        />
-        <motion.div
-          className="absolute bottom-0 left-0 size-96 rounded-full bg-emerald-600/5 blur-3xl"
-          animate={{
-            x: [0, -40, 0],
-            y: [0, 40, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: easeInOut,
-          }}
-        />
-      </div>
-
-      {/* Content */}
       <motion.section
         className="relative z-10 mx-auto max-w-2xl text-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Icon animation */}
         <motion.div
           className="mb-8 flex justify-center"
           variants={itemVariants}
@@ -90,7 +60,6 @@ export const MainPage = (): JSX.Element => {
           </motion.div>
         </motion.div>
 
-        {/* Main heading */}
         <motion.h1
           className="text-4xl leading-tight font-bold tracking-tight text-zinc-100"
           variants={itemVariants}
@@ -102,7 +71,6 @@ export const MainPage = (): JSX.Element => {
           !
         </motion.h1>
 
-        {/* Subtitle */}
         <motion.p
           className="text-md mt-6 text-zinc-400"
           variants={itemVariants}
@@ -110,7 +78,6 @@ export const MainPage = (): JSX.Element => {
           Tu asistente de IA para hablar con cualquier base de datos.
         </motion.p>
 
-        {/* Instructions section */}
         <motion.div
           className="mt-12 space-y-6 rounded-2xl border border-zinc-800/50 bg-zinc-900/30 p-8 backdrop-blur-md"
           variants={itemVariants}
