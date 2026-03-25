@@ -14,8 +14,6 @@ const PANEL_MIN_HEIGHT = 350
 const PANEL_WIDTH = 300
 const PANEL_BASE_SHADOW =
   '0 8px 40px rgba(0,0,0,0.55), 0 0 40px rgba(16,185,129,0.18), 0 0 0 1px rgba(16,185,129,0.07)'
-const PANEL_GLOW_SHADOW =
-  '0 10px 44px rgba(0,0,0,0.58), 0 0 52px rgba(52,211,153,0.22), 0 0 0 1px rgba(52,211,153,0.1)'
 
 const computePosition = (rect?: DOMRect): { top: number; left: number } => {
   if (!rect) return { top: 0, left: 92 }
@@ -52,22 +50,16 @@ export const AuxPanelWrapper = ({
             x: 0,
             top: pos.top,
             left: pos.left,
-            boxShadow: [
-              PANEL_BASE_SHADOW,
-              PANEL_GLOW_SHADOW,
-              PANEL_BASE_SHADOW,
-            ],
+            // boxShadow: [
+            //   PANEL_BASE_SHADOW,
+            //   PANEL_GLOW_SHADOW,
+            //   PANEL_BASE_SHADOW,
+            // ],
           }}
           exit={{ opacity: 0, x: -8 }}
           transition={{
             duration: 0.18,
             ease: 'easeOut',
-            boxShadow: {
-              duration: 7.5,
-              repeat: Infinity,
-              repeatDelay: 2.4,
-              ease: 'easeInOut',
-            },
           }}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
