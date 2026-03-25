@@ -208,6 +208,7 @@ Current shared backend models include:
 - `CreateConversationInput`
 - `PendingMessage`
 - `CompleteMessage`
+- `UserMessage`
 - `SSEChunkIncoming`
 - `SSEChunkData`
 - `SSEChunkFinished`
@@ -274,11 +275,26 @@ These are the backend endpoints that the instructions must reflect.
 
 ### Chat
 
-| Method | Path                                                              | Description                               |
-| ------ | ----------------------------------------------------------------- | ----------------------------------------- |
-| `GET`  | `/chat/messages?database_id=<id>&conversation_id=<id>`            | Get message history for a conversation    |
-| `GET`  | `/chat/stream?query=<text>&database_id=<id>&conversation_id=<id>` | Start SSE chat stream                     |
-| `POST` | `/chat/stream`                                                    | Start SSE chat stream from a request body |
+| Method | Path                                                   | Description                               |
+| ------ | ------------------------------------------------------ | ----------------------------------------- |
+| `GET`  | `/chat/messages?database_id=<id>&conversation_id=<id>` | Get message history for a conversation    |
+| `POST` | `/chat/stream`                                         | Start SSE chat stream from a request body |
+
+`POST /chat/stream` must receive a JSON body with this shape:
+
+```python
+class UserMessage(CompleteMessage):
+    role: Literal["user"]
+    type: Literal["text"]
+    status: Literal["complete"] = "complete"
+    data: TextData
+
+
+class ChatRequestBody(BaseModel):
+    message: UserMessage
+    database_id: str
+    conversation_id: str
+```
 
 ---
 
@@ -353,6 +369,7 @@ Maintain these rules unless the task explicitly changes them:
 - widget detection is keyword-based
 - a query may yield text only, or text plus widget plus closing text
 - user and bot messages are persisted to the mock conversation history
+- the persisted user message must reuse the exact `message.id` and `message.timestamp` received from the frontend
 - stream generation should stay deterministic and client-compatible
 
 Current keyword families include terms such as:
@@ -518,8 +535,24 @@ The chat endpoint must implement the same **SSE chunk sequence** as the client-s
 
 ### Endpoint
 
-```
-GET /chat/stream?query=<string>&database_id=<string>
+````
+POST /chat/stream
+
+```json
+{
+    "message": {
+        "id": "<frontend-message-id>",
+        "role": "user",
+        "type": "text",
+        "status": "complete",
+        "data": { "text": "<full user message>" },
+        "timestamp": "<iso-datetime>"
+    },
+    "database_id": "<database_id>",
+    "conversation_id": "<conversation_id>"
+}
+````
+
 ```
 
 Returns an SSE stream using `sse-starlette`'s `EventSourceResponse`.
@@ -529,18 +562,23 @@ Returns an SSE stream using `sse-starlette`'s `EventSourceResponse`.
 Every response follows this exact sequence:
 
 ```
+
 # 1. Signal that a response is starting (drives skeleton in client)
+
 event: message
 data: {"event": "incoming", "type": "<MessageType>"}
 
 # 2. Send the full data payload (replaces skeleton with real widget/text)
+
 event: message
 data: {"event": "data", "type": "<MessageType>", "data": <MessageData>}
 
 # 3. Signal completion
+
 event: message
 data: {"event": "finished"}
-```
+
+````
 
 ### MessageType values
 
@@ -565,7 +603,7 @@ class SSEChunkFinished(BaseModel):
     event: Literal["finished"]
 
 SSEChunk = Union[SSEChunkIncoming, SSEChunkData, SSEChunkFinished]
-```
+````
 
 ---
 
@@ -576,7 +614,7 @@ SSEChunk = Union[SSEChunkIncoming, SSEChunkData, SSEChunkFinished]
 Specifically:
 
 - `GET /databases` returns a static in-memory list of databases (PostgreSQL, MongoDB, SQLite).
-- `GET /chat/stream` streams mocked SSE chunks — a text message followed by a widget — using the same keyword-based detection logic as the client mock (keywords: `schema`, `kpi`, `revenue`, `trend`, `line`, `bar`, `table`).
+- `POST /chat/stream` streams mocked SSE chunks — a text message followed by a widget — using the same keyword-based detection logic as the client mock (keywords: `schema`, `kpi`, `revenue`, `trend`, `line`, `bar`, `table`).
 - Simulate realistic latency with `asyncio.sleep()` between chunks (900 ms before first chunk, 700 ms before data, 500 ms before widget chunk, etc.) to match the client mock timing.
 
 Do **not** implement LLM calls, real database connections, or query execution yet. That comes in a later phase.

@@ -27,7 +27,7 @@ Understanding this flow is essential before making any change to either layer:
 1. **Client starts** → fetches registered databases via `GET /databases`. The response is displayed in the `SidePanel`.
 2. **User selects a database** → the client navigates to `/:id_db`. The `databaseId` is read from the URL and scopes all subsequent interactions.
 3. **Chat loads** → client fetches the message history for that database via `GET /chat/messages?databaseId=<id>`. Messages are rendered in the chat feed.
-4. **User sends a query** → the client sends it to `GET /chat/stream?query=<text>&database_id=<id>` and opens an SSE stream.
+4. **User sends a query** → the client builds a full `userMessage`, sends it to `POST /chat/stream` together with `database_id` and `conversation_id`, and opens an SSE stream.
 5. **Server processes the query** → detects the response type (text, table, chart, schema…) and begins streaming SSE chunks.
 6. **Client consumes the stream** via `AsyncGenerator<SSEChunk>` inside `useChat.ts` → renders a skeleton on `incoming`, replaces with the real widget/text on `data`, finalizes on `finished`.
 7. **Result displayed** → one or two messages appear in the chat feed (a text explanation + optionally a widget).

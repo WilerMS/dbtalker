@@ -49,9 +49,21 @@ All of these must go through `src/services/dbService.ts`.
 
 ### SSE (chat streaming)
 
-- `GET /chat/stream?query=...&databaseId=...` — opens an SSE stream.
+- `POST /chat/stream` — opens an SSE stream.
 - Consumed via an `AsyncGenerator<SSEChunk>` inside `streamAssistantResponse()`.
 - **The SSEChunk format is the cross-cutting contract between client and server.** See the section below and [`src/types/chat.ts`](../src/types/chat.ts) for the canonical types.
+
+The request body must include:
+
+```typescript
+{
+  message: userMessage,
+  database_id: string,
+  conversation_id: string,
+}
+```
+
+`userMessage` is the full object built in `useChat.ts` before streaming, not just the raw text. The backend persists that message with the same `id` and `timestamp` sent by the client.
 
 ---
 
