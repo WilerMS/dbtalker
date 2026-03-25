@@ -7,7 +7,7 @@ import type {
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
+  import.meta.env.VITE_API_BASE_URL ?? 'http://172.31.240.184:8000'
 
 interface ApiCompleteMessage {
   id: string

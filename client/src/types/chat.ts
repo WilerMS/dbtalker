@@ -7,6 +7,7 @@ export type MessageType =
   | 'line'
   | 'table'
   | 'code'
+  | 'question'
 export type PreviewWidgetType = Exclude<MessageType, 'text'>
 
 export interface TextData {
@@ -20,6 +21,19 @@ export interface CodeData {
   language: CodeLanguage
   code: string
   description?: string
+}
+
+export interface QuestionOption {
+  id: string
+  label: string
+  description?: string
+}
+
+export interface QuestionData {
+  title: string
+  prompt: string
+  options: QuestionOption[]
+  hint?: string
 }
 
 export interface SchemaColumn {
@@ -95,6 +109,7 @@ export type MessageData =
   | LineData
   | TableData
   | CodeData
+  | QuestionData
 
 export interface PendingMessage {
   id: string

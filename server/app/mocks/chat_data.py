@@ -11,6 +11,8 @@ from app.models.database import (
     LinePoint,
     MessageData,
     MessageType,
+    QuestionData,
+    QuestionOption,
     SchemaColumn,
     SchemaData,
     SchemaEdge,
@@ -59,6 +61,10 @@ _WIDGET_INTRO_TEXTS: dict[str, str] = {
         "Generé el snippet SQL correspondiente a tu consulta. "
         "Puedes revisarlo, copiarlo y adaptarlo para ejecutar exactamente el análisis que quieres. "
         "Incluye joins, filtros y agregaciones listos para usarse en tu base de datos."
+    ),
+    "question": (
+        "Antes de continuar, necesito una pequeña aclaración para ajustar mejor el análisis. "
+        "Elige una de las opciones y continuaré con el siguiente paso automáticamente."
     ),
 }
 
@@ -260,6 +266,29 @@ CODE_PREVIEW_DATA = CodeData(
     ),
 )
 
+QUESTION_PREVIEW_DATA = QuestionData(
+    title="Necesito una confirmación",
+    prompt="¿Qué enfoque quieres que priorice para la siguiente respuesta?",
+    options=[
+        QuestionOption(
+            id="focus-speed",
+            label="Priorizar rapidez",
+            description="Entrego un resumen ejecutivo con los hallazgos más importantes.",
+        ),
+        QuestionOption(
+            id="focus-detail",
+            label="Priorizar detalle",
+            description="Incluyo breakdown por tabla, supuestos y explicación técnica.",
+        ),
+        QuestionOption(
+            id="focus-sql",
+            label="Priorizar SQL",
+            description="Genero consulta lista para ejecutar junto con una breve interpretación.",
+        ),
+    ],
+    hint="Puedes cambiar de opción en cualquier momento.",
+)
+
 
 def detect_widget_type(query: str) -> MessageType | None:
     q = query.lower()
@@ -276,6 +305,8 @@ def detect_widget_type(query: str) -> MessageType | None:
         return "table"
     if "sql" in q or "query" in q or "consulta" in q or "snippet" in q:
         return "code"
+    if "question" in q or "pregunta" in q:
+        return "question"
 
     return None
 
@@ -295,17 +326,21 @@ def generate_text_for_widget(widget_type: MessageType | None, database_id: str) 
     )
 
 
-_ALL_WIDGET_LABELS = "schema (esquema), KPI (métricas clave), bar (barras), line (tendencia), table (tabla) y code (snippet SQL)"
+_ALL_WIDGET_LABELS = (
+    "schema (esquema), KPI (métricas clave), bar (barras), line (tendencia), "
+    "table (tabla), code (snippet SQL) y question (preguntas guiadas)"
+)
 
 
 def generate_closing_text(shown_widget_type: MessageType) -> str:
     other_labels = {
-        "schema": "KPI, bar, line, table y code",
-        "kpi": "schema, bar, line, table y code",
-        "bar": "schema, KPI, line, table y code",
-        "line": "schema, KPI, bar, table y code",
-        "table": "schema, KPI, bar, line y code",
-        "code": "schema, KPI, bar, line y table",
+        "schema": "KPI, bar, line, table, code y question",
+        "kpi": "schema, bar, line, table, code y question",
+        "bar": "schema, KPI, line, table, code y question",
+        "line": "schema, KPI, bar, table, code y question",
+        "table": "schema, KPI, bar, line, code y question",
+        "code": "schema, KPI, bar, line, table y question",
+        "question": "schema, KPI, bar, line, table y code",
     }
     others = other_labels.get(shown_widget_type, _ALL_WIDGET_LABELS)
     return (
@@ -330,7 +365,8 @@ _WELCOME_MESSAGES: dict[str, str] = {
         '"bar" para un gráfico de barras, '
         '"tendencia" para una gráfica de líneas con evolución temporal, '
         'o "tabla" para explorar filas de datos directamente, '
-        'o "consulta SQL" para generar snippets listos para ejecutar. '
+        'o "consulta SQL" para generar snippets listos para ejecutar, '
+        'o "question" para que te haga una pregunta con opciones. '
         "Solo escríbelo en lenguaje natural."
     ),
     "83d48401c6f4447283184ebd610148f6": (
@@ -342,7 +378,8 @@ _WELCOME_MESSAGES: dict[str, str] = {
         '"bar" para comparar categorías, '
         '"line" para ver tendencias a lo largo del tiempo, '
         'o "table" para inspeccionar registros individuales, '
-        'o "sql" para generar una consulta lista para ejecutar. '
+        'o "sql" para generar una consulta lista para ejecutar, '
+        'o "question" para responder con una opción guiada. '
         "Combínalos en la misma conversación para un análisis completo."
     ),
     "83d48401c6f4447283184ebd610148f7": (
@@ -352,7 +389,8 @@ _WELCOME_MESSAGES: dict[str, str] = {
         '"schema" te muestra el modelo de datos, '
         '"KPI" te da un indicador clave al instante, '
         '"bar" o "line" generan gráficos automáticamente, '
-        '"tabla" lista los datos en formato tabular y "sql" crea un snippet de consulta. '
+        '"tabla" lista los datos en formato tabular, "sql" crea un snippet de consulta '
+        'y "question" habilita preguntas con opciones. '
         "No necesitas escribir SQL manualmente: solo descríbeme lo que quieres ver."
     ),
 }
@@ -361,7 +399,7 @@ _DEFAULT_WELCOME_MESSAGE = (
     "¡Bienvenido a DBTalkie! "
     "Puedo generar diferentes tipos de visualizaciones a partir de tus datos. "
     'Prueba pidiendo un "schema", un "KPI", un gráfico de "barras", '
-    'una "tendencia", una "tabla" o una "consulta SQL" en lenguaje natural.'
+    'una "tendencia", una "tabla", una "consulta SQL" o un "question" en lenguaje natural.'
 )
 
 
@@ -382,6 +420,8 @@ def get_widget_data_by_type(widget_type: MessageType) -> MessageData:
         return TABLE_PREVIEW_DATA
     elif widget_type == "code":
         return CODE_PREVIEW_DATA
+    elif widget_type == "question":
+        return QUESTION_PREVIEW_DATA
     else:
         raise ValueError(f"Unknown widget type: {widget_type}")
 

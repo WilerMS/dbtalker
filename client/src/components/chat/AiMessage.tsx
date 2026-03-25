@@ -6,6 +6,7 @@ import type {
   KpiData,
   LineData,
   Message,
+  QuestionData,
   SchemaData,
   TableData,
   TextData,
@@ -16,6 +17,7 @@ import { BarChartWidget } from './widgets/BarChartWidget'
 import { LineChartWidget } from './widgets/LineChartWidget'
 import { TableWidget } from './widgets/TableWidget'
 import { CodeWidget } from './widgets/CodeWidget'
+import { QuestionWidget } from './widgets/QuestionWidget'
 import { TextMessageSkeleton } from './skeletons/TextMessageSkeleton'
 import { SchemaWidgetSkeleton } from './skeletons/SchemaWidgetSkeleton'
 import { KpiWidgetSkeleton } from './skeletons/KpiWidgetSkeleton'
@@ -23,6 +25,7 @@ import { BarChartWidgetSkeleton } from './skeletons/BarChartWidgetSkeleton'
 import { LineChartWidgetSkeleton } from './skeletons/LineChartWidgetSkeleton'
 import { TableWidgetSkeleton } from './skeletons/TableWidgetSkeleton'
 import { CodeWidgetSkeleton } from './skeletons/CodeWidgetSkeleton'
+import { QuestionWidgetSkeleton } from './skeletons/QuestionWidgetSkeleton'
 
 interface AiMessageProps {
   message: Message
@@ -52,6 +55,9 @@ const expandedWidgetSizes = {
     width: 'min(96vw, 1320px)',
     height: '720px',
   },
+  question: {
+    width: 'min(95vw, 900px)',
+  },
 } as const
 
 export const AiMessage = ({ message }: AiMessageProps) => {
@@ -72,6 +78,8 @@ export const AiMessage = ({ message }: AiMessageProps) => {
         return <TableWidgetSkeleton />
       case 'code':
         return <CodeWidgetSkeleton />
+      case 'question':
+        return <QuestionWidgetSkeleton />
     }
   }
 
@@ -160,6 +168,20 @@ export const AiMessage = ({ message }: AiMessageProps) => {
           {({ isExpanded }) => (
             <CodeWidget
               data={complete.data as CodeData}
+              isExpanded={isExpanded}
+            />
+          )}
+        </ExpandableWidget>
+      )
+    case 'question':
+      return (
+        <ExpandableWidget
+          widgetId={complete.id}
+          expandedSize={expandedWidgetSizes.question}
+        >
+          {({ isExpanded }) => (
+            <QuestionWidget
+              data={complete.data as QuestionData}
               isExpanded={isExpanded}
             />
           )}

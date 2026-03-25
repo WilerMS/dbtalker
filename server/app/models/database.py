@@ -66,7 +66,16 @@ class CreateConversationInput(BaseModel):
 # ============================================================================
 
 MessageRole = Literal["user", "bot"]
-MessageType = Literal["text", "schema", "kpi", "bar", "line", "table", "code"]
+MessageType = Literal[
+    "text",
+    "schema",
+    "kpi",
+    "bar",
+    "line",
+    "table",
+    "code",
+    "question",
+]
 
 
 # --- Text Data ---
@@ -182,6 +191,24 @@ class CodeData(BaseModel):
     description: str | None = None
 
 
+# --- Question Data ---
+class QuestionOption(BaseModel):
+    """Selectable option for a question widget."""
+
+    id: str
+    label: str
+    description: str | None = None
+
+
+class QuestionData(BaseModel):
+    """Question widget data where the user can choose one option."""
+
+    title: str
+    prompt: str
+    options: list[QuestionOption] = Field(min_length=1, max_length=3)
+    hint: str | None = None
+
+
 # --- Message Data Union ---
 MessageData = Union[
     TextData,
@@ -191,6 +218,7 @@ MessageData = Union[
     LineData,
     TableData,
     CodeData,
+    QuestionData,
 ]
 
 
