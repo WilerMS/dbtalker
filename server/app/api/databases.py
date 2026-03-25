@@ -14,7 +14,7 @@ from app.models.database import (
     ConversationRecord,
     CreateConversationInput,
     CreateDatabaseInput,
-    DatabaseRecord,
+    DatabaseResponseRecord,
     UpdateDatabaseInput,
 )
 
@@ -27,35 +27,39 @@ ConversationControllerDep = Annotated[
 ]
 
 
-@router.get("/", response_model=list[DatabaseRecord])
+@router.get("/", response_model=list[DatabaseResponseRecord])
 async def list_databases(
     database_controller: DatabaseControllerDep,
-) -> list[DatabaseRecord]:
+) -> list[DatabaseResponseRecord]:
     return database_controller.list_databases()
 
 
-@router.get("/{database_id}", response_model=DatabaseRecord)
+@router.get("/{database_id}", response_model=DatabaseResponseRecord)
 async def get_database_by_id(
     database_id: str,
     database_controller: DatabaseControllerDep,
-) -> DatabaseRecord:
+) -> DatabaseResponseRecord:
     return database_controller.get_database(database_id)
 
 
-@router.post("/", response_model=DatabaseRecord, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=DatabaseResponseRecord,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_database_endpoint(
     input_data: CreateDatabaseInput,
     database_controller: DatabaseControllerDep,
-) -> DatabaseRecord:
-    return database_controller.create_database(input_data)
+) -> DatabaseResponseRecord:
+    return await database_controller.create_database(input_data)
 
 
-@router.patch("/{database_id}", response_model=DatabaseRecord)
+@router.patch("/{database_id}", response_model=DatabaseResponseRecord)
 async def update_database_endpoint(
     database_id: str,
     input_data: UpdateDatabaseInput,
     database_controller: DatabaseControllerDep,
-) -> DatabaseRecord:
+) -> DatabaseResponseRecord:
     return database_controller.update_database(database_id, input_data)
 
 

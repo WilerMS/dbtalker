@@ -12,8 +12,43 @@ from pydantic import BaseModel, Field
 DatabaseEngine = Literal["postgresql", "mongodb", "sqlite"]
 
 
+class DatabaseConnection(BaseModel):
+    """Stored database connection details (server-side only)."""
+
+    host: str
+    port: int
+    database: str
+    username: str
+    password: str
+    use_ssl: bool
+
+
+class DatabaseConnectionInput(BaseModel):
+    """Request connection details for creating a database."""
+
+    host: str
+    port: int = Field(gt=0)
+    database: str
+    username: str
+    password: str
+    use_ssl: bool
+
+
 class DatabaseRecord(BaseModel):
-    """Represents a registered database connection."""
+    """Represents a registered database with server-side connection data."""
+
+    id: str
+    name: str
+    engine: DatabaseEngine
+    icon: str
+    description: str | None = None
+    connection: DatabaseConnection
+    created_at: datetime
+    updated_at: datetime
+
+
+class DatabaseResponseRecord(BaseModel):
+    """Represents public database metadata returned to the frontend."""
 
     id: str
     name: str
@@ -23,6 +58,21 @@ class DatabaseRecord(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    @classmethod
+    def from_database_record(
+        cls,
+        database_record: "DatabaseRecord",
+    ) -> "DatabaseResponseRecord":
+        return cls(
+            id=database_record.id,
+            name=database_record.name,
+            engine=database_record.engine,
+            icon=database_record.icon,
+            description=database_record.description,
+            created_at=database_record.created_at,
+            updated_at=database_record.updated_at,
+        )
+
 
 class CreateDatabaseInput(BaseModel):
     """Request body for creating a new database."""
@@ -30,6 +80,7 @@ class CreateDatabaseInput(BaseModel):
     name: str
     engine: DatabaseEngine
     description: str | None = None
+    connection: DatabaseConnectionInput
 
 
 class UpdateDatabaseInput(BaseModel):

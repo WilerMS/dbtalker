@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+
 from app.mocks.databases import (
     create_database as mock_create_database,
 )
@@ -29,7 +31,8 @@ class DatabaseService:
     def get_database_by_id(self, database_id: str) -> DatabaseRecord | None:
         return mock_get_database(database_id)
 
-    def create_database(self, input_data: CreateDatabaseInput) -> DatabaseRecord:
+    async def create_database(self, input_data: CreateDatabaseInput) -> DatabaseRecord:
+        await asyncio.sleep(2)
         return mock_create_database(input_data)
 
     def update_database(
