@@ -1,9 +1,3 @@
-"""
-Chat controller for orchestrating chat operations.
-Delegates streaming and message logic to ChatService.
-Handles validation of conversation/database context.
-"""
-
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
@@ -16,12 +10,6 @@ from app.utility.errors import ResourceNotFoundError
 
 
 class ChatController:
-    """
-    Controller for chat operations.
-    Injects services and validates context (database, conversation existence).
-    Delegates actual chat logic to ChatService.
-    """
-
     def __init__(
         self,
         chat_service: ChatService,
@@ -53,21 +41,6 @@ class ChatController:
         database_id: str,
         conversation_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
-        """
-        Stream chat response for a query.
-        Validates database and conversation exist before streaming.
-
-        Args:
-            user_message: The complete user message payload from the frontend.
-            database_id: The database context (must exist).
-            conversation_id: The conversation context (validated if provided).
-
-        Yields:
-            SSE chunk dictionaries with event and data fields.
-
-        Raises:
-            ResourceNotFoundError: If database or conversation doesn't exist.
-        """
         self._validate_database_and_conversation(database_id, conversation_id)
 
         # Delegate to chat service for streaming
@@ -81,15 +54,5 @@ class ChatController:
         conversation_id: str,
         database_id: str,
     ) -> list[CompleteMessage]:
-        """
-        Get all messages for a conversation.
-
-        Args:
-            conversation_id: The conversation ID.
-            database_id: The database context.
-
-        Returns:
-            List of complete messages in the conversation.
-        """
         self._validate_database_and_conversation(database_id, conversation_id)
         return self._chat_service.get_conversation_messages(conversation_id, database_id)
