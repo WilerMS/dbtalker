@@ -137,12 +137,16 @@ export interface UserMessage extends CompleteMessage {
 export type Message = PendingMessage | CompleteMessage
 
 // SSE chunk types emitted by the mock streaming service
-export interface SSEChunkIncoming {
+export interface SSEChunkBase {
+  id: string
+}
+
+export interface SSEChunkIncoming extends SSEChunkBase {
   event: 'incoming'
   type: MessageType
 }
 
-export interface SSEChunkData {
+export interface SSEChunkData extends SSEChunkBase {
   event: 'data'
   type: MessageType
   data: MessageData

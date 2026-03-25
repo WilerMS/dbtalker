@@ -85,6 +85,7 @@ export class ChatService {
     const streamRequest = fetchEventSource(url.toString(), {
       method: 'POST',
       signal: abortController.signal,
+      openWhenHidden: true,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -193,11 +194,14 @@ export class ChatService {
 
     if (
       (chunk.event === 'incoming' || chunk.event === 'data') &&
+      'id' in chunk &&
+      typeof chunk.id === 'string' &&
       'type' in chunk &&
       typeof chunk.type === 'string'
     ) {
       if (chunk.event === 'incoming') {
         return {
+          id: chunk.id,
           event: 'incoming',
           type: chunk.type as MessageType,
         }
@@ -205,6 +209,7 @@ export class ChatService {
 
       if ('data' in chunk) {
         return {
+          id: chunk.id,
           event: 'data',
           type: chunk.type as MessageType,
           data: chunk.data as MessageData,

@@ -1,10 +1,9 @@
-import { useMemo, useEffect, useRef, useState } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 
 import type {
   CompleteMessage,
   Message,
   MessageType,
-  PendingMessage,
   UserMessage,
 } from '../types/chat'
 import { ChatService } from '../services/chatService'
@@ -27,9 +26,9 @@ const buildUserMessage = (text: string): UserMessage => {
   }
 }
 
-const buildPendingMessage = (type: MessageType): PendingMessage => {
+const buildPendingMessage = (id: string, type: MessageType): Message => {
   return {
-    id: crypto.randomUUID(),
+    id,
     role: 'bot',
     type,
     status: 'pending',
@@ -38,12 +37,12 @@ const buildPendingMessage = (type: MessageType): PendingMessage => {
 }
 
 const buildBotCompleteMessage = (
+  id: string,
   type: MessageType,
   data: CompleteMessage['data'],
-  completedId: string | null,
 ): CompleteMessage => {
   return {
-    id: completedId ?? crypto.randomUUID(),
+    id,
     role: 'bot',
     type,
     status: 'complete',
@@ -54,13 +53,9 @@ const buildBotCompleteMessage = (
 
 const replacePendingMessage = (
   messages: Message[],
-  completedId: string | null,
+  completedId: string,
   completeMessage: CompleteMessage,
 ): Message[] => {
-  if (!completedId) {
-    return [...messages, completeMessage]
-  }
-
   return messages.map((message) =>
     message.id === completedId ? completeMessage : message,
   )
@@ -74,8 +69,6 @@ export const useChat = (
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
-  // Tracks the id of the current PendingMessage so we can replace it on 'data'
-  const pendingIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -118,7 +111,6 @@ export const useChat = (
 
     setMessages((prev) => [...prev, userMessage])
     setIsLoading(true)
-    pendingIdRef.current = null
 
     try {
       for await (const chunk of chatService.streamAiResponse(
@@ -131,23 +123,33 @@ export const useChat = (
           setIsLoading(false)
           setIsStreaming(true)
 
-          const pending = buildPendingMessage(chunk.type)
-          pendingIdRef.current = pending.id
+          const pending = buildPendingMessage(chunk.id, chunk.type)
+
+          const hasPendingMessage = messages.some(
+            (message) => message.id === chunk.id,
+          )
+
+          if (hasPendingMessage) continue
+
           setMessages((prev) => [...prev, pending])
         } else if (chunk.event === 'data') {
-          // Replace the pending skeleton with the real complete message
-          const completedId = pendingIdRef.current
-          pendingIdRef.current = null
-
           const complete = buildBotCompleteMessage(
+            chunk.id,
             chunk.type,
             chunk.data,
-            completedId,
           )
 
-          setMessages((prev) =>
-            replacePendingMessage(prev, completedId, complete),
-          )
+          setMessages((prev) => {
+            const hasPendingMessage = prev.some(
+              (message) => message.id === chunk.id,
+            )
+
+            if (!hasPendingMessage) {
+              return [...prev, complete]
+            }
+
+            return replacePendingMessage(prev, chunk.id, complete)
+          })
         } else if (chunk.event === 'finished') {
           setIsStreaming(false)
         }
