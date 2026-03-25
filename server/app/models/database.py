@@ -66,7 +66,7 @@ class CreateConversationInput(BaseModel):
 # ============================================================================
 
 MessageRole = Literal["user", "bot"]
-MessageType = Literal["text", "schema", "kpi", "bar", "line", "table"]
+MessageType = Literal["text", "schema", "kpi", "bar", "line", "table", "code"]
 
 
 # --- Text Data ---
@@ -169,8 +169,29 @@ class TableData(BaseModel):
     rows: list[dict[str, str | float | int]]  # Use dict directly for flexibility
 
 
+# --- Code Snippet Data ---
+CodeLanguage = Literal["sql", "postgresql", "mysql", "sqlite"]
+
+
+class CodeData(BaseModel):
+    """Code snippet widget data."""
+
+    title: str
+    language: CodeLanguage
+    code: str
+    description: str | None = None
+
+
 # --- Message Data Union ---
-MessageData = Union[TextData, SchemaData, KpiData, BarData, LineData, TableData]
+MessageData = Union[
+    TextData,
+    SchemaData,
+    KpiData,
+    BarData,
+    LineData,
+    TableData,
+    CodeData,
+]
 
 
 # ============================================================================

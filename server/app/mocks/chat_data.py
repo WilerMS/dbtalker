@@ -4,6 +4,7 @@ from datetime import datetime
 
 from app.models.database import (
     BarData,
+    CodeData,
     CompleteMessage,
     KpiData,
     LineData,
@@ -53,6 +54,11 @@ _WIDGET_INTRO_TEXTS: dict[str, str] = {
         "y cuáles presentan degradación de rendimiento. "
         "Los servicios marcados como 'degraded' requieren atención prioritaria, "
         "ya que su latencia supera los umbrales aceptables definidos para el sistema."
+    ),
+    "code": (
+        "Generé el snippet SQL correspondiente a tu consulta. "
+        "Puedes revisarlo, copiarlo y adaptarlo para ejecutar exactamente el análisis que quieres. "
+        "Incluye joins, filtros y agregaciones listos para usarse en tu base de datos."
     ),
 }
 
@@ -225,6 +231,35 @@ TABLE_PREVIEW_DATA = TableData(
     ],
 )
 
+CODE_PREVIEW_DATA = CodeData(
+    title="SQL generado",
+    language="sql",
+    description="Consulta para obtener ingresos semanales y variacion vs semana anterior.",
+    code=(
+        "WITH weekly_revenue AS (\n"
+        "  SELECT\n"
+        "    date_trunc('week', paid_at) AS week_start,\n"
+        "    SUM(total_amount) AS revenue\n"
+        "  FROM orders\n"
+        "  WHERE status = 'paid'\n"
+        "  GROUP BY 1\n"
+        "), ranked AS (\n"
+        "  SELECT\n"
+        "    week_start,\n"
+        "    revenue,\n"
+        "    LAG(revenue) OVER (ORDER BY week_start) AS prev_revenue\n"
+        "  FROM weekly_revenue\n"
+        ")\n"
+        "SELECT\n"
+        "  week_start,\n"
+        "  revenue,\n"
+        "  ROUND(((revenue - prev_revenue) / NULLIF(prev_revenue, 0)) * 100, 2) AS wow_delta_pct\n"
+        "FROM ranked\n"
+        "ORDER BY week_start DESC\n"
+        "LIMIT 8;"
+    ),
+)
+
 
 def detect_widget_type(query: str) -> MessageType | None:
     q = query.lower()
@@ -239,6 +274,8 @@ def detect_widget_type(query: str) -> MessageType | None:
         return "bar"
     if "table" in q or "rows" in q or "filas" in q:
         return "table"
+    if "sql" in q or "query" in q or "consulta" in q or "snippet" in q:
+        return "code"
 
     return None
 
@@ -254,22 +291,21 @@ def generate_text_for_widget(widget_type: MessageType | None, database_id: str) 
         f"Base de datos '{database_id}' lista. "
         "Puedes pedirme cosas como: "
         '"muéstrame el schema", "enséñame un KPI", "quiero un gráfico de barras", '
-        '"muéstrame la tendencia" o "dame una tabla".'
+        '"muéstrame la tendencia", "dame una tabla" o "genera la consulta SQL".'
     )
 
 
-_ALL_WIDGET_LABELS = (
-    "schema (esquema), KPI (métricas clave), bar (barras), line (tendencia) y table (tabla)"
-)
+_ALL_WIDGET_LABELS = "schema (esquema), KPI (métricas clave), bar (barras), line (tendencia), table (tabla) y code (snippet SQL)"
 
 
 def generate_closing_text(shown_widget_type: MessageType) -> str:
     other_labels = {
-        "schema": "KPI, bar, line y table",
-        "kpi": "schema, bar, line y table",
-        "bar": "schema, KPI, line y table",
-        "line": "schema, KPI, bar y table",
-        "table": "schema, KPI, bar y line",
+        "schema": "KPI, bar, line, table y code",
+        "kpi": "schema, bar, line, table y code",
+        "bar": "schema, KPI, line, table y code",
+        "line": "schema, KPI, bar, table y code",
+        "table": "schema, KPI, bar, line y code",
+        "code": "schema, KPI, bar, line y table",
     }
     others = other_labels.get(shown_widget_type, _ALL_WIDGET_LABELS)
     return (
@@ -293,8 +329,9 @@ _WELCOME_MESSAGES: dict[str, str] = {
         '"KPI" para obtener métricas clave de negocio, '
         '"bar" para un gráfico de barras, '
         '"tendencia" para una gráfica de líneas con evolución temporal, '
-        'o "tabla" para explorar filas de datos directamente. '
-        "Solo escríbelo en lenguaje natural — sin SQL."
+        'o "tabla" para explorar filas de datos directamente, '
+        'o "consulta SQL" para generar snippets listos para ejecutar. '
+        "Solo escríbelo en lenguaje natural."
     ),
     "83d48401c6f4447283184ebd610148f6": (
         "¡Bienvenido a tu base de datos MongoDB! "
@@ -304,7 +341,8 @@ _WELCOME_MESSAGES: dict[str, str] = {
         '"KPI" para ver métricas de volumen de eventos, '
         '"bar" para comparar categorías, '
         '"line" para ver tendencias a lo largo del tiempo, '
-        'o "table" para inspeccionar registros individuales. '
+        'o "table" para inspeccionar registros individuales, '
+        'o "sql" para generar una consulta lista para ejecutar. '
         "Combínalos en la misma conversación para un análisis completo."
     ),
     "83d48401c6f4447283184ebd610148f7": (
@@ -314,8 +352,8 @@ _WELCOME_MESSAGES: dict[str, str] = {
         '"schema" te muestra el modelo de datos, '
         '"KPI" te da un indicador clave al instante, '
         '"bar" o "line" generan gráficos automáticamente, '
-        'y "tabla" lista los datos en formato tabular. '
-        "No necesitas escribir SQL — solo descríbeme lo que quieres ver."
+        '"tabla" lista los datos en formato tabular y "sql" crea un snippet de consulta. '
+        "No necesitas escribir SQL manualmente: solo descríbeme lo que quieres ver."
     ),
 }
 
@@ -323,7 +361,7 @@ _DEFAULT_WELCOME_MESSAGE = (
     "¡Bienvenido a DBTalkie! "
     "Puedo generar diferentes tipos de visualizaciones a partir de tus datos. "
     'Prueba pidiendo un "schema", un "KPI", un gráfico de "barras", '
-    'una "tendencia" o una "tabla" — todo en lenguaje natural, sin SQL.'
+    'una "tendencia", una "tabla" o una "consulta SQL" en lenguaje natural.'
 )
 
 
@@ -342,6 +380,8 @@ def get_widget_data_by_type(widget_type: MessageType) -> MessageData:
         return LINE_PREVIEW_DATA
     elif widget_type == "table":
         return TABLE_PREVIEW_DATA
+    elif widget_type == "code":
+        return CODE_PREVIEW_DATA
     else:
         raise ValueError(f"Unknown widget type: {widget_type}")
 

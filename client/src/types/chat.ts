@@ -1,9 +1,25 @@
 export type MessageRole = 'user' | 'bot'
-export type MessageType = 'text' | 'schema' | 'kpi' | 'bar' | 'line' | 'table'
+export type MessageType =
+  | 'text'
+  | 'schema'
+  | 'kpi'
+  | 'bar'
+  | 'line'
+  | 'table'
+  | 'code'
 export type PreviewWidgetType = Exclude<MessageType, 'text'>
 
 export interface TextData {
   text: string
+}
+
+export type CodeLanguage = 'sql' | 'postgresql' | 'mysql' | 'sqlite'
+
+export interface CodeData {
+  title: string
+  language: CodeLanguage
+  code: string
+  description?: string
 }
 
 export interface SchemaColumn {
@@ -78,6 +94,7 @@ export type MessageData =
   | BarData
   | LineData
   | TableData
+  | CodeData
 
 export interface PendingMessage {
   id: string

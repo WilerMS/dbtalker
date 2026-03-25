@@ -1,25 +1,28 @@
 import { ExpandableWidget } from '../ui/ExpandableWidget'
 import type {
   BarData,
+  CodeData,
   CompleteMessage,
   KpiData,
+  LineData,
   Message,
   SchemaData,
   TableData,
   TextData,
-  LineData,
 } from '../../types/chat'
 import { SchemaWidget } from './widgets/SchemaWidget'
 import { KpiWidget } from './widgets/KpiWidget'
 import { BarChartWidget } from './widgets/BarChartWidget'
 import { LineChartWidget } from './widgets/LineChartWidget'
 import { TableWidget } from './widgets/TableWidget'
+import { CodeWidget } from './widgets/CodeWidget'
 import { TextMessageSkeleton } from './skeletons/TextMessageSkeleton'
 import { SchemaWidgetSkeleton } from './skeletons/SchemaWidgetSkeleton'
 import { KpiWidgetSkeleton } from './skeletons/KpiWidgetSkeleton'
 import { BarChartWidgetSkeleton } from './skeletons/BarChartWidgetSkeleton'
 import { LineChartWidgetSkeleton } from './skeletons/LineChartWidgetSkeleton'
 import { TableWidgetSkeleton } from './skeletons/TableWidgetSkeleton'
+import { CodeWidgetSkeleton } from './skeletons/CodeWidgetSkeleton'
 
 interface AiMessageProps {
   message: Message
@@ -45,6 +48,10 @@ const expandedWidgetSizes = {
     width: 'min(96vw, 1320px)',
     height: '550px',
   },
+  code: {
+    width: 'min(96vw, 1320px)',
+    height: '720px',
+  },
 } as const
 
 export const AiMessage = ({ message }: AiMessageProps) => {
@@ -63,6 +70,8 @@ export const AiMessage = ({ message }: AiMessageProps) => {
         return <LineChartWidgetSkeleton />
       case 'table':
         return <TableWidgetSkeleton />
+      case 'code':
+        return <CodeWidgetSkeleton />
     }
   }
 
@@ -137,6 +146,20 @@ export const AiMessage = ({ message }: AiMessageProps) => {
           {({ isExpanded }) => (
             <TableWidget
               data={complete.data as TableData}
+              isExpanded={isExpanded}
+            />
+          )}
+        </ExpandableWidget>
+      )
+    case 'code':
+      return (
+        <ExpandableWidget
+          widgetId={complete.id}
+          expandedSize={expandedWidgetSizes.code}
+        >
+          {({ isExpanded }) => (
+            <CodeWidget
+              data={complete.data as CodeData}
               isExpanded={isExpanded}
             />
           )}

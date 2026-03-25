@@ -111,9 +111,7 @@ export const useChat = (
   const sendMessage = async (text: string): Promise<void> => {
     const nextText = text.trim()
 
-    if (!nextText) {
-      return
-    }
+    if (!nextText) return
 
     setMessages((prev) => [...prev, buildUserMessage(nextText)])
     setIsLoading(true)
