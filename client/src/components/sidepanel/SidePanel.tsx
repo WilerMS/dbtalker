@@ -9,9 +9,12 @@ import { useGetDatabases } from '../../hooks/useDatabases/useGetDatabases'
 import { DynamicIcon } from '../ui/DynamicIcon'
 import { useDelayedHide } from './hooks/useDelayedHide'
 import { Logo } from '../ui/Logo'
+import { useModal } from '../../hooks/useModal'
+import { CreateDatabaseModalContent } from './components/create-database'
 
 export const SidePanel: FC = () => {
   const navigate = useNavigate()
+  const { openModal } = useModal()
 
   const { id_db: selectedDatabaseId } = useParams<{ id_db: string }>()
   const { databases = [] } = useGetDatabases()
@@ -56,7 +59,20 @@ export const SidePanel: FC = () => {
           </SidePanelItemButton>
         ))}
 
-        <SidePanelItemButton title="Add database">
+        <SidePanelItemButton
+          title="Add database"
+          onClick={() => {
+            openModal({
+              content: ({ closeModal }) => (
+                <CreateDatabaseModalContent onClose={closeModal} />
+              ),
+              size: {
+                width: 'min(94vw, 1040px)',
+                maxHeight: '90vh',
+              },
+            })
+          }}
+        >
           <Plus size={20} />
         </SidePanelItemButton>
 
