@@ -1,5 +1,5 @@
-import { DatabaseZap, LockKeyhole, Network, Server } from 'lucide-react'
-import { useState, type ChangeEvent, type JSX } from 'react'
+import { X } from 'lucide-react'
+import { useState, type ChangeEvent } from 'react'
 import { InputField } from '../../../ui/InputField'
 import { PasswordField } from '../../../ui/PasswordField'
 import { SelectField } from '../../../ui/SelectField'
@@ -43,7 +43,7 @@ const baseFieldClassName =
 
 export const CreateDatabaseModalContent = ({
   onClose,
-}: CreateDatabaseModalContentProps): JSX.Element => {
+}: CreateDatabaseModalContentProps) => {
   const [formState, setFormState] =
     useState<CreateDatabaseFormState>(initialFormState)
 
@@ -64,22 +64,18 @@ export const CreateDatabaseModalContent = ({
   }
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="h-hull relative overflow-hidden">
       <div className="absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/35 to-transparent" />
 
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(280px,0.68fr)]">
+      <div className="grid gap-0">
         <div className="border-b border-zinc-800/90 p-6 md:p-8 lg:border-r lg:border-b-0">
           <div className="mb-8 flex items-start justify-between gap-4">
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[11px] font-medium tracking-[0.24em] text-emerald-300 uppercase">
-                <DatabaseZap className="size-3.5" />
-                New SQL Source
-              </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-semibold tracking-[0.02em] text-zinc-50 md:text-3xl">
+                <h2 className="text-2xl font-semibold tracking-[0.02em] text-zinc-50">
                   Create database connection
                 </h2>
-                <p className="max-w-2xl text-sm leading-6 text-zinc-400">
+                <p className="max-w-2xl text-xs leading-6 text-zinc-400">
                   This screen is only the UI layer for now. You can define a
                   generic SQL connection profile, but nothing will be sent to
                   the backend yet.
@@ -90,9 +86,9 @@ export const CreateDatabaseModalContent = ({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full border border-zinc-800 bg-zinc-950/70 px-4 py-2 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase transition-all duration-300 hover:border-emerald-400/40 hover:text-emerald-200 hover:shadow-[0_0_18px_rgba(52,211,153,0.18)]"
+              className="cursor-pointer rounded-full border border-zinc-800 bg-zinc-950/70 p-2 text-xs font-medium tracking-[0.18em] text-zinc-400 uppercase transition-all duration-300 hover:border-emerald-400/40 hover:text-emerald-200 hover:shadow-[0_0_18px_rgba(52,211,153,0.18)]"
             >
-              Close
+              <X size={24} />
             </button>
           </div>
 
@@ -226,67 +222,6 @@ export const CreateDatabaseModalContent = ({
             </div>
           </form>
         </div>
-
-        <aside className="relative p-6 md:p-8">
-          <div className="absolute inset-x-8 top-0 h-px bg-linear-to-r from-transparent via-zinc-700 to-transparent lg:hidden" />
-          <div className="space-y-4">
-            <div className="rounded-[24px] border border-zinc-800 bg-zinc-950/60 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-3 text-emerald-300">
-                  <Server className="size-5" />
-                </div>
-                <div>
-                  <p className="text-xs tracking-[0.2em] text-zinc-500 uppercase">
-                    Connection preview
-                  </p>
-                  <p className="mt-1 text-sm font-medium text-zinc-100">
-                    {formState.databaseName || 'Untitled source'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3 text-sm text-zinc-400">
-                <div className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-800/90 bg-zinc-900/45 px-4 py-3">
-                  <span>Engine</span>
-                  <span className="text-zinc-100">{formState.engine}</span>
-                </div>
-                <div className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-800/90 bg-zinc-900/45 px-4 py-3">
-                  <span>Network target</span>
-                  <span className="truncate text-zinc-100">
-                    {formState.host || 'pending-host'}:
-                    {formState.port || '0000'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-800/90 bg-zinc-900/45 px-4 py-3">
-                  <span>Database</span>
-                  <span className="text-zinc-100">
-                    {formState.database || 'pending-database'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[24px] border border-zinc-800 bg-zinc-950/50 p-5">
-              <p className="mb-3 text-xs tracking-[0.2em] text-zinc-500 uppercase">
-                Included fields
-              </p>
-              <div className="space-y-3 text-sm text-zinc-400">
-                <div className="flex items-center gap-3 rounded-2xl border border-zinc-800/90 bg-zinc-900/40 px-4 py-3">
-                  <Network className="size-4 text-emerald-300" />
-                  Host, port and database namespace
-                </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-zinc-800/90 bg-zinc-900/40 px-4 py-3">
-                  <LockKeyhole className="size-4 text-emerald-300" />
-                  Credentials and SSL toggle
-                </div>
-                <div className="flex items-center gap-3 rounded-2xl border border-zinc-800/90 bg-zinc-900/40 px-4 py-3">
-                  <DatabaseZap className="size-4 text-emerald-300" />
-                  Generic SQL engine selector
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
       </div>
     </section>
   )

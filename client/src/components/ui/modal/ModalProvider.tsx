@@ -164,7 +164,7 @@ export const ModalProvider = ({
                     className="relative z-10 w-full overflow-hidden rounded-[28px] border border-emerald-400/18 bg-zinc-900/88 shadow-[0_20px_70px_rgba(0,0,0,0.52),0_0_44px_rgba(16,185,129,0.14)] ring-1 ring-white/6 backdrop-blur-xl"
                   >
                     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.14),transparent_38%),linear-gradient(180deg,rgba(16,185,129,0.05),transparent_42%)]" />
-                    <div className="relative max-h-[88vh] overflow-y-auto">
+                    <div className="relative max-h-[88vh] overflow-y-hidden">
                       {modalContent}
                     </div>
                   </motion.div>

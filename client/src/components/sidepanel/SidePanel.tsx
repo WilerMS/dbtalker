@@ -67,7 +67,7 @@ export const SidePanel: FC = () => {
                 <CreateDatabaseModalContent onClose={closeModal} />
               ),
               size: {
-                width: 'min(94vw, 1040px)',
+                width: 'min(94vw, 750px)',
                 maxHeight: '90vh',
               },
             })
