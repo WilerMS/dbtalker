@@ -48,7 +48,7 @@ export const ChatInput = ({
     <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-10">
       <div className="chat-composer-shell mx-auto lg:max-w-[90%]">
         <div className="chat-composer-shell-top pointer-events-none absolute -top-14 right-0 left-0 mx-auto h-16 max-w-200" />
-        <div className="test pointer-events-auto mx-auto max-w-200 px-4 pb-6 backdrop-blur-2xl lg:px-0">
+        <div className="test pointer-events-auto mx-auto max-w-200 px-4 pb-6 backdrop-blur-xl lg:px-0">
           <div
             className="chat-composer-frame group relative rounded-2xl p-px"
             style={{ viewTransitionName: 'container-to-input' }}
