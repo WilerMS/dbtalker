@@ -1,8 +1,9 @@
-import type { JSX } from 'react'
+import { useState, type JSX } from 'react'
 import type { Element } from 'hast'
 import ShikiHighlighter from 'react-shiki'
 import type { CodeData } from '../../../types/chat'
 import { dbtalkieTheme } from './codeTheme'
+import { Play } from 'lucide-react'
 
 const transparentBgTransformer = {
   pre(node: Element) {
@@ -18,6 +19,8 @@ const transparentBgTransformer = {
 interface CodeWidgetProps {
   data: CodeData
   isExpanded?: boolean
+  sendMessage: (text: string) => Promise<void>
+  isLastMessage?: boolean
 }
 
 const expandedHeight = 'h-[72vh]'
@@ -26,7 +29,12 @@ const collapsedHeight = 'h-[26rem]'
 export const CodeWidget = ({
   data,
   isExpanded = false,
+  sendMessage,
+  isLastMessage = false,
 }: CodeWidgetProps): JSX.Element => {
+  const [executed, setExecuted] = useState(false)
+  const canRun = isLastMessage && !executed
+
   return (
     <div
       className={[
@@ -56,6 +64,27 @@ export const CodeWidget = ({
         >
           {data.code}
         </ShikiHighlighter>
+      </div>
+
+      <div className="flex items-center justify-end border-t border-zinc-800 px-5 py-3">
+        <button
+          type="button"
+          disabled={!canRun}
+          onClick={async () => {
+            if (!canRun) return
+            setExecuted(true)
+            await sendMessage('ejecuta este código')
+          }}
+          className={[
+            'flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm! font-medium tracking-wide transition-all duration-300',
+            canRun
+              ? 'cursor-pointer border-emerald-400/50 bg-emerald-400/10 text-emerald-300 hover:border-emerald-400 hover:text-emerald-200 hover:shadow-[0_0_15px_rgba(52,211,153,0.25)]'
+              : 'cursor-not-allowed border-zinc-700 text-zinc-500 opacity-50',
+          ].join(' ')}
+        >
+          <Play size={14} />
+          {executed ? 'Ejecutado' : 'Ejecutar código'}
+        </button>
       </div>
     </div>
   )

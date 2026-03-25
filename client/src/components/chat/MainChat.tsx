@@ -47,7 +47,7 @@ export const MainChat = ({
         className="scrollbar-thin scrollbar-track-zinc-900 scrollbar-thumb-zinc-700 hover:scrollbar-thumb-zinc-600 min-h-0 flex-1 overflow-y-auto pt-4 pb-45"
       >
         <div className="mx-auto flex w-full max-w-187.5 flex-col gap-6 px-4 lg:px-0">
-          {groupedMessages.map((group) => (
+          {groupedMessages.map((group, index) => (
             <div
               key={`${group.role}-${group.timestamp.getTime()}`}
               className={[
@@ -67,7 +67,12 @@ export const MainChat = ({
                       group.role === 'user' ? (
                         <UserMessage key={message.id} message={message} />
                       ) : (
-                        <AiMessage key={message.id} message={message} />
+                        <AiMessage
+                          key={message.id}
+                          message={message}
+                          sendMessage={sendMessage}
+                          isLastMessage={index === groupedMessages.length - 1}
+                        />
                       ),
                     )}
                   </div>

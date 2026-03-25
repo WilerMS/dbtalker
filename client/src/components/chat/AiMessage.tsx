@@ -29,6 +29,8 @@ import { QuestionWidgetSkeleton } from './skeletons/QuestionWidgetSkeleton'
 
 interface AiMessageProps {
   message: Message
+  isLastMessage?: boolean
+  sendMessage: (text: string) => Promise<void>
 }
 
 const expandedWidgetSizes = {
@@ -60,7 +62,11 @@ const expandedWidgetSizes = {
   },
 } as const
 
-export const AiMessage = ({ message }: AiMessageProps) => {
+export const AiMessage = ({
+  message,
+  isLastMessage,
+  sendMessage,
+}: AiMessageProps) => {
   // Render the appropriate skeleton while waiting for the real data
   if (message.status === 'pending') {
     switch (message.type) {
@@ -169,6 +175,8 @@ export const AiMessage = ({ message }: AiMessageProps) => {
             <CodeWidget
               data={complete.data as CodeData}
               isExpanded={isExpanded}
+              sendMessage={sendMessage}
+              isLastMessage={isLastMessage}
             />
           )}
         </ExpandableWidget>
@@ -183,6 +191,8 @@ export const AiMessage = ({ message }: AiMessageProps) => {
             <QuestionWidget
               data={complete.data as QuestionData}
               isExpanded={isExpanded}
+              sendMessage={sendMessage}
+              isLastMessage={isLastMessage}
             />
           )}
         </ExpandableWidget>

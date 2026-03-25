@@ -4,15 +4,24 @@ import type { QuestionData } from '../../../types/chat'
 interface QuestionWidgetProps {
   data: QuestionData
   isExpanded?: boolean
+  isLastMessage?: boolean
+  sendMessage: (text: string) => Promise<void>
 }
 
 export const QuestionWidget = ({
   data,
   isExpanded = false,
+  isLastMessage = false,
+  sendMessage,
 }: QuestionWidgetProps): JSX.Element => {
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
+  const [selectedOptionId, setSelectedOptionId] = useState<string>()
+  const normalizedOptions = useMemo(
+    () => data.options.slice(0, 3),
+    [data.options],
+  )
+  const isLocked = selectedOptionId !== undefined || !isLastMessage
 
-  const normalizedOptions = useMemo(() => data.options.slice(0, 3), [data.options])
+  console.log({ isLastMessage, isLocked })
 
   return (
     <div
@@ -45,12 +54,17 @@ export const QuestionWidget = ({
             <button
               key={option.id}
               type="button"
-              onClick={() => {
+              onClick={async () => {
+                if (isLocked) return
+
                 setSelectedOptionId(option.id)
+                await sendMessage(option.label)
               }}
+              disabled={isLocked}
               className={[
                 'group w-full rounded-xl border px-4 py-3 text-left transition-all duration-300',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/70',
+                'focus-visible:ring-2 focus-visible:ring-emerald-400/70 focus-visible:outline-none',
+                isLocked ? 'cursor-not-allowed opacity-90' : '',
                 isSelected
                   ? 'border-emerald-400/60 bg-emerald-400/10 shadow-[0_0_18px_rgba(52,211,153,0.22)]'
                   : 'border-zinc-800 bg-zinc-900/70 hover:border-emerald-400/45 hover:shadow-[0_0_15px_rgba(52,211,153,0.15)]',
@@ -80,17 +94,6 @@ export const QuestionWidget = ({
             </button>
           )
         })}
-      </div>
-
-      <div className="relative z-10 flex items-center justify-between gap-4">
-        <p className="text-xs leading-5 text-zinc-400">
-          {data.hint ?? 'Selecciona una opción para continuar con la conversación.'}
-        </p>
-        {selectedOptionId ? (
-          <span className="rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 py-1 text-[11px] tracking-wide text-emerald-200 uppercase">
-            Opción elegida
-          </span>
-        ) : null}
       </div>
     </div>
   )
