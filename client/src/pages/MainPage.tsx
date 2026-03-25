@@ -92,7 +92,7 @@ export const MainPage = (): JSX.Element => {
 
         {/* Main heading */}
         <motion.h1
-          className="text-4xl leading-tight font-bold tracking-tight text-zinc-100 sm:text-5xl"
+          className="text-4xl leading-tight font-bold tracking-tight text-zinc-100"
           variants={itemVariants}
         >
           ¡Bienvenido a{' '}
@@ -104,10 +104,10 @@ export const MainPage = (): JSX.Element => {
 
         {/* Subtitle */}
         <motion.p
-          className="mt-6 text-lg text-zinc-400 sm:text-xl"
+          className="text-md mt-6 text-zinc-400"
           variants={itemVariants}
         >
-          Tu asistente de IA para hablar con cualquier base de datos. 🚀
+          Tu asistente de IA para hablar con cualquier base de datos.
         </motion.p>
 
         {/* Instructions section */}
@@ -115,54 +115,47 @@ export const MainPage = (): JSX.Element => {
           className="mt-12 space-y-6 rounded-2xl border border-zinc-800/50 bg-zinc-900/30 p-8 backdrop-blur-md"
           variants={itemVariants}
         >
-          <div className="space-y-4 text-left">
-            <div className="flex items-start gap-4">
-              <div className="mt-1 flex size-6 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-950/40">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center text-xs font-bold text-emerald-300">
-                  1
-                </span>
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-100">
-                  Abre la base de datos en el panel izquierdo
-                </p>
-                <p className="mt-1 text-sm text-zinc-400">
-                  Haz click en una de las bases de datos disponibles para
-                  empezar a chatear.
-                </p>
-              </div>
-            </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold tracking-[0.14em] text-emerald-300/90 uppercase [text-shadow:0_0_12px_rgba(52,211,153,0.28)]">
+              Empieza en segundos
+            </p>
+            <p className="mt-3 max-w-xl text-base leading-relaxed text-zinc-300">
+              Elige una opcion para empezar:
+              <span className="font-semibold text-emerald-200 [text-shadow:0_0_12px_rgba(52,211,153,0.35)]">
+                {' '}
+                usa la base de prueba o conecta la tuya
+              </span>
+              .
+            </p>
+          </div>
 
-            <div className="flex items-start gap-4">
-              <div className="mt-1 flex size-6 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-950/40">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center text-xs font-bold text-emerald-300">
-                  2
-                </span>
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-100">
-                  Usa nuestra base de datos de prueba
+          <div className="relative overflow-hidden rounded-2xl bg-zinc-900/50 p-5 text-left">
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400/60 bg-emerald-950/45 shadow-[0_0_14px_rgba(52,211,153,0.24)]">
+                  <span className="text-xs font-black text-emerald-200">1</span>
+                </div>
+                <p className="text-sm leading-relaxed text-zinc-300">
+                  <span className="font-semibold text-zinc-100">
+                    Usa la base de datos de prueba.
+                  </span>{' '}
+                  Lanza una demo al instante con la base que ya te
+                  proporcionamos.
                 </p>
-                <p className="mt-1 text-sm text-zinc-400">
-                  Tenemos una base de datos lista para que explores todo el
-                  poder de DBTalkie. ¡Sin configuración! 🎯
-                </p>
               </div>
-            </div>
 
-            <div className="flex items-start gap-4">
-              <div className="mt-1 flex size-6 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-950/40">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center text-xs font-bold text-emerald-300">
-                  3
-                </span>
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-100">
-                  Conecta tu propia base de datos
-                </p>
-                <p className="mt-1 text-sm text-zinc-400">
-                  ¿Quieres conquistar el mundo con tus datos? Usa el botón
-                  debajo para conectar tu base de datos. 💪
+              <div className="h-px bg-linear-to-r from-transparent via-zinc-700/70 to-transparent" />
+
+              <div className="flex items-start gap-4">
+                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-emerald-400/60 bg-emerald-950/45 shadow-[0_0_14px_rgba(52,211,153,0.24)]">
+                  <span className="text-xs font-black text-emerald-200">2</span>
+                </div>
+                <p className="text-sm leading-relaxed text-zinc-300">
+                  <span className="font-semibold text-zinc-100">
+                    Agrega tu propia base de datos.
+                  </span>{' '}
+                  Conecta tus datos reales y consulta todo desde una sola
+                  interfaz.
                 </p>
               </div>
             </div>
@@ -183,7 +176,7 @@ export const MainPage = (): JSX.Element => {
           </a>
 
           <button
-            className="group relative inline-flex items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-900/50 px-8 py-3 font-semibold text-zinc-300 transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:text-emerald-200 hover:shadow-[0_0_20px_rgba(52,211,153,0.3)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+            className="group relative inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-900/50 px-8 py-3 font-semibold text-zinc-300 transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:text-emerald-200 hover:shadow-[0_0_20px_rgba(52,211,153,0.3)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
             disabled
           >
             <Zap className="size-5" strokeWidth={1.5} />
