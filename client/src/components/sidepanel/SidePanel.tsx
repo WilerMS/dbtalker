@@ -10,7 +10,7 @@ import { DynamicIcon } from '../ui/DynamicIcon'
 import { useDelayedHide } from './hooks/useDelayedHide'
 import { Logo } from '../ui/Logo'
 import { useModal } from '../../hooks/useModal'
-import { CreateDatabaseModalContent } from './components/create-database'
+import { CreateDatabaseModalContent } from './components/database-manager'
 
 export const SidePanel: FC = () => {
   const navigate = useNavigate()

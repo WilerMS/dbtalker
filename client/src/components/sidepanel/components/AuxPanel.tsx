@@ -11,7 +11,7 @@ import {
 import { LoadingState } from '../../ui/LoadingState'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useModal } from '../../../hooks/useModal'
-import { UpdateDatabaseModalContent } from './create-database'
+import { UpdateDatabaseModalContent } from './database-manager'
 
 interface AuxPanelProps {
   anchorRect?: DOMRect
