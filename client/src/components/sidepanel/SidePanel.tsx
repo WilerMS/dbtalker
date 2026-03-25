@@ -64,7 +64,17 @@ export const SidePanel: FC = () => {
           onClick={() => {
             openModal({
               content: ({ closeModal }) => (
-                <CreateDatabaseModalContent onClose={closeModal} />
+                <CreateDatabaseModalContent
+                  onClose={closeModal}
+                  onCreationSuccess={(databaseId, conversationId) => {
+                    navigate(
+                      `/app/${databaseId}/conversations/${conversationId}`,
+                      {
+                        viewTransition: true,
+                      },
+                    )
+                  }}
+                />
               ),
               size: {
                 width: 'min(94vw, 750px)',

@@ -19,6 +19,20 @@ interface ApiDatabaseRecord {
   updated_at: string
 }
 
+interface ApiCreateDatabaseInput {
+  name: string
+  engine: DatabaseRecord['engine']
+  description?: string
+  connection: {
+    host: string
+    port: number
+    database: string
+    username: string
+    password: string
+    use_ssl: boolean
+  }
+}
+
 interface ApiConversationRecord {
   id: string
   database_id: string
@@ -87,10 +101,24 @@ export const getDatabaseById = async (
 export const createDatabase = async (
   input: CreateDatabaseInput,
 ): Promise<DatabaseRecord> => {
+  const requestBody: ApiCreateDatabaseInput = {
+    name: input.name,
+    engine: input.engine,
+    description: input.description,
+    connection: {
+      host: input.connection.host,
+      port: input.connection.port,
+      database: input.connection.database,
+      username: input.connection.username,
+      password: input.connection.password,
+      use_ssl: input.connection.useSsl,
+    },
+  }
+
   const response = await fetch(`${API_BASE_URL}/databases`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(input),
+    body: JSON.stringify(requestBody),
   })
 
   if (!response.ok) {

@@ -10,10 +10,20 @@ export interface DatabaseRecord {
   updatedAt: Date
 }
 
+export interface DatabaseConnectionInput {
+  host: string
+  port: number
+  database: string
+  username: string
+  password: string
+  useSsl: boolean
+}
+
 export interface CreateDatabaseInput {
   name: string
   engine: DatabaseEngine
   description?: string
+  connection: DatabaseConnectionInput
 }
 
 export interface UpdateDatabaseInput {

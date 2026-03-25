@@ -1,12 +1,16 @@
 import { X } from 'lucide-react'
-import { useState, type ChangeEvent } from 'react'
+import { useState, type ChangeEvent, type SubmitEvent } from 'react'
+import { useCreateDatabase } from '../../../../hooks/useDatabases'
+import type { DatabaseEngine } from '../../../../types/database'
 import { InputField } from '../../../ui/InputField'
 import { PasswordField } from '../../../ui/PasswordField'
 import { SelectField } from '../../../ui/SelectField'
 import { ToggleField } from '../../../ui/ToggleField'
+import { useCreateConversation } from '../../../../hooks/useConversations'
 
 interface CreateDatabaseModalContentProps {
   onClose: () => void
+  onCreationSuccess: (databaseId: string, conversationId: string) => void
 }
 
 interface CreateDatabaseFormState {
@@ -33,10 +37,10 @@ const initialFormState: CreateDatabaseFormState = {
 
 const sqlEngineOptions = [
   { label: 'PostgreSQL', value: 'postgresql' },
-  { label: 'MySQL', value: 'mysql' },
-  { label: 'MariaDB', value: 'mariadb' },
-  { label: 'SQL Server', value: 'sqlserver' },
-  { label: 'SQLite', value: 'sqlite' },
+  // { label: 'MySQL', value: 'mysql' },
+  // { label: 'MariaDB', value: 'mariadb' },
+  // { label: 'SQL Server', value: 'sqlserver' },
+  // { label: 'SQLite', value: 'sqlite' },
 ] as const
 
 const baseFieldClassName =
@@ -44,7 +48,12 @@ const baseFieldClassName =
 
 export const CreateDatabaseModalContent = ({
   onClose,
+  onCreationSuccess,
 }: CreateDatabaseModalContentProps) => {
+  const { createDatabase, isPending: isCreatingDatabase } = useCreateDatabase()
+  const { createConversation, isPending: isCreatingConversation } =
+    useCreateConversation()
+
   const [formState, setFormState] =
     useState<CreateDatabaseFormState>(initialFormState)
 
@@ -63,6 +72,46 @@ export const CreateDatabaseModalContent = ({
       [name]: nextValue,
     }))
   }
+
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const parsedPort = Number(formState.port)
+    if (!Number.isInteger(parsedPort) || parsedPort <= 0) return
+
+    const databaseRecord = await createDatabase({
+      name: formState.databaseName.trim(),
+      engine: formState.engine as DatabaseEngine,
+      connection: {
+        host: formState.host.trim(),
+        port: parsedPort,
+        database: formState.database.trim(),
+        username: formState.username.trim(),
+        password: formState.password,
+        useSsl: formState.useSsl,
+      },
+    })
+
+    const conversationRecord = await createConversation({
+      title: 'Conversacion inicial',
+      databaseId: databaseRecord.id,
+    })
+
+    onCreationSuccess(databaseRecord.id, conversationRecord.id)
+    setFormState(initialFormState)
+    onClose()
+  }
+
+  const isPending = isCreatingDatabase || isCreatingConversation
+
+  const isSubmitDisabled =
+    isPending ||
+    formState.databaseName.trim().length === 0 ||
+    formState.host.trim().length === 0 ||
+    formState.port.trim().length === 0 ||
+    formState.database.trim().length === 0 ||
+    formState.username.trim().length === 0 ||
+    formState.password.trim().length === 0
 
   return (
     <section className="h-hull relative overflow-hidden">
@@ -94,7 +143,9 @@ export const CreateDatabaseModalContent = ({
 
           <form
             className="space-y-6"
-            onSubmit={(event) => event.preventDefault()}
+            onSubmit={(event) => {
+              void handleSubmit(event)
+            }}
           >
             <div className="grid gap-5 md:grid-cols-2">
               <InputField
@@ -104,6 +155,7 @@ export const CreateDatabaseModalContent = ({
                 inputClassName={baseFieldClassName}
                 name="databaseName"
                 value={formState.databaseName}
+                required
                 onChange={handleChange}
                 placeholder="Almacen de analitica"
               />
@@ -116,6 +168,7 @@ export const CreateDatabaseModalContent = ({
                 selectClassName={baseFieldClassName}
                 name="engine"
                 value={formState.engine}
+                required
                 onChange={handleChange}
               />
 
@@ -127,6 +180,7 @@ export const CreateDatabaseModalContent = ({
                 name="host"
                 value={formState.host}
                 onChange={handleChange}
+                required
                 placeholder="db.company.internal"
               />
 
@@ -140,6 +194,7 @@ export const CreateDatabaseModalContent = ({
                 onChange={handleChange}
                 inputMode="numeric"
                 placeholder="5432"
+                required
               />
 
               <InputField
@@ -151,6 +206,7 @@ export const CreateDatabaseModalContent = ({
                 value={formState.database}
                 onChange={handleChange}
                 placeholder="almacen_datos"
+                required
               />
 
               <InputField
@@ -162,6 +218,7 @@ export const CreateDatabaseModalContent = ({
                 value={formState.username}
                 onChange={handleChange}
                 placeholder="usuario_lectura"
+                required
               />
 
               <PasswordField
@@ -173,6 +230,7 @@ export const CreateDatabaseModalContent = ({
                 value={formState.password}
                 onChange={handleChange}
                 placeholder="••••••••••••"
+                required
               />
             </div>
 
@@ -187,10 +245,10 @@ export const CreateDatabaseModalContent = ({
             <div className="flex flex-wrap items-center justify-end gap-3 border-t border-zinc-800/90 pt-5">
               <button
                 type="submit"
-                disabled
-                className="cursor-not-allowed rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase opacity-60"
+                disabled={isSubmitDisabled}
+                className="cursor-pointer rounded-full border border-emerald-400/30 bg-emerald-400/12 px-5 py-2.5 text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Agregar base de datos
+                {isPending ? 'Guardando...' : 'Agregar base de datos'}
               </button>
               <button
                 type="button"
