@@ -261,29 +261,35 @@ Message = Union[PendingMessage, CompleteMessage]
 
 
 # ============================================================================
-# SSE Chunk Types (the binding contract with client)
+# SSE Chunk Types
 # ============================================================================
 
 
-class SSEChunkIncoming(BaseModel):
-    """SSE event: signals that a new message is incoming (drives skeleton in client)."""
+class SSEChunkBase(BaseModel):
+    """Base SSE chunk carrying the message identifier shared by the stream pair."""
 
-    event: Literal["incoming"] = "incoming"
+    id: str
+
+
+class SSEChunkIncoming(SSEChunkBase):
+    """Signals that a streamed message has started."""
+
+    event: Literal["incoming"]
     type: MessageType
 
 
-class SSEChunkData(BaseModel):
-    """SSE event: delivers the full message data."""
+class SSEChunkData(SSEChunkBase):
+    """Carries the payload for a streamed message."""
 
-    event: Literal["data"] = "data"
+    event: Literal["data"]
     type: MessageType
     data: MessageData
 
 
 class SSEChunkFinished(BaseModel):
-    """SSE event: signals that streaming has finished."""
+    """Signals that the full SSE response is complete."""
 
-    event: Literal["finished"] = "finished"
+    event: Literal["finished"]
 
 
 SSEChunk = Union[SSEChunkIncoming, SSEChunkData, SSEChunkFinished]

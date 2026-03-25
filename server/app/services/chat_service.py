@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import AsyncGenerator
 from datetime import datetime
+from uuid import uuid4
 
 from app.mocks.chat_data import (
     append_message_to_conversation,
@@ -57,22 +58,24 @@ class ChatService:
         primary_widget_type = self.detect_widget_type(query_text)
 
         # SEQUENCE 1: Text Message
+        text_message_id = str(uuid4())
         await asyncio.sleep(0.9)
 
         yield self._serialize_sse_chunk(
-            SSEChunkIncoming(event="incoming", type="text"),
+            SSEChunkIncoming(id=text_message_id, event="incoming", type="text"),
         )
 
         await asyncio.sleep(0.7)
 
         text_content = generate_text_for_widget(primary_widget_type, database_id)
         text_chunk = SSEChunkData(
+            id=text_message_id,
             event="data",
             type="text",
             data=TextData(text=text_content),
         )
         bot_text_message = CompleteMessage(
-            id=f"bot-text-{datetime.now().timestamp()}",
+            id=text_message_id,
             role="bot",
             type="text",
             status="complete",
@@ -84,10 +87,12 @@ class ChatService:
 
         # SEQUENCE 2: Primary Widget (if detected)
         if primary_widget_type:
+            widget_message_id = str(uuid4())
             await asyncio.sleep(0.5)
 
             yield self._serialize_sse_chunk(
                 SSEChunkIncoming(
+                    id=widget_message_id,
                     event="incoming",
                     type=primary_widget_type,
                 ),
@@ -97,12 +102,13 @@ class ChatService:
 
             widget_data = get_widget_data_by_type(primary_widget_type)
             widget_chunk = SSEChunkData(
+                id=widget_message_id,
                 event="data",
                 type=primary_widget_type,
                 data=widget_data,
             )
             bot_widget_message = CompleteMessage(
-                id=f"bot-widget-{datetime.now().timestamp()}",
+                id=widget_message_id,
                 role="bot",
                 type=primary_widget_type,
                 status="complete",
@@ -113,22 +119,28 @@ class ChatService:
             yield self._serialize_sse_chunk(widget_chunk)
 
             # SEQUENCE 3: Closing suggestion text
+            closing_message_id = str(uuid4())
             await asyncio.sleep(0.5)
 
             yield self._serialize_sse_chunk(
-                SSEChunkIncoming(event="incoming", type="text"),
+                SSEChunkIncoming(
+                    id=closing_message_id,
+                    event="incoming",
+                    type="text",
+                ),
             )
 
             await asyncio.sleep(0.7)
 
             closing_text = generate_closing_text(primary_widget_type)
             closing_chunk = SSEChunkData(
+                id=closing_message_id,
                 event="data",
                 type="text",
                 data=TextData(text=closing_text),
             )
             bot_closing_message = CompleteMessage(
-                id=f"bot-closing-{datetime.now().timestamp()}",
+                id=closing_message_id,
                 role="bot",
                 type="text",
                 status="complete",
