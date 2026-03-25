@@ -9,7 +9,7 @@ import {
   useGetConversations,
 } from '../../../hooks/useConversations'
 import { LoadingState } from '../../ui/LoadingState'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 interface AuxPanelProps {
   anchorRect?: DOMRect
@@ -28,6 +28,7 @@ export const AuxPanel = ({
 }: AuxPanelProps) => {
   const isOpen = isVisible && Boolean(anchorRect && database)
 
+  const { id_conversation } = useParams<{ id_conversation: string }>()
   const navigate = useNavigate()
 
   // Conversations handlers
@@ -43,7 +44,9 @@ export const AuxPanel = ({
       title: 'Nueva conversacion',
     })
 
-    navigate(`/app/${databaseId}/conversations/${newConversation.id}`)
+    navigate(`/app/${databaseId}/conversations/${newConversation.id}`, {
+      viewTransition: true,
+    })
   }
 
   // Database handlers here
@@ -96,6 +99,10 @@ export const AuxPanel = ({
                     databaseId: database.id,
                     conversationId,
                   })
+
+                  if (id_conversation === conversationId) {
+                    navigate(`/app`, { viewTransition: true })
+                  }
                 }}
               />
             )}
