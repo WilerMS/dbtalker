@@ -1,31 +1,51 @@
-"""
-Conversation service for managing chat conversations.
-Encapsulates conversation operations using POO.
-Currently imports from mocks; prepared for future DB migration.
-"""
-
 from __future__ import annotations
 
-from app.mocks.conversations import (
-    create_conversation as mock_create_conversation,
-)
-from app.mocks.conversations import delete_conversation as mock_delete_conversation
-from app.mocks.conversations import (
-    get_conversations_by_database as mock_get_conversations_by_database,
-)
-from app.models.database import ConversationRecord
-from app.services.database_service import DatabaseService
+from models.domain import Conversation
+from sqlalchemy import delete, insert, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.schemas.conversation import CreateConversationInput
 
 
 class ConversationService:
-    def __init__(self, database_service: DatabaseService) -> None:
-        self._database_service = database_service
+    def __init__(self, db: AsyncSession) -> None:
+        self._db = db
 
-    def get_conversations_by_database(self, database_id: str) -> list[ConversationRecord]:
-        return mock_get_conversations_by_database(database_id)
+    async def get_conversations_by_database(self, database_id: str) -> list[Conversation]:
+        query = select(Conversation).where(Conversation.database_id == database_id)
+        result = await self._db.execute(query)
 
-    def create_conversation(self, database_id: str, title: str) -> ConversationRecord:
-        return mock_create_conversation(database_id, title)
+        return list(result.scalars().all())
 
-    def delete_conversation(self, database_id: str, conversation_id: str) -> bool:
-        return mock_delete_conversation(database_id, conversation_id)
+    async def create_conversation(
+        self, input_data: CreateConversationInput
+    ) -> Conversation:
+        query = (
+            insert(Conversation)
+            .values(
+                id=input_data.id,
+                database_id=input_data.database_id,
+                title=input_data.title,
+            )
+            .returning(Conversation)
+        )
+
+        result = await self._db.execute(query)
+        await self._db.commit()
+
+        return result.scalar_one()
+
+    async def delete_conversation(self, database_id: str, conversation_id: str) -> bool:
+        query = (
+            delete(Conversation)
+            .where(
+                Conversation.id == conversation_id,
+                Conversation.database_id == database_id,
+            )
+            .returning(Conversation.id)
+        )
+
+        result = await self._db.execute(query)
+        await self._db.commit()
+
+        return result.scalar_one_or_none() is not None

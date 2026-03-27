@@ -77,9 +77,9 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="users",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="email", type="varchar"),
-                    SchemaColumn(name="created_at", type="timestamp"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="email", type="varchar", isPrimaryKey=False),
+                    SchemaColumn(name="created_at", type="timestamp", isPrimaryKey=False),
                 ],
             ),
         ),
@@ -89,9 +89,9 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="orders",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="user_id", type="uuid"),
-                    SchemaColumn(name="total", type="numeric"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="user_id", type="uuid", isPrimaryKey=False),
+                    SchemaColumn(name="total", type="numeric", isPrimaryKey=False),
                 ],
             ),
         ),
@@ -101,9 +101,11 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="sessions",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="user_id", type="uuid"),
-                    SchemaColumn(name="last_seen_at", type="timestamp"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="user_id", type="uuid", isPrimaryKey=False),
+                    SchemaColumn(
+                        name="last_seen_at", type="timestamp", isPrimaryKey=False
+                    ),
                 ],
             ),
         ),
@@ -113,10 +115,10 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="order_items",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="order_id", type="uuid"),
-                    SchemaColumn(name="product_id", type="uuid"),
-                    SchemaColumn(name="qty", type="int"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="order_id", type="uuid", isPrimaryKey=False),
+                    SchemaColumn(name="product_id", type="uuid", isPrimaryKey=False),
+                    SchemaColumn(name="qty", type="int", isPrimaryKey=False),
                 ],
             ),
         ),
@@ -126,10 +128,10 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="products",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="sku", type="varchar"),
-                    SchemaColumn(name="price", type="numeric"),
-                    SchemaColumn(name="inventory", type="int"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="sku", type="varchar", isPrimaryKey=False),
+                    SchemaColumn(name="price", type="numeric", isPrimaryKey=False),
+                    SchemaColumn(name="inventory", type="int", isPrimaryKey=False),
                 ],
             ),
         ),
@@ -139,10 +141,10 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="payments",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="order_id", type="uuid"),
-                    SchemaColumn(name="provider", type="varchar"),
-                    SchemaColumn(name="status", type="varchar"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="order_id", type="uuid", isPrimaryKey=False),
+                    SchemaColumn(name="provider", type="varchar", isPrimaryKey=False),
+                    SchemaColumn(name="status", type="varchar", isPrimaryKey=False),
                 ],
             ),
         ),
@@ -152,10 +154,10 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="invoices",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="payment_id", type="uuid"),
-                    SchemaColumn(name="issued_at", type="timestamp"),
-                    SchemaColumn(name="currency", type="char(3)"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="payment_id", type="uuid", isPrimaryKey=False),
+                    SchemaColumn(name="issued_at", type="timestamp", isPrimaryKey=False),
+                    SchemaColumn(name="currency", type="char(3)", isPrimaryKey=False),
                 ],
             ),
         ),
@@ -165,10 +167,12 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="shipments",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="order_id", type="uuid"),
-                    SchemaColumn(name="carrier", type="varchar"),
-                    SchemaColumn(name="delivered_at", type="timestamp"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="order_id", type="uuid", isPrimaryKey=False),
+                    SchemaColumn(name="carrier", type="varchar", isPrimaryKey=False),
+                    SchemaColumn(
+                        name="delivered_at", type="timestamp", isPrimaryKey=False
+                    ),
                 ],
             ),
         ),
@@ -178,10 +182,10 @@ SCHEMA_PREVIEW_DATA = SchemaData(
             data=SchemaNodeData(
                 label="addresses",
                 columns=[
-                    SchemaColumn(name="id", type="uuid", is_primary_key=True),
-                    SchemaColumn(name="user_id", type="uuid"),
-                    SchemaColumn(name="city", type="varchar"),
-                    SchemaColumn(name="country", type="varchar"),
+                    SchemaColumn(name="id", type="uuid", isPrimaryKey=True),
+                    SchemaColumn(name="user_id", type="uuid", isPrimaryKey=False),
+                    SchemaColumn(name="city", type="varchar", isPrimaryKey=False),
+                    SchemaColumn(name="country", type="varchar", isPrimaryKey=False),
                 ],
             ),
         ),
@@ -191,10 +195,16 @@ SCHEMA_PREVIEW_DATA = SchemaData(
         SchemaEdge(id="users-sessions", source="users", target="sessions", label="1:n"),
         SchemaEdge(id="users-addresses", source="users", target="addresses", label="1:n"),
         SchemaEdge(id="orders-items", source="orders", target="order_items", label="1:n"),
-        SchemaEdge(id="products-items", source="products", target="order_items", label="1:n"),
+        SchemaEdge(
+            id="products-items", source="products", target="order_items", label="1:n"
+        ),
         SchemaEdge(id="orders-payments", source="orders", target="payments", label="1:n"),
-        SchemaEdge(id="payments-invoices", source="payments", target="invoices", label="1:1"),
-        SchemaEdge(id="orders-shipments", source="orders", target="shipments", label="1:n"),
+        SchemaEdge(
+            id="payments-invoices", source="payments", target="invoices", label="1:1"
+        ),
+        SchemaEdge(
+            id="orders-shipments", source="orders", target="shipments", label="1:n"
+        ),
         SchemaEdge(
             id="addresses-shipments",
             source="addresses",
@@ -772,7 +782,9 @@ _messages_by_conversation: dict[str, list[CompleteMessage]] = {
 }
 
 
-def get_messages_for_conversation(conversation_id: str, database_id: str) -> list[CompleteMessage]:
+def get_messages_for_conversation(
+    conversation_id: str, database_id: str
+) -> list[CompleteMessage]:
     """Return messages for a conversation, seeding a welcome message on first access."""
     if conversation_id not in _messages_by_conversation:
         welcome_text = get_welcome_message(database_id)
@@ -789,7 +801,9 @@ def get_messages_for_conversation(conversation_id: str, database_id: str) -> lis
     return _messages_by_conversation[conversation_id].copy()
 
 
-def append_message_to_conversation(conversation_id: str, message: CompleteMessage) -> None:
+def append_message_to_conversation(
+    conversation_id: str, message: CompleteMessage
+) -> None:
     """Append a message to a conversation's history."""
     if conversation_id not in _messages_by_conversation:
         _messages_by_conversation[conversation_id] = []

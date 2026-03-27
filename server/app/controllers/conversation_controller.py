@@ -1,75 +1,40 @@
-"""
-Conversation controller for orchestrating conversation operations.
-Delegates business logic to ConversationService and DatabaseService.
-Handles validation and HTTP-level concerns.
-"""
-
 from __future__ import annotations
 
-from app.models.database import ConversationRecord
+from app.schemas.conversation import (
+    ConversationRecord,
+    CreateConversationInput,
+)
 from app.services.conversation_service import ConversationService
-from app.services.database_service import DatabaseService
 from app.utility.errors import ResourceNotFoundError
 
 
 class ConversationController:
-    """
-    Controller for conversation operations.
-    Injects services and orchestrates domain logic.
-    Validates that databases exist before creating conversations.
-    """
+    def __init__(self, conversation_service: ConversationService) -> None:
+        self._conversation_service = conversation_service
 
-    def __init__(
-        self,
-        conversation_service: ConversationService,
-        database_service: DatabaseService,
-    ) -> None:
-        """Initialize ConversationController with injected services."""
-        self._service = conversation_service
-        self._database_service = database_service
+    async def get_conversations_by_database(
+        self, database_id: str
+    ) -> list[ConversationRecord]:
+        conversations = await self._conversation_service.get_conversations_by_database(
+            database_id
+        )
+        return [
+            ConversationRecord.model_validate(conversation)
+            for conversation in conversations
+        ]
 
-    def get_conversations_by_database(self, database_id: str) -> list[ConversationRecord]:
-        """
-        Get all conversations for a database.
-
-        Args:
-            database_id: The ID of the database.
-
-        Returns:
-            List of conversations for the database.
-        """
-        if not self._database_service.get_database_by_id(database_id):
-            raise ResourceNotFoundError(f"Database '{database_id}' not found.")
-        return self._service.get_conversations_by_database(database_id)
-
-    def create_conversation(
-        self,
-        database_id: str,
-        title: str,
+    async def create_conversation(
+        self, input_data: CreateConversationInput
     ) -> ConversationRecord:
-        """
-        Create a new conversation for a database.
+        created = await self._conversation_service.create_conversation(input_data)
+        return ConversationRecord.model_validate(created)
 
-        Args:
-            database_id: The ID of the database.
-            title: The title of the conversation.
-
-        Returns:
-            The newly created ConversationRecord.
-        """
-        if not self._database_service.get_database_by_id(database_id):
-            raise ResourceNotFoundError(f"Database '{database_id}' not found.")
-        return self._service.create_conversation(database_id, title)
-
-    def delete_conversation(self, database_id: str, conversation_id: str) -> bool:
-        """Delete a conversation that belongs to the specified database."""
-        if not self._database_service.get_database_by_id(database_id):
-            raise ResourceNotFoundError(f"Database '{database_id}' not found.")
-
-        was_deleted = self._service.delete_conversation(database_id, conversation_id)
+    async def delete_conversation(self, database_id: str, conversation_id: str) -> bool:
+        was_deleted = await self._conversation_service.delete_conversation(
+            database_id, conversation_id
+        )
         if not was_deleted:
             raise ResourceNotFoundError(
-                f"Conversation '{conversation_id}' not found for database '{database_id}'."
+                f"Conversation '{conversation_id}' not found in database '{database_id}'."
             )
-
         return True
