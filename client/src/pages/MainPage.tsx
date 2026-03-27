@@ -53,7 +53,7 @@ export const MainPage: FC = () => {
 
   const handleGoToDemo = async () => {
     const newConversation = await createConversation({
-      databaseId: DEFAULT_DATABASE_ID,
+      database_id: DEFAULT_DATABASE_ID,
       title: 'Nueva conversacion',
     })
 

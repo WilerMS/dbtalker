@@ -18,7 +18,7 @@ import {
 
 interface CreateDatabaseModalContentProps {
   onClose: () => void
-  onCreationSuccess: (databaseId: string, conversationId: string) => void
+  onCreationSuccess: (database_id: string, conversationId: string) => void
 }
 
 export const CreateDatabaseModalContent = ({
@@ -58,7 +58,7 @@ export const CreateDatabaseModalContent = ({
 
     const conversationRecord = await createConversation({
       title: 'Conversacion inicial',
-      databaseId: databaseRecord.id,
+      database_id: databaseRecord.id,
     })
 
     onCreationSuccess(databaseRecord.id, conversationRecord.id)

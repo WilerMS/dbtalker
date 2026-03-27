@@ -42,4 +42,5 @@ export interface ConversationRecord {
 
 export interface CreateConversationInput {
   title: string
+  database_id: string
 }

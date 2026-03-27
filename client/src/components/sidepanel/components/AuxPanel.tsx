@@ -49,7 +49,7 @@ export const AuxPanel = ({
     onMouseLeave()
 
     const newConversation = await createConversation({
-      databaseId,
+      database_id: databaseId,
       title: 'Nueva conversacion',
     })
 
