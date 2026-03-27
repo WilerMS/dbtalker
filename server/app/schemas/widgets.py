@@ -4,8 +4,6 @@ from pydantic import BaseModel, Field
 
 
 class TextData(BaseModel):
-    """Plain text response data."""
-
     text: str
 
 

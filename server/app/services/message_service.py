@@ -1,6 +1,7 @@
-from models.domain import Message
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.domain import Message
 
 
 class MessageService:

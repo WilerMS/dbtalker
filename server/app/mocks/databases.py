@@ -125,7 +125,9 @@ def create_database(input_data: CreateDatabaseInput) -> DatabaseRecord:
     return created
 
 
-def update_database(database_id: str, input_data: UpdateDatabaseInput) -> DatabaseRecord | None:
+def update_database(
+    database_id: str, input_data: UpdateDatabaseInput
+) -> DatabaseRecord | None:
     for index, database in enumerate(_databases):
         if database.id != database_id:
             continue
@@ -133,7 +135,9 @@ def update_database(database_id: str, input_data: UpdateDatabaseInput) -> Databa
         updated = database.model_copy(
             update={
                 "name": input_data.name if input_data.name is not None else database.name,
-                "engine": input_data.engine if input_data.engine is not None else database.engine,
+                "engine": input_data.engine
+                if input_data.engine is not None
+                else database.engine,
                 "icon": (
                     _icon_for_engine(input_data.engine)
                     if input_data.engine is not None

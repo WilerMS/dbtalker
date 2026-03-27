@@ -1,7 +1,8 @@
-from models.domain import Database
-from schemas.database import CreateDatabaseInput, UpdateDatabaseInput
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.domain import Database
+from app.schemas.database import CreateDatabaseInput, UpdateDatabaseInput
 
 
 class DatabaseService:

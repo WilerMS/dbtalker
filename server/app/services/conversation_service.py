@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from models.domain import Conversation
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.domain import Conversation
 from app.schemas.conversation import CreateConversationInput
 
 
