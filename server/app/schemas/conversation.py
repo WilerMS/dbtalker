@@ -14,8 +14,5 @@ class ConversationRecord(BaseModel):
 
 
 class CreateConversationInput(BaseModel):
-    """Request body for creating a new conversation."""
-
-    id: str
     database_id: str
     title: str

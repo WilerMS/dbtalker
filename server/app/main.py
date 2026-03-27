@@ -1,11 +1,32 @@
+import asyncio
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.router import api_router
+from app.core.database import init_db, seed_db
 from app.utility.errors import ResourceNotFoundError
 
-app = FastAPI(title="DBTalkie Backend", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Retry a few times so startup is resilient when DB takes extra seconds.
+    for attempt in range(5):
+        try:
+            await init_db()
+            await seed_db()
+            break
+        except Exception:
+            if attempt == 4:
+                raise
+            await asyncio.sleep(1)
+
+    yield
+
+
+app = FastAPI(title="DBTalkie Backend", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

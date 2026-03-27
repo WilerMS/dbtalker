@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from uuid import uuid4
+
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,10 +22,11 @@ class ConversationService:
     async def create_conversation(
         self, input_data: CreateConversationInput
     ) -> Conversation:
+        conversation_id = str(uuid4())
         query = (
             insert(Conversation)
             .values(
-                id=input_data.id,
+                id=conversation_id,
                 database_id=input_data.database_id,
                 title=input_data.title,
             )

@@ -25,7 +25,10 @@ class ChatService:
         db_messages = await self._message_service.get_messages_by_conversation_id(
             conversation_id
         )
-        return [CompleteMessage.model_validate(msg) for msg in db_messages]
+        return [
+            CompleteMessage.model_validate(msg, from_attributes=True)
+            for msg in db_messages
+        ]
 
     async def generate_response_stream(
         self,
