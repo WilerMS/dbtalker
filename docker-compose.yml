@@ -1,4 +1,22 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dbtalkie-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=dbtalkie
+      - POSTGRES_PASSWORD=dbtalkie
+      - POSTGRES_DB=dbtalkie
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbtalkie -d dbtalkie"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   backend:
     build:
       context: ./server
@@ -11,6 +29,15 @@ services:
     volumes:
       - ./server:/app
       - backend_venv:/app/.venv
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=dbtalkie
+      - DB_PASSWORD=dbtalkie
+      - DB_NAME=dbtalkie
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -37,5 +64,6 @@ services:
         condition: service_healthy
 
 volumes:
+  postgres_data:
   backend_venv:
   frontend_node_modules:

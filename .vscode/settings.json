@@ -2,6 +2,8 @@
   "chat.tools.terminal.autoApprove": {
     "npm install": true
   },
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.diagnosticMode": "workspace",
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,

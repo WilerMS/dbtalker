@@ -5,8 +5,11 @@ description = "DBTalkie FastAPI backend"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "alembic>=1.18.4",
+    "asyncpg>=0.31.0",
     "fastapi>=0.135.1",
     "jsonwebtoken>=1.0.0",
+    "sqlalchemy>=2.0.48",
     "sse-starlette>=3.3.3",
     "uvicorn[standard]>=0.42.0",
 ]
@@ -15,8 +18,8 @@ dependencies = [
 package = false
 
 [tool.ruff]
-# Longitud de línea (como el printWidth de Prettier)
-line-length = 100
+# Longitud de línea
+line-length = 90
 
 [tool.ruff.lint]
 # Selecciona las reglas (E = Errores, F = Pyflakes, I = Isort, B = Bugbear)
@@ -27,3 +30,11 @@ ignore = []
 [tool.ruff.format]
 # Usa comillas dobles (estilo Black)
 quote-style = "double"
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends", 
+    "fastapi.Query", 
+    "fastapi.Path", 
+    "fastapi.Body"
+]
