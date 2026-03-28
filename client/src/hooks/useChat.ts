@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useEffectEvent, useState } from 'react'
+import { useMemo, useEffect, useEffectEvent, useState, useRef } from 'react'
 
 import { ChatService } from '../services/chatService'
 import type {
@@ -23,6 +23,7 @@ export const useChat = (
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
+  const streamAbortControllerRef = useRef<AbortController | null>(null)
 
   const initializeChat = useEffectEvent(async (signal: AbortSignal) => {
     setIsLoading(true)
@@ -49,6 +50,10 @@ export const useChat = (
 
     return () => {
       abortController.abort()
+      if (streamAbortControllerRef.current) {
+        streamAbortControllerRef.current.abort()
+        streamAbortControllerRef.current = null
+      }
     }
   }, [conversationId, databaseId])
 
@@ -69,13 +74,22 @@ export const useChat = (
     setMessages((prev) => [...prev, userMessage])
     setIsLoading(true)
 
+    const streamController = new AbortController()
+    streamAbortControllerRef.current = streamController
+
     try {
       for await (const chunk of chatService.streamAiResponse(
         userMessage,
         databaseId,
         conversationId,
+        streamController.signal,
       )) {
+        if (streamController.signal.aborted) {
+          return
+        }
+
         if (chunk.event === 'finished') {
+          streamAbortControllerRef.current = null
           return setIsStreaming(false)
         }
 
@@ -113,6 +127,7 @@ export const useChat = (
         }
       }
     } finally {
+      streamAbortControllerRef.current = null
       setIsLoading(false)
       setIsStreaming(false)
     }

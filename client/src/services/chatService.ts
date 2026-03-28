@@ -72,9 +72,9 @@ export class ChatService {
     userMessage: UserMessage,
     databaseId: string,
     conversationId: string,
+    signal: AbortSignal,
   ): AsyncGenerator<SSEChunk> {
     const url = new URL(`${this.apiBaseUrl}/chat/stream`)
-    const abortController = new AbortController()
     const state = this.createStreamState()
     const requestBody = this.buildStreamRequestBody(
       userMessage,
@@ -82,16 +82,22 @@ export class ChatService {
       conversationId,
     )
 
+    // Setup abort handler to wake up the reader if waiting
+    const abortHandler = () => {
+      this.wakeUpReader(state)
+    }
+    signal.addEventListener('abort', abortHandler)
+
     const streamRequest = fetchEventSource(url.toString(), {
       method: 'POST',
-      signal: abortController.signal,
+      signal,
       openWhenHidden: true,
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
       onmessage: (event) => {
-        this.handleMessageEvent(event.data, state, abortController)
+        this.handleMessageEvent(event.data, state)
       },
       onerror: (error) => {
         if (state.isStreamDone) {
@@ -108,7 +114,7 @@ export class ChatService {
         this.finishStream(state)
       },
     }).catch((error) => {
-      if (abortController.signal.aborted && state.isStreamDone) {
+      if (signal.aborted && state.isStreamDone) {
         return
       }
 
@@ -121,6 +127,11 @@ export class ChatService {
 
     try {
       while (!state.isStreamDone || state.queue.length > 0) {
+        // If signal was aborted externally, stop immediately
+        if (signal.aborted) {
+          break
+        }
+
         if (state.queue.length === 0) {
           await this.waitForNextChunk(state)
         }
@@ -140,7 +151,7 @@ export class ChatService {
         }
       }
     } finally {
-      abortController.abort()
+      signal.removeEventListener('abort', abortHandler)
       await streamRequest
     }
   }
@@ -254,22 +265,16 @@ export class ChatService {
     this.wakeUpReader(state)
   }
 
-  private handleMessageEvent(
-    rawData: string,
-    state: StreamState,
-    abortController: AbortController,
-  ): void {
+  private handleMessageEvent(rawData: string, state: StreamState): void {
     try {
       const chunk = this.parseChunk(rawData)
       this.pushChunk(state, chunk)
 
       if (chunk.event === 'finished') {
         this.finishStream(state)
-        abortController.abort()
       }
     } catch (error) {
       this.handleStreamFailure(error, state, 'Unexpected SSE parse error.')
-      abortController.abort()
     }
   }
 
