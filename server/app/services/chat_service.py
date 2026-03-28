@@ -38,10 +38,16 @@ class ChatService:
         conversation_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
 
-        new_conversation_messages: list[CompleteMessage] = [user_message]
+        new_conversation_messages: list[CompleteMessage] = []
 
         # TODO: summarize history to save tokens in large conversations
         history = await self.get_conversation_messages(conversation_id)
+
+        # Save the user message to ensure it's saved if any error occurs during streaming
+        await self._message_service.save_messages(
+            conversation_id,
+            [user_message],
+        )
 
         async for chunk in self._ai_service.generate_dynamic_stream(
             user_message, history, database_id
