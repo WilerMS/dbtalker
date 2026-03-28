@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom'
 
 import { Logo } from '../components/ui/Logo'
 import { useCreateConversation } from '../hooks/useConversations/useCreateConversation'
+import { useModal } from '../hooks/useModal'
+import { CreateDatabaseModalContent } from '../components/sidepanel/components/database-manager'
 
 const easeOut = [0.16, 1, 0.3, 1] as const
 const easeInOut = [0.45, 0, 0.55, 1] as const
@@ -50,6 +52,7 @@ export const MainPage: FC = () => {
   const navigate = useNavigate()
 
   const { createConversation, isPending } = useCreateConversation()
+  const { openModal } = useModal()
 
   const handleGoToDemo = async () => {
     const newConversation = await createConversation({
@@ -174,7 +177,27 @@ export const MainPage: FC = () => {
 
           <button
             className="group relative inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-900/50 px-5 py-3 font-semibold text-zinc-300 transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:text-emerald-200 hover:shadow-[0_0_20px_rgba(52,211,153,0.3)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
-            disabled
+            onClick={() => {
+              openModal({
+                content: ({ closeModal }) => (
+                  <CreateDatabaseModalContent
+                    onClose={closeModal}
+                    onCreationSuccess={(databaseId, conversationId) => {
+                      navigate(
+                        `/app/${databaseId}/conversations/${conversationId}`,
+                        {
+                          viewTransition: true,
+                        },
+                      )
+                    }}
+                  />
+                ),
+                size: {
+                  width: 'min(94vw, 750px)',
+                  maxHeight: '90vh',
+                },
+              })
+            }}
           >
             <Zap className="size-5" strokeWidth={1.5} />
             <span>Conectar Nueva BD</span>
