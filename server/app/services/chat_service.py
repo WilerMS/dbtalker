@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
+from datetime import datetime, timezone
 
 from app.schemas.chat import (
     CompleteMessage,
@@ -37,13 +38,10 @@ class ChatService:
         conversation_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
 
+        new_conversation_messages: list[CompleteMessage] = [user_message]
+
         # TODO: summarize history to save tokens in large conversations
         history = await self.get_conversation_messages(conversation_id)
-
-        # This saves the user's message inmediately
-        await self._message_service.save_message(
-            conversation_id, "user", "text", user_message.data.model_dump(by_alias=True)
-        )
 
         async for chunk in self._ai_service.generate_dynamic_stream(
             user_message, history, database_id
@@ -54,13 +52,22 @@ class ChatService:
             elif chunk.event == "data":
                 yield self._serialize_sse_chunk(chunk)
 
-                await self._message_service.save_message(
-                    conversation_id,
-                    "bot",
-                    chunk.type,
-                    chunk.data.model_dump(by_alias=True),
+                new_conversation_messages.append(
+                    CompleteMessage(
+                        id=chunk.id,
+                        role="bot",
+                        type=chunk.type,
+                        status="complete",
+                        data=chunk.data,
+                        timestamp=datetime.now(timezone.utc),
+                    )
                 )
 
+        # Save all bot messages at the end of the stream
+        await self._message_service.save_messages(
+            conversation_id,
+            new_conversation_messages,
+        )
         yield self._serialize_sse_chunk(SSEChunkFinished(event="finished"))
 
     def _serialize_sse_chunk(self, chunk: SSEChunk) -> dict[str, str]:

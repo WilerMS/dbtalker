@@ -2,6 +2,7 @@ from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.domain import Message
+from app.schemas.chat import CompleteMessage
 
 
 class MessageService:
@@ -19,25 +20,34 @@ class MessageService:
         result = await self._db.execute(query)
         return list(result.scalars().all())
 
-    async def save_message(
+    async def save_messages(
         self,
         conversation_id: str,
-        role: str,
-        msg_type: str,
-        data: dict,
-        status: str = "complete",
-    ) -> Message:
-        query = (
-            insert(Message)
-            .values(
-                conversation_id=conversation_id,
-                role=role,
-                type=msg_type,
-                status=status,
-                data=data,
-            )
-            .returning(Message)
-        )
+        messages: list[CompleteMessage],
+    ) -> list[Message]:
+        if not messages:
+            return []
+
+        payloads: list[dict[str, object]] = [
+            {
+                "id": message.id,
+                "conversation_id": conversation_id,
+                "role": message.role,
+                "type": message.type,
+                "status": message.status,
+                "data": message.data.model_dump(by_alias=True),
+                "timestamp": message.timestamp,
+            }
+            for message in messages
+        ]
+
+        query = insert(Message).values(payloads).returning(Message)
         result = await self._db.execute(query)
         await self._db.commit()
-        return result.scalar_one()
+        return list(result.scalars().all())
+
+    async def save_message(
+        self, conversation_id: str, message: CompleteMessage
+    ) -> Message:
+        saved_messages = await self.save_messages(conversation_id, [message])
+        return saved_messages[0]
