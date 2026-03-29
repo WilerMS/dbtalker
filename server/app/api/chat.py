@@ -6,19 +6,19 @@ from sse_starlette.sse import EventSourceResponse
 from app.api.dependencies import chat_controller
 from app.controllers.chat_controller import ChatController
 from app.schemas.chat import (
+    ChatMessage,
     ChatRequestBody,
-    CompleteMessage,
 )
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
-@router.get("/messages", response_model=list[CompleteMessage])
+@router.get("/messages", response_model=list[ChatMessage])
 async def get_chat_messages(
     database_id: str = Query(...),
     conversation_id: str = Query(...),
     chat_controller: ChatController = Depends(chat_controller),
-) -> list[CompleteMessage]:
+) -> list[ChatMessage]:
     return await chat_controller.get_messages(conversation_id, database_id)
 
 

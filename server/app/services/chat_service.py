@@ -4,14 +4,16 @@ from collections.abc import AsyncGenerator
 from datetime import datetime, timezone
 
 from app.schemas.chat import (
-    CompleteMessage,
+    BOT_MESSAGE_CLASSES,
+    ChatMessage,
+    TextMessage,
     UserMessage,
 )
 from app.schemas.streaming import (
     SSEChunk,
     SSEChunkFinished,
 )
-from app.services.ai_service import AIService
+from app.services.ai_service.ai_service import AIService
 from app.services.message_service import MessageService
 
 
@@ -20,16 +22,24 @@ class ChatService:
         self._message_service = message_service
         self._ai_service = ai_service
 
-    async def get_conversation_messages(
-        self, conversation_id: str
-    ) -> list[CompleteMessage]:
+    async def get_conversation_messages(self, conversation_id: str) -> list[ChatMessage]:
         db_messages = await self._message_service.get_messages_by_conversation_id(
             conversation_id
         )
-        return [
-            CompleteMessage.model_validate(msg, from_attributes=True)
-            for msg in db_messages
-        ]
+
+        chat_messages: list[ChatMessage] = []
+
+        for msg in db_messages:
+            if msg.role == "user":
+                valid_msg = UserMessage.model_validate(msg, from_attributes=True)
+                chat_messages.append(valid_msg)
+
+            elif msg.role == "bot":
+                MessageClass = BOT_MESSAGE_CLASSES.get(msg.type, TextMessage)
+                valid_msg = MessageClass.model_validate(msg, from_attributes=True)
+                chat_messages.append(valid_msg)
+
+        return chat_messages
 
     async def generate_response_stream(
         self,
@@ -38,7 +48,7 @@ class ChatService:
         conversation_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
 
-        new_conversation_messages: list[CompleteMessage] = []
+        new_conversation_messages: list[ChatMessage] = []
 
         # TODO: summarize history to save tokens in large conversations
         history = await self.get_conversation_messages(conversation_id)
@@ -52,14 +62,17 @@ class ChatService:
         async for chunk in self._ai_service.generate_dynamic_stream(
             user_message, history, database_id
         ):
+            print(f"Generated chunk: {chunk}")
+
             if chunk.event == "incoming":
                 yield self._serialize_sse_chunk(chunk)
 
             elif chunk.event == "data":
                 yield self._serialize_sse_chunk(chunk)
 
+                MessageClass = BOT_MESSAGE_CLASSES.get(chunk.type, TextMessage)
                 new_conversation_messages.append(
-                    CompleteMessage(
+                    MessageClass(
                         id=chunk.id,
                         role="bot",
                         type=chunk.type,

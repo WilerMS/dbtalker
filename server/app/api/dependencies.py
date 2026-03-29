@@ -7,7 +7,7 @@ from app.controllers.chat_controller import ChatController
 from app.controllers.conversation_controller import ConversationController
 from app.controllers.db_controller import DatabaseController
 from app.core.database import get_db
-from app.services.ai_service import AIService
+from app.services.ai_service.ai_service import AIService
 from app.services.chat_service import ChatService
 from app.services.conversation_service import ConversationService
 from app.services.db_service import DatabaseService

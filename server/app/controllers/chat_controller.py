@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 
 from app.schemas.chat import (
-    CompleteMessage,
+    ChatMessage,
     UserMessage,
 )
 from app.services.chat_service import ChatService
@@ -27,7 +27,7 @@ class ChatController:
         self,
         conversation_id: str,
         database_id: str,
-    ) -> list[CompleteMessage]:
+    ) -> list[ChatMessage]:
         await self._validate_database_and_conversation(database_id, conversation_id)
         return await self._chat_service.get_conversation_messages(conversation_id)
 

@@ -2,7 +2,7 @@ from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.domain import Message
-from app.schemas.chat import CompleteMessage
+from app.schemas.chat import ChatMessage
 
 
 class MessageService:
@@ -23,7 +23,7 @@ class MessageService:
     async def save_messages(
         self,
         conversation_id: str,
-        messages: list[CompleteMessage],
+        messages: list[ChatMessage],
     ) -> list[Message]:
         if not messages:
             return []
@@ -46,8 +46,6 @@ class MessageService:
         await self._db.commit()
         return list(result.scalars().all())
 
-    async def save_message(
-        self, conversation_id: str, message: CompleteMessage
-    ) -> Message:
+    async def save_message(self, conversation_id: str, message: ChatMessage) -> Message:
         saved_messages = await self.save_messages(conversation_id, [message])
         return saved_messages[0]
