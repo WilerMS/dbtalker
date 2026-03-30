@@ -29,6 +29,7 @@ export type UpdateDatabaseFormState = z.infer<typeof databaseFormSchema>
 
 export const sqlEngineOptions = [
   { label: 'PostgreSQL', value: 'postgresql' },
+  { label: 'Turso DB', value: 'turso' },
   // { label: 'MySQL', value: 'mysql' },
   // { label: 'MariaDB', value: 'mariadb' },
   // { label: 'SQL Server', value: 'sqlserver' },
