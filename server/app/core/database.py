@@ -6,9 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.config import settings
 from app.models.domain import Base, Database
 
-DATABASE_URL = settings.database_url
-
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(settings.database_url, echo=True)
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
@@ -35,16 +33,16 @@ async def seed_db() -> None:
 
         default_database = Database(
             id="83d48401c6f4447283184ebd610148f5",
-            name="Base de Datos de Prueba",
+            name="Demo E-commerce DB",
             engine="postgresql",
             icon="Database",
             description="Seed inicial para pruebas locales",
             connection_data={
-                "host": "postgres",
-                "port": 5432,
-                "user": "dbtalkie",
-                "password": "dbtalkie",
-                "database": "dbtalkie",
+                "host": settings.demo_db_host,
+                "port": settings.demo_db_port,
+                "user": settings.demo_db_user,
+                "password": settings.demo_db_password,
+                "database": settings.demo_db_name,
             },
         )
 
