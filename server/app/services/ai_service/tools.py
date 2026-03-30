@@ -35,9 +35,9 @@ class ShowKPI(BaseModel):
 
 class ShowTable(BaseModel):
     """
-    Tool to render a structured data table in the UI.
-    USE THIS WHEN the user requests a list, a detailed breakdown, or multiple records
-    (e.g., 'Show me the top 10 customers', 'List the latest transactions').
+    CRITICAL: YOU MUST USE THIS TOOL TO DISPLAY ANY TABULAR DATA, LISTS, OR MULTIPLE RECORDS.
+    IF YOU HAVE MULTIPLE ROWS OF DATA FROM THE DATABASE, DO NOT WRITE THEM IN TEXT.
+    USE THIS TOOL IMMEDIATELY AFTER RECEIVING THE SQL RESULTS.
     """
 
     columns: list[str] = Field(
