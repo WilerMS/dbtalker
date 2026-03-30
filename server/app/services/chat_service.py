@@ -9,6 +9,7 @@ from app.schemas.chat import (
     TextMessage,
     UserMessage,
 )
+from app.schemas.database import DatabaseRecord
 from app.schemas.streaming import (
     SSEChunk,
     SSEChunkFinished,
@@ -42,28 +43,20 @@ class ChatService:
         return chat_messages
 
     async def generate_response_stream(
-        self,
-        user_message: UserMessage,
-        database_id: str,
-        conversation_id: str,
+        self, conversation_id: str, user_message: UserMessage, database: DatabaseRecord
     ) -> AsyncGenerator[dict[str, str], None]:
 
-        new_conversation_messages: list[ChatMessage] = []
-
-        # TODO: summarize history to save tokens in large conversations
-        history = await self.get_conversation_messages(conversation_id)
+        new_messages: list[ChatMessage] = []
 
         # Save the user message to ensure it's saved if any error occurs during streaming
-        await self._message_service.save_messages(
+        await self._message_service.save_message(
             conversation_id,
-            [user_message],
+            user_message,
         )
 
-        async for chunk in self._ai_service.generate_dynamic_stream(
-            user_message, history, database_id
-        ):
-            print(f"Generated chunk: {chunk}")
+        history = await self.get_conversation_messages(conversation_id)
 
+        async for chunk in self._ai_service.generate_dynamic_stream(history, database):
             if chunk.event == "incoming":
                 yield self._serialize_sse_chunk(chunk)
 
@@ -71,7 +64,7 @@ class ChatService:
                 yield self._serialize_sse_chunk(chunk)
 
                 MessageClass = BOT_MESSAGE_CLASSES.get(chunk.type, TextMessage)
-                new_conversation_messages.append(
+                new_messages.append(
                     MessageClass(
                         id=chunk.id,
                         role="bot",
@@ -85,7 +78,7 @@ class ChatService:
         # Save all bot messages at the end of the stream
         await self._message_service.save_messages(
             conversation_id,
-            new_conversation_messages,
+            new_messages,
         )
         yield self._serialize_sse_chunk(SSEChunkFinished(event="finished"))
 

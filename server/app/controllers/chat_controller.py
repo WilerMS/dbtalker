@@ -6,6 +6,7 @@ from app.schemas.chat import (
     ChatMessage,
     UserMessage,
 )
+from app.schemas.database import DatabaseConnection, DatabaseRecord
 from app.services.chat_service import ChatService
 from app.services.conversation_service import ConversationService
 from app.services.db_service import DatabaseService
@@ -33,15 +34,17 @@ class ChatController:
 
     async def stream_chat(
         self,
-        user_message: UserMessage,
         database_id: str,
+        user_message: UserMessage,
         conversation_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
-        await self._validate_database_and_conversation(database_id, conversation_id)
+        database = await self._validate_database_and_conversation(
+            database_id, conversation_id
+        )
 
         # Delegate to chat service for streaming
         async for chunk in self._chat_service.generate_response_stream(
-            user_message, database_id, conversation_id
+            conversation_id, user_message, database
         ):
             yield chunk
 
@@ -50,8 +53,9 @@ class ChatController:
         self,
         database_id: str,
         conversation_id: str,
-    ) -> None:
-        if not await self._db_service.get_database_by_id(database_id):
+    ) -> DatabaseRecord:
+        database = await self._db_service.get_database_by_id(database_id)
+        if not database:
             raise ResourceNotFoundError(f"Database '{database_id}' not found.")
 
         conversations = await self._conversation_service.get_conversations_by_database(
@@ -61,3 +65,21 @@ class ChatController:
             raise ResourceNotFoundError(
                 f"Conversation '{conversation_id}' not found in database '{database_id}'."
             )
+
+        return DatabaseRecord(
+            id=database.id,
+            name=database.name,
+            engine=database.engine,
+            icon=database.icon,
+            description=database.description,
+            connection=DatabaseConnection(
+                host=database.connection_data["host"],
+                port=database.connection_data["port"],
+                database=database.connection_data["database"],
+                username=database.connection_data["user"],
+                password=database.connection_data["password"],
+                use_ssl=False,
+            ),
+            created_at=database.created_at,
+            updated_at=database.updated_at,
+        )

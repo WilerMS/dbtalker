@@ -73,7 +73,7 @@ class TableData(BaseModel):
     rows: list[dict[str, str | float | int]]
 
 
-CodeLanguage = Literal["sql", "postgresql", "mysql", "sqlite"]
+CodeLanguage = Literal["sql", "postgresql", "mysql"]
 
 
 class CodeData(BaseModel):
