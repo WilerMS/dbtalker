@@ -1,5 +1,3 @@
-from typing import Any
-
 from pydantic import BaseModel, Field
 
 
@@ -36,23 +34,23 @@ class ShowKPI(BaseModel):
 class ShowTable(BaseModel):
     """
     CRITICAL: YOU MUST USE THIS TOOL TO DISPLAY ANY TABULAR DATA, LISTS, OR MULTIPLE RECORDS.
-    IF YOU HAVE MULTIPLE ROWS OF DATA FROM THE DATABASE, DO NOT WRITE THEM IN TEXT.
-    USE THIS TOOL IMMEDIATELY AFTER RECEIVING THE SQL RESULTS.
+    YOU MUST PROVIDE 'title', 'columns', AND 'rows'. DO NOT LEAVE 'rows' EMPTY.
     """
 
+    title: str = Field(
+        description="A short, descriptive title for the table (e.g., 'Latest Transactions')."
+    )
     columns: list[str] = Field(
         description=(
             "An array of human-readable column headers. "
-            "Format in Title Case and keep them concise (e.g., ['Transaction Date', 'Customer Name', 'Total Amount'])."
+            "Format in Title Case (e.g., ['Transaction Date', 'Customer Name', 'Total Amount'])."
         )
     )
-    rows: list[dict[str, Any]] = Field(
+    rows: list[list[str]] = Field(
         description=(
-            "An array of JSON objects representing the rows of the table. "
-            "CRITICAL: The keys in EACH dictionary MUST exactly match the exact strings defined in the 'columns' array. "
-            "Ensure all numerical values are properly formatted (e.g., limiting decimals to 2 places, adding currency symbols). "
-            "Handle missing data by providing a null value or the string '-'. "
-            "Do NOT include nested objects or arrays inside the row values; use flat primitive types (string, number, boolean)."
+            "An array of rows, where each row is an array of strings. "
+            "CRITICAL: The length of each row array MUST exactly match the length of the 'columns' array. "
+            "Ensure numerical values are formatted (e.g., '€250.00'). Use '-' for missing data."
         )
     )
 

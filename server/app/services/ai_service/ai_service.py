@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import json
-import os
 import uuid
 from collections.abc import AsyncGenerator
+from datetime import datetime
 
 from langchain_core.messages import (
     AIMessage,
@@ -15,30 +15,48 @@ from langchain_core.messages import (
 )
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
+from sqlalchemy.exc import OperationalError as SQLAlchemyOperationalError
 
-from app.schemas.chat import ChatMessage, UserMessage
+from app.config import settings
+from app.schemas.chat import ChatMessage
+from app.schemas.database import DatabaseRecord
 from app.schemas.streaming import SSEChunk, SSEChunkData, SSEChunkIncoming
 from app.schemas.widgets import KpiData, TableData, TextData
+from app.services.ai_service.agent_factory import AgentFactory
 from app.services.ai_service.prompts import EXECUTIVE_ASSISTANT_PROMPT
-from app.services.ai_service.tools import dbtalkie_tools, query_database
 
 
 class AIService:
     def __init__(self):
-        api_key = os.getenv("OPENAI_API_KEY")
         self.llm = ChatOpenAI(
             model="gpt-4o-mini",
             temperature=0,
-            api_key=SecretStr(api_key) if api_key else None,
+            api_key=SecretStr(settings.openai_api_key),
         )
-        self.llm_with_tools = self.llm.bind_tools(dbtalkie_tools)
 
     async def generate_dynamic_stream(
-        self, user_message: UserMessage, history: list[ChatMessage], database_id: str
+        self, history: list[ChatMessage], db_record: DatabaseRecord
     ) -> AsyncGenerator[SSEChunk, None]:
+        try:
+            llm_with_tools, sql_tools = AgentFactory.build_sql_agent(self.llm, db_record)
+        except SQLAlchemyOperationalError:
+            error_id = str(uuid.uuid4())
+            yield SSEChunkIncoming(id=error_id, event="incoming", type="text")
+            yield SSEChunkData(
+                id=error_id,
+                event="data",
+                type="text",
+                data=TextData(
+                    text=(
+                        "No pude conectarme a la base de datos configurada. "
+                        "Verifica host, puerto y credenciales, y prueba nuevamente."
+                    )
+                ),
+            )
+            return
 
-        # 1. Construir el contexto para la IA
-        messages: list[BaseMessage] = self._build_history(history, user_message)
+        # TODO: summarize history to save tokens in large conversations
+        messages: list[BaseMessage] = self._build_history(history)
 
         ITERATIONS = 0
         MAX_ITERATIONS = 5
@@ -46,8 +64,7 @@ class AIService:
         while ITERATIONS < MAX_ITERATIONS:
             ITERATIONS += 1
 
-            # 2. La IA decide
-            response = await self.llm_with_tools.ainvoke(messages)
+            response = await llm_with_tools.ainvoke(messages)
             messages.append(response)
 
             if response.content and isinstance(response.content, str):
@@ -69,10 +86,30 @@ class AIService:
                     tool_id = tool_call["id"]
 
                     # * Backend Tools
-                    if tool_name == "query_database":
-                        db_result = query_database.invoke(tool_args)
+                    if tool_name in [t.name for t in sql_tools]:
+                        tool_instance = next(t for t in sql_tools if t.name == tool_name)
+
+                        print(
+                            f"AI requested tool '{tool_name}' with args: {tool_args}"
+                        )  # Debug log
+
+                        # Send intermediate "Consulting database..."
+                        # TODO: Change this to a widget
+                        status_id = str(uuid.uuid4())
+                        yield SSEChunkIncoming(
+                            id=status_id, event="incoming", type="text"
+                        )
+                        yield SSEChunkData(
+                            id=status_id,
+                            event="data",
+                            type="text",
+                            data=TextData(text="Consultando la base de datos..."),
+                        )
+
+                        db_result = await tool_instance.ainvoke(tool_args)
+
                         messages.append(
-                            ToolMessage(tool_call_id=tool_id, content=db_result)
+                            ToolMessage(tool_call_id=tool_id, content=str(db_result))
                         )
 
                     # * Frontend Tools (UI Widgets)
@@ -101,13 +138,14 @@ class AIService:
                         )
 
                     elif tool_name == "ShowTable":
+                        print("Rendering table with args:", tool_args)  # Debug log
                         table_id = str(uuid.uuid4())
                         yield SSEChunkIncoming(
                             id=table_id, event="incoming", type="table"
                         )
 
                         table_data = TableData(
-                            title=tool_args.get("title", "Table"),
+                            title=tool_args.get("title", "Table Data"),
                             columns=tool_args.get("columns", []),
                             rows=tool_args.get("rows", []),
                         )
@@ -131,11 +169,11 @@ class AIService:
                 # We break the loop because the final text (if any) was already yielded in step 2.
                 break
 
-    def _build_history(
-        self, history: list[ChatMessage], user_message: UserMessage
-    ) -> list[BaseMessage]:
+    def _build_history(self, history: list[ChatMessage]) -> list[BaseMessage]:
+        now = datetime.now().strftime("%Y-%m-%d")
+        dynamic_system_prompt = EXECUTIVE_ASSISTANT_PROMPT.replace("%now%", now)
 
-        messages: list[BaseMessage] = [SystemMessage(content=EXECUTIVE_ASSISTANT_PROMPT)]
+        messages: list[BaseMessage] = [SystemMessage(content=dynamic_system_prompt)]
 
         for msg in history:
             if msg.role == "user":
@@ -163,7 +201,5 @@ class AIService:
                 # TODO: Add more widget types here
                 content = f"[System Note: Displayed {msg.type} widget with data: {msg.data.model_dump_json()}]"
                 messages.append(AIMessage(content=content))
-
-        messages.append(HumanMessage(content=user_message.data.text))
 
         return messages

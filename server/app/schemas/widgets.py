@@ -70,7 +70,7 @@ class TableRow(BaseModel):
 class TableData(BaseModel):
     title: str
     columns: list[str]
-    rows: list[dict[str, str | float | int]]
+    rows: list[list[str | int | float]]
 
 
 CodeLanguage = Literal["sql", "postgresql", "mysql"]
