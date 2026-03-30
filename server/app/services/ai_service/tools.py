@@ -1,6 +1,5 @@
 from typing import Any
 
-from langchain_core.tools import tool
 from pydantic import BaseModel, Field
 
 
@@ -70,16 +69,3 @@ class QueryDatabaseInput(BaseModel):
             "3. Use appropriate aggregations (SUM, COUNT, AVG) if the user asks for a KPI or total metric."
         )
     )
-
-
-@tool("query_database", args_schema=QueryDatabaseInput)
-def query_database(sql_query: str) -> str:
-    """
-    Executes a raw SQL query against the user's connected database and returns the results as a JSON string.
-    Use this tool whenever you need to fetch exact numbers, records, or statistics from the database.
-    """
-    print(f"--> [BASE DE DATOS REAL] Ejecutando SQL: {sql_query}")
-    return '[{"total_revenue": 2480000, "month": "March"}]'
-
-
-dbtalkie_tools = [ShowKPI, ShowTable, query_database]
