@@ -59,7 +59,22 @@ services:
       backend:
         condition: service_healthy
 
+  postgres-demo:
+    image: postgres:16-alpine
+    container_name: dbtalkie_postgres_demo
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DEMO_DB_USER}
+      POSTGRES_PASSWORD: ${DEMO_DB_PASSWORD}
+      POSTGRES_DB: ${DEMO_DB_NAME}
+    ports:
+      - "${DEMO_DB_PORT}:5432"
+    volumes:
+      - postgres_demo_data:/var/lib/postgresql/data
+      - ./scripts/init-demo.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
 volumes:
   postgres_data:
   backend_venv:
   frontend_node_modules:
+  postgres_demo_data:
