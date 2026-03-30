@@ -13,5 +13,11 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    demo_db_host: str = Field(default=...)
+    demo_db_user: str = Field(default=...)
+    demo_db_password: str = Field(default=...)
+    demo_db_name: str = Field(default=...)
+    demo_db_port: int = Field(default=...)
+
 
 settings = Settings()
