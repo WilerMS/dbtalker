@@ -6,13 +6,17 @@ interface TableWidgetProps {
   isExpanded?: boolean
 }
 
+const expandedHeight = 'h-[72vh]'
+const collapsedHeight = 'h-[26rem]'
+
 export const TableWidget = ({
   data,
   isExpanded = false,
 }: TableWidgetProps): JSX.Element => {
   return (
     <div
-      className={`rounded-2xl border border-zinc-800 bg-zinc-900/50 ${isExpanded ? 'max-h-[72vh] overflow-auto' : 'overflow-hidden'}`}
+      data-component="TableWidget"
+      className={`h-full rounded-2xl border border-zinc-800 bg-zinc-900/50 ${isExpanded ? expandedHeight : collapsedHeight}`}
     >
       <div className="h-12 shrink-0 px-6 py-4">
         <div className="flex h-full items-center">
@@ -44,10 +48,10 @@ export const TableWidget = ({
               key={`row-${rowIndex}`}
               className="border-b border-zinc-800/50 text-zinc-200 transition-colors hover:bg-emerald-900/20"
             >
-              {data.columns.map((column) => (
+              {row.map((column) => (
                 <td key={`${rowIndex}-${column}`} className="h-11.25 px-6 py-0">
                   <div className="flex h-full items-center">
-                    <span className="block">{row[column]}</span>
+                    <span className="block">{column}</span>
                   </div>
                 </td>
               ))}

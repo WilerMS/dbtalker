@@ -91,14 +91,10 @@ export interface LineData {
   title?: string
 }
 
-export interface TableRow {
-  [key: string]: string | number
-}
-
 export interface TableData {
   title: string
   columns: string[]
-  rows: TableRow[]
+  rows: string[][]
 }
 
 export type MessageData =

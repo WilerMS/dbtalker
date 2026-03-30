@@ -88,7 +88,7 @@ export const WidgetModal = ({
           <motion.div
             transition={widgetModalTransition}
             style={modalStyle}
-            className="fixed top-1/2 left-1/2 z-10 min-h-0 -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-2xl"
+            className="fixed top-1/2 left-1/2 z-10 min-h-0 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl"
           >
             {children}
           </motion.div>
