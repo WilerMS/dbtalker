@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from app.models.domain import Database
 
-DatabaseEngine = Literal["postgresql", "sqlite"]
+DatabaseEngine = Literal["postgresql"]
 
 
 class DatabaseConnection(BaseModel):
