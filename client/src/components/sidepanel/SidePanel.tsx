@@ -12,12 +12,13 @@ import { Logo } from '../ui/Logo'
 import { useModal } from '../../hooks/useModal'
 import { CreateDatabaseModalContent } from './components/database-manager'
 import { UserButton } from './components/user-button/UserButton'
-import { Show, useClerk } from '@clerk/react'
+import { Show, useClerk, useUser } from '@clerk/react'
 
 export const SidePanel: FC = () => {
   const navigate = useNavigate()
   const { openModal } = useModal()
   const { openSignIn } = useClerk()
+  const { isSignedIn } = useUser()
 
   const { id_db: selectedDatabaseId } = useParams<{ id_db: string }>()
   const { databases = [] } = useGetDatabases()
@@ -65,6 +66,7 @@ export const SidePanel: FC = () => {
         <SidePanelItemButton
           title="Add database"
           onClick={() => {
+            if (!isSignedIn) return openSignIn()
             openModal({
               content: ({ closeModal }) => (
                 <CreateDatabaseModalContent

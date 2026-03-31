@@ -1,5 +1,4 @@
 import { type JSX } from 'react'
-import { Show, SignInButton, SignUpButton } from '@clerk/react'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 
 import { AppLayout } from './components/layout/AppLayout'
@@ -38,19 +37,7 @@ const router = createBrowserRouter([
 ])
 
 const App = (): JSX.Element => {
-  return (
-    <>
-      <header
-        style={{ display: 'flex', gap: 8, alignItems: 'center', padding: 8 }}
-      >
-        <Show when="signed-out">
-          <SignInButton mode="modal" />
-          <SignUpButton mode="modal" />
-        </Show>
-      </header>
-      <RouterProvider router={router} />
-    </>
-  )
+  return <RouterProvider router={router} />
 }
 
 export default App
