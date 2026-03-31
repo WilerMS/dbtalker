@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 interface AuxPanelWrapperProps {
   isOpen: boolean
   anchorRect?: DOMRect
+  minHeight?: number
   onMouseEnter: () => void
   onMouseLeave: () => void
   children: ReactNode
@@ -15,11 +16,14 @@ const PANEL_WIDTH = 300
 const PANEL_BASE_SHADOW =
   '0 8px 40px rgba(0,0,0,0.55), 0 0 40px rgba(16,185,129,0.18), 0 0 0 1px rgba(16,185,129,0.07)'
 
-const computePosition = (rect?: DOMRect): { top: number; left: number } => {
+const computePosition = (
+  rect?: DOMRect,
+  minHeight: number = PANEL_MIN_HEIGHT,
+): { top: number; left: number } => {
   if (!rect) return { top: 0, left: 92 }
-  const wouldOverflowBottom = rect.top + PANEL_MIN_HEIGHT > window.innerHeight
+  const wouldOverflowBottom = rect.top + minHeight > window.innerHeight
   return {
-    top: wouldOverflowBottom ? rect.bottom - PANEL_MIN_HEIGHT : rect.top,
+    top: wouldOverflowBottom ? rect.bottom - minHeight : rect.top,
     left: 92,
   }
 }
@@ -27,11 +31,12 @@ const computePosition = (rect?: DOMRect): { top: number; left: number } => {
 export const AuxPanelWrapper = ({
   isOpen,
   anchorRect,
+  minHeight = PANEL_MIN_HEIGHT,
   onMouseEnter,
   onMouseLeave,
   children,
 }: AuxPanelWrapperProps) => {
-  const pos = computePosition(anchorRect)
+  const pos = computePosition(anchorRect, minHeight)
 
   return createPortal(
     <AnimatePresence>
@@ -66,7 +71,7 @@ export const AuxPanelWrapper = ({
           style={{
             position: 'fixed',
             width: PANEL_WIDTH,
-            height: PANEL_MIN_HEIGHT,
+            height: minHeight,
             zIndex: 50,
           }}
           className="flex flex-col rounded-2xl border border-zinc-700/40 bg-linear-to-b from-zinc-900/90 via-emerald-950/60 to-zinc-900/88 backdrop-blur-md"

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FC } from 'react'
-import { Settings, LogOut, Plus } from 'lucide-react'
+import { Settings, Plus, User } from 'lucide-react'
 import type { DatabaseRecord } from '../../types/database'
 import { AuxPanel } from './components/AuxPanel'
 import { SidePanelItemButton } from './components/SidePanelItemButton'
@@ -11,10 +11,13 @@ import { useDelayedHide } from './hooks/useDelayedHide'
 import { Logo } from '../ui/Logo'
 import { useModal } from '../../hooks/useModal'
 import { CreateDatabaseModalContent } from './components/database-manager'
+import { UserButton } from './components/user-button/UserButton'
+import { Show, useClerk } from '@clerk/react'
 
 export const SidePanel: FC = () => {
   const navigate = useNavigate()
   const { openModal } = useModal()
+  const { openSignIn } = useClerk()
 
   const { id_db: selectedDatabaseId } = useParams<{ id_db: string }>()
   const { databases = [] } = useGetDatabases()
@@ -88,18 +91,27 @@ export const SidePanel: FC = () => {
 
         <div className="grow" />
 
-        <SidePanelItemButton
-          onClick={() =>
-            void navigate('/app/settings', { viewTransition: true })
-          }
-          title="Settings"
-        >
-          <Settings size={20} />
-        </SidePanelItemButton>
+        <UserButton />
 
-        <SidePanelItemButton title="Log out" variant="danger">
-          <LogOut size={20} />
-        </SidePanelItemButton>
+        <Show when="signed-in">
+          <SidePanelItemButton
+            onClick={() =>
+              void navigate('/app/settings', { viewTransition: true })
+            }
+            title="Settings"
+          >
+            <Settings size={20} />
+          </SidePanelItemButton>
+        </Show>
+
+        <Show when="signed-out">
+          <SidePanelItemButton
+            onClick={() => void openSignIn()}
+            title="Settings"
+          >
+            <User size={20} />
+          </SidePanelItemButton>
+        </Show>
       </nav>
 
       <AuxPanel

@@ -64,7 +64,7 @@ export const SidePanelItemButton = ({
         aria-hidden
         className={`pointer-events-none absolute -inset-[45%] animate-spin rounded-full bg-conic ${movingShineClassName} ${movingShineOpacityClassName} blur-sm transition-opacity duration-300 [animation-duration:4.5s]`}
       />
-      <span className="relative z-10 transition-transform duration-300 group-hover:scale-105 group-[aria-current=true]:scale-105">
+      <span className="relative z-10 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 group-[aria-current=true]:scale-105">
         {children}
       </span>
     </button>
