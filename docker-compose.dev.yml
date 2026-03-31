@@ -45,8 +45,8 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      target: development
     container_name: dbtalkie-frontend
-    target: development
     working_dir: /app
     command: npm run dev -- --host 0.0.0.0 --port 5173
     ports:
