@@ -3,7 +3,7 @@ from typing import Optional
 import httpx
 from clerk_backend_api import Clerk
 from clerk_backend_api.security.types import AuthenticateRequestOptions
-from fastapi import Depends, HTTPException, Path, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.config import settings
@@ -80,7 +80,7 @@ async def get_optional_user(
 
 
 async def resolve_active_user(
-    database_id: str = Path(...),
+    database_id: str,
     user_id: str | None = Depends(get_optional_user),
 ) -> str:
     if database_id == settings.demo_db_id:

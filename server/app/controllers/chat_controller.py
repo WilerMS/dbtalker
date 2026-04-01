@@ -28,8 +28,11 @@ class ChatController:
         self,
         conversation_id: str,
         database_id: str,
+        user_id: str,
     ) -> list[ChatMessage]:
-        await self._validate_database_and_conversation(database_id, conversation_id)
+        await self._validate_database_and_conversation(
+            database_id, conversation_id, user_id
+        )
         return await self._chat_service.get_conversation_messages(conversation_id)
 
     async def stream_chat(
@@ -37,9 +40,10 @@ class ChatController:
         database_id: str,
         user_message: UserMessage,
         conversation_id: str,
+        user_id: str,
     ) -> AsyncGenerator[dict[str, str], None]:
         database = await self._validate_database_and_conversation(
-            database_id, conversation_id
+            database_id, conversation_id, user_id
         )
 
         # Delegate to chat service for streaming
@@ -48,22 +52,28 @@ class ChatController:
         ):
             yield chunk
 
-    # TODO: Investigate this validation to avoid the loop
     async def _validate_database_and_conversation(
         self,
         database_id: str,
         conversation_id: str,
+        user_id: str,
     ) -> DatabaseRecord:
-        database = await self._db_service.get_database_by_id(database_id)
-        if not database:
-            raise ResourceNotFoundError(f"Database '{database_id}' not found.")
 
-        conversations = await self._conversation_service.get_conversations_by_database(
-            database_id
-        )
-        if not any(conversation.id == conversation_id for conversation in conversations):
+        # 1. Checking the database existence and ownership
+        database = await self._db_service.get_database_by_id(database_id, user_id=user_id)
+        if not database:
             raise ResourceNotFoundError(
-                f"Conversation '{conversation_id}' not found in database '{database_id}'."
+                f"Database '{database_id}' from user '{user_id}' not found."
+            )
+
+        # 2. Checking the conversation existence, ownership and that it belongs to the database
+        conversation = await self._conversation_service.get_conversation_by_id(
+            conversation_id, user_id=user_id
+        )
+
+        if not conversation or conversation.database_id != database_id:
+            raise ResourceNotFoundError(
+                f"Conversation '{conversation_id}' not found or access denied."
             )
 
         return DatabaseRecord(
