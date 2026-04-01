@@ -9,6 +9,7 @@ import { Logo } from '../components/ui/Logo'
 import { useCreateConversation } from '../hooks/useConversations/useCreateConversation'
 import { useModal } from '../hooks/useModal'
 import { CreateDatabaseModalContent } from '../components/sidepanel/components/database-manager'
+import { useGetDemoDatabase } from '../hooks/useDatabases'
 
 const easeOut = [0.16, 1, 0.3, 1] as const
 const easeInOut = [0.45, 0, 0.55, 1] as const
@@ -48,22 +49,22 @@ const glowVariants: Variants = {
   },
 }
 
-const DEFAULT_DATABASE_ID = '83d48401c6f4447283184ebd610148f5'
-
 export const MainPage: FC = () => {
   const navigate = useNavigate()
+  const { database: demoDb } = useGetDemoDatabase()
   const { createConversation, isPending } = useCreateConversation()
   const { openModal } = useModal()
   const { isSignedIn } = useUser()
   const { openSignIn } = useClerk()
 
   const handleGoToDemo = async () => {
+    if (!demoDb) return
     const newConversation = await createConversation({
-      database_id: DEFAULT_DATABASE_ID,
+      database_id: demoDb.id,
       title: 'Nueva conversacion',
     })
 
-    const newPath = `/app/${DEFAULT_DATABASE_ID}/conversations/${newConversation.id}`
+    const newPath = `/app/${demoDb.id}/conversations/${newConversation.id}`
 
     await navigate(newPath, { viewTransition: true })
   }
