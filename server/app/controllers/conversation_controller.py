@@ -5,12 +5,18 @@ from app.schemas.conversation import (
     CreateConversationInput,
 )
 from app.services.conversation_service import ConversationService
+from app.services.message_service import MessageService
 from app.utility.errors import ResourceNotFoundError
 
 
 class ConversationController:
-    def __init__(self, conversation_service: ConversationService) -> None:
+    def __init__(
+        self,
+        conversation_service: ConversationService,
+        message_service: MessageService,
+    ) -> None:
         self._conversation_service = conversation_service
+        self._message_service = message_service
 
     async def get_conversations_by_database(
         self, database_id: str

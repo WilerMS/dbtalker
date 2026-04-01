@@ -21,10 +21,8 @@ def db_service(
     return DatabaseService(db)
 
 
-def conversation_service(
-    db: AsyncSession = Depends(get_db),
-) -> ConversationService:
-    return ConversationService(db=db)
+def ai_service() -> AIService:
+    return AIService()
 
 
 def message_service(
@@ -33,8 +31,11 @@ def message_service(
     return MessageService(db=db)
 
 
-def ai_service() -> AIService:
-    return AIService()
+def conversation_service(
+    db: AsyncSession = Depends(get_db),
+    message_service: MessageService = Depends(message_service),
+) -> ConversationService:
+    return ConversationService(db=db, message_service=message_service)
 
 
 def chat_service(

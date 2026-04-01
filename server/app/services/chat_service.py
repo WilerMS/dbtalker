@@ -43,7 +43,10 @@ class ChatService:
         return chat_messages
 
     async def generate_response_stream(
-        self, conversation_id: str, user_message: UserMessage, database: DatabaseRecord
+        self,
+        conversation_id: str,
+        user_message: UserMessage,
+        database: DatabaseRecord,
     ) -> AsyncGenerator[dict[str, str], None]:
 
         new_messages: list[ChatMessage] = []
