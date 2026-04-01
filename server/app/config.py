@@ -3,11 +3,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    demo_user_id: str = Field(default=...)
-
-    db_user: str = Field(default=...)
-    db_password: str = Field(default=...)
-    db_name: str = Field(default=...)
+    db_user: str = Field(alias="POSTGRES_USER", default=...)
+    db_password: str = Field(alias="POSTGRES_PASSWORD", default=...)
+    db_name: str = Field(alias="POSTGRES_DB", default=...)
     db_host: str = Field(default="postgres")
     db_port: int = Field(default=5432)
 
@@ -15,6 +13,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    demo_user_id: str = Field(default=...)
     demo_db_id: str = Field(default=...)
     demo_db_name: str = Field(default=...)
 
