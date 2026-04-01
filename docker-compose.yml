@@ -42,6 +42,9 @@ services:
       target: production
       args:
         - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+        - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
+        - VITE_DEMO_DB_ID=${VITE_DEMO_DB_ID}
+        - VITE_DEMO_USER_ID=${VITE_DEMO_USER_ID}
     container_name: dbtalkie-frontend
     restart: unless-stopped
     depends_on:
