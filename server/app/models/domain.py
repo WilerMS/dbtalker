@@ -26,6 +26,8 @@ class Database(Base):
     icon: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
 
+    user_id: Mapped[str] = mapped_column(String(255), nullable=False)
+
     # TODO: hash the connection details
     connection_data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
 
@@ -59,6 +61,8 @@ class Conversation(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+    user_id: Mapped[str] = mapped_column(String(255), nullable=False)
 
     # Relations
     database: Mapped["Database"] = relationship(

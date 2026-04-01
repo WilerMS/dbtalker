@@ -32,11 +32,12 @@ async def seed_db() -> None:
             return
 
         default_database = Database(
-            id="83d48401c6f4447283184ebd610148f5",
+            id=settings.demo_db_id,
             name="Demo E-commerce DB",
             engine="postgresql",
             icon="Database",
-            description="Seed inicial para pruebas locales",
+            user_id=settings.demo_user_id,
+            description="Initial demo database with sample e-commerce data.",
             connection_data={
                 "host": settings.demo_db_host,
                 "port": settings.demo_db_port,

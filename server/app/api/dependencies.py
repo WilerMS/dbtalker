@@ -53,9 +53,11 @@ def db_controller(
 
 def conversation_controller(
     conversation_service: ConversationService = Depends(conversation_service),
+    message_service: MessageService = Depends(message_service),
 ) -> ConversationController:
     return ConversationController(
         conversation_service=conversation_service,
+        message_service=message_service,
     )
 
 
