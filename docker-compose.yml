@@ -1,7 +1,7 @@
 services:
-  postgres:
+  postgres_service:
     image: postgres:16-alpine
-    container_name: dbtalkie-postgres
+    container_name: dbtalkie-postgres-service
     ports:
       - "${DB_PORT}:5432"
     environment:
@@ -12,7 +12,7 @@ services:
     env_file:
       - .env
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_service_data:/var/lib/postgresql/data
       - ./scripts/init-demo.sql:/tmp/init-demo.sql:ro
       - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
     healthcheck:
@@ -33,7 +33,7 @@ services:
     env_file:
       - .env
     depends_on:
-      postgres:
+      postgres_service:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -61,6 +61,6 @@ services:
         condition: service_healthy
 
 volumes:
-  postgres_data:
+  postgres_service_data:
   backend_venv:
   frontend_node_modules:
