@@ -55,7 +55,7 @@ services:
         - VITE_DEMO_USER_ID=${VITE_DEMO_USER_ID}
     container_name: dbtalkie-frontend
     ports:
-      - "3000:3000"
+      - "8001:3000"
     restart: unless-stopped
     depends_on:
       backend:
