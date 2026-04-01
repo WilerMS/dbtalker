@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, status
 # Dependency injection
 from app.api.dependencies import conversation_controller
 from app.controllers.conversation_controller import ConversationController
+from app.core.security import resolve_active_user
 
 # Schemas
 from app.schemas.conversation import (
@@ -19,8 +20,12 @@ router = APIRouter(prefix="/databases", tags=["Conversations"])
 async def get_conversations(
     database_id: str,
     conv_controller: ConversationController = Depends(conversation_controller),
+    active_user_id: str = Depends(resolve_active_user),
 ) -> list[ConversationRecord]:
-    return await conv_controller.get_conversations_by_database(database_id)
+
+    return await conv_controller.get_conversations_by_database(
+        database_id, active_user_id
+    )
 
 
 @router.post(
@@ -32,9 +37,10 @@ async def create_conversation(
     database_id: str,
     input_data: CreateConversationInput,
     conv_controller: ConversationController = Depends(conversation_controller),
+    active_user_id: str = Depends(resolve_active_user),
 ) -> ConversationRecord:
     input_data.database_id = database_id
-    return await conv_controller.create_conversation(input_data)
+    return await conv_controller.create_conversation(input_data, active_user_id)
 
 
 @router.delete(
@@ -45,5 +51,8 @@ async def delete_conversation(
     database_id: str,
     conversation_id: str,
     conv_controller: ConversationController = Depends(conversation_controller),
+    active_user_id: str = Depends(resolve_active_user),
 ) -> None:
-    await conv_controller.delete_conversation(database_id, conversation_id)
+    await conv_controller.delete_conversation(
+        database_id, conversation_id, active_user_id
+    )

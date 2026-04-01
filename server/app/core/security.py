@@ -3,7 +3,7 @@ from typing import Optional
 import httpx
 from clerk_backend_api import Clerk
 from clerk_backend_api.security.types import AuthenticateRequestOptions
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Path, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.config import settings
@@ -77,3 +77,19 @@ async def get_optional_user(
     except Exception as e:
         print(f"Silent error while validating Clerk token: {e}")
         return None
+
+
+async def resolve_active_user(
+    database_id: str = Path(...),
+    user_id: str | None = Depends(get_optional_user),
+) -> str:
+    if database_id == settings.demo_db_id:
+        return settings.demo_user_id
+
+    if user_id is not None:
+        return user_id
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Debes iniciar sesión para acceder a los chats de esta base de datos.",
+    )

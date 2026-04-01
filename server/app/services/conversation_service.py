@@ -18,8 +18,12 @@ class ConversationService:
         self._db = db
         self._message_service = message_service
 
-    async def get_conversations_by_database(self, database_id: str) -> list[Conversation]:
-        query = select(Conversation).where(Conversation.database_id == database_id)
+    async def get_conversations_by_database(
+        self, database_id: str, user_id: str
+    ) -> list[Conversation]:
+        query = select(Conversation).where(
+            Conversation.database_id == database_id, Conversation.user_id == user_id
+        )
         result = await self._db.execute(query)
 
         return list(result.scalars().all())
@@ -37,6 +41,7 @@ class ConversationService:
     async def create_conversation(
         self,
         input_data: CreateConversationInput,
+        user_id: str,
     ) -> Conversation:
         conversation_id = str(uuid4())
         query = (
@@ -45,6 +50,7 @@ class ConversationService:
                 id=conversation_id,
                 database_id=input_data.database_id,
                 title=input_data.title,
+                user_id=user_id,
             )
             .returning(Conversation)
         )
@@ -78,12 +84,15 @@ class ConversationService:
 
         return conversation
 
-    async def delete_conversation(self, database_id: str, conversation_id: str) -> bool:
+    async def delete_conversation(
+        self, database_id: str, conversation_id: str, user_id: str
+    ) -> bool:
         query = (
             delete(Conversation)
             .where(
                 Conversation.id == conversation_id,
                 Conversation.database_id == database_id,
+                Conversation.user_id == user_id,
             )
             .returning(Conversation.id)
         )

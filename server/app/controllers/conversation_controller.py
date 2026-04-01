@@ -19,10 +19,10 @@ class ConversationController:
         self._message_service = message_service
 
     async def get_conversations_by_database(
-        self, database_id: str
+        self, database_id: str, user_id: str
     ) -> list[ConversationRecord]:
         conversations = await self._conversation_service.get_conversations_by_database(
-            database_id
+            database_id, user_id
         )
         return [
             ConversationRecord.model_validate(conversation)
@@ -30,14 +30,18 @@ class ConversationController:
         ]
 
     async def create_conversation(
-        self, input_data: CreateConversationInput
+        self, input_data: CreateConversationInput, user_id: str
     ) -> ConversationRecord:
-        created = await self._conversation_service.create_conversation(input_data)
+        created = await self._conversation_service.create_conversation(
+            input_data, user_id
+        )
         return ConversationRecord.model_validate(created)
 
-    async def delete_conversation(self, database_id: str, conversation_id: str) -> bool:
+    async def delete_conversation(
+        self, database_id: str, conversation_id: str, user_id: str
+    ) -> bool:
         was_deleted = await self._conversation_service.delete_conversation(
-            database_id, conversation_id
+            database_id, conversation_id, user_id
         )
         if not was_deleted:
             raise ResourceNotFoundError(
