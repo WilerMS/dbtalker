@@ -25,6 +25,12 @@ class DatabaseController:
             raise ResourceNotFoundError(f"Database '{database_id}' not found.")
         return DatabaseResponseRecord.from_database(database)
 
+    async def get_demo_database(self) -> DatabaseResponseRecord:
+        database = await self._service.get_demo_database()
+        if not database:
+            raise ResourceNotFoundError("Demo database not found.")
+        return DatabaseResponseRecord.from_database(database)
+
     async def create_database(
         self, input_data: CreateDatabaseInput, user_id: str
     ) -> DatabaseResponseRecord:

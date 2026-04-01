@@ -1,6 +1,7 @@
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.models.domain import Database
 from app.schemas.database import CreateDatabaseInput, UpdateDatabaseInput
 
@@ -18,6 +19,11 @@ class DatabaseService:
         query = select(Database).where(
             Database.id == database_id, Database.user_id == user_id
         )
+        result = await self._db.execute(query)
+        return result.scalar_one_or_none()
+
+    async def get_demo_database(self) -> Database | None:
+        query = select(Database).where(Database.id == settings.demo_db_id)
         result = await self._db.execute(query)
         return result.scalar_one_or_none()
 

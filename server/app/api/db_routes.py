@@ -22,6 +22,13 @@ async def list_databases(
     return await database_controller.list_databases(user_id)
 
 
+@router.get("/demo", response_model=DatabaseResponseRecord)
+async def get_demo_database(
+    database_controller: DatabaseController = Depends(db_controller),
+) -> DatabaseResponseRecord:
+    return await database_controller.get_demo_database()
+
+
 @router.get("/{database_id}", response_model=DatabaseResponseRecord)
 async def get_database_by_id(
     database_id: str,
