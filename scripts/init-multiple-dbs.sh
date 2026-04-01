@@ -17,10 +17,7 @@ echo "------------------------------------------------"
 
 echo "-> Creating DEMO database: $DEMO_DB_NAME"
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-        SELECT 'CREATE DATABASE "$DEMO_DB_NAME"'
-        WHERE NOT EXISTS (
-            SELECT FROM pg_database WHERE datname = '$DEMO_DB_NAME'
-        )\gexec
+    CREATE DATABASE "$DEMO_DB_NAME" WITH OWNER "$POSTGRES_USER";
 EOSQL
 
 echo "-> Injecting init-demo.sql into $DEMO_DB_NAME..."
