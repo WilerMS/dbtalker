@@ -13,7 +13,14 @@ from langchain_core.tools import BaseTool
 from sqlalchemy.exc import OperationalError as SQLAlchemyOperationalError
 
 from app.schemas.database import DatabaseConnection, DatabaseRecord
-from app.services.ai_service.tools import ShowCode, ShowKPI, ShowQuestion, ShowTable
+from app.services.ai_service.tools import (
+    ShowBarChart,
+    ShowCode,
+    ShowKPI,
+    ShowLineChart,
+    ShowQuestion,
+    ShowTable,
+)
 
 
 class AgentFactory:
@@ -31,7 +38,14 @@ class AgentFactory:
             QuerySQLCheckerTool(db=langchain_db, llm=llm),
         ]
 
-        all_tools = sql_tools + [ShowKPI, ShowTable, ShowQuestion, ShowCode]
+        all_tools = sql_tools + [
+            ShowKPI,
+            ShowTable,
+            ShowBarChart,
+            ShowLineChart,
+            ShowQuestion,
+            ShowCode,
+        ]
 
         llm_with_tools = llm.bind_tools(all_tools, parallel_tool_calls=False)
 

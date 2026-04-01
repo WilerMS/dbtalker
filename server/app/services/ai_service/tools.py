@@ -57,6 +57,64 @@ class ShowTable(BaseModel):
     )
 
 
+class ShowBarChart(BaseModel):
+    """
+    Use this tool to render grouped or categorical comparisons as a bar chart.
+    """
+
+    title: str | None = Field(
+        default=None,
+        description=(
+            "Optional chart title in the user's language. "
+            "If omitted, the UI will use a generic label."
+        ),
+    )
+    labels: list[str] = Field(
+        min_length=1,
+        description=(
+            "Category labels for the x-axis in display order. "
+            "Example: ['Enero', 'Febrero', 'Marzo']."
+        ),
+    )
+    values: list[float] = Field(
+        min_length=1,
+        description=(
+            "Numeric values aligned 1:1 with labels. "
+            "Length MUST match labels exactly."
+        ),
+    )
+
+
+class ShowLinePoint(BaseModel):
+    x: str = Field(
+        description=(
+            "X-axis coordinate label for a single point, usually a date or time bucket."
+        )
+    )
+    y: float = Field(description="Y-axis numeric value for the point.")
+
+
+class ShowLineChart(BaseModel):
+    """
+    Use this tool to render trends over time or ordered sequences as a line chart.
+    """
+
+    title: str | None = Field(
+        default=None,
+        description=(
+            "Optional chart title in the user's language. "
+            "If omitted, the UI will use a generic label."
+        ),
+    )
+    points: list[ShowLinePoint] = Field(
+        min_length=2,
+        description=(
+            "Ordered sequence of points for the trend. "
+            "Each point needs x and y. Use chronological order when applicable."
+        ),
+    )
+
+
 class ShowQuestionOption(BaseModel):
     id: str = Field(
         description=(

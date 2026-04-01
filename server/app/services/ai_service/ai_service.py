@@ -21,7 +21,15 @@ from app.config import settings
 from app.schemas.chat import ChatMessage
 from app.schemas.database import DatabaseRecord
 from app.schemas.streaming import SSEChunk, SSEChunkData, SSEChunkIncoming
-from app.schemas.widgets import CodeData, KpiData, QuestionData, TableData, TextData
+from app.schemas.widgets import (
+    BarData,
+    CodeData,
+    KpiData,
+    LineData,
+    QuestionData,
+    TableData,
+    TextData,
+)
 from app.services.ai_service.agent_factory import AgentFactory
 from app.services.ai_service.prompts import EXECUTIVE_ASSISTANT_PROMPT
 
@@ -59,7 +67,7 @@ class AIService:
         messages: list[BaseMessage] = self._build_history(history)
 
         iterations = 0
-        max_iterations = 5
+        max_iterations = 20
 
         while iterations < max_iterations:
             iterations += 1
@@ -168,6 +176,104 @@ class AIService:
                             ToolMessage(
                                 tool_call_id=tool_id,
                                 content="Table widget rendered successfully.",
+                            )
+                        )
+                        continue
+
+                    if tool_name == "ShowBarChart":
+                        try:
+                            bar_data = BarData.model_validate(tool_args)
+                        except ValidationError as error:
+                            messages.append(
+                                ToolMessage(
+                                    tool_call_id=tool_id,
+                                    content=(
+                                        "ShowBarChart payload invalid. "
+                                        "You must send labels and values "
+                                        "with matching lengths. "
+                                        f"Validation details: {error}"
+                                    ),
+                                )
+                            )
+                            continue
+
+                        if len(bar_data.labels) != len(bar_data.values):
+                            messages.append(
+                                ToolMessage(
+                                    tool_call_id=tool_id,
+                                    content=(
+                                        "ShowBarChart payload invalid. "
+                                        "labels and values must have the same length."
+                                    ),
+                                )
+                            )
+                            continue
+
+                        bar_id = str(uuid.uuid4())
+                        yield SSEChunkIncoming(id=bar_id, event="incoming", type="bar")
+                        await asyncio.sleep(1.7)
+                        yield SSEChunkData(
+                            id=bar_id,
+                            event="data",
+                            type="bar",
+                            data=bar_data,
+                        )
+
+                        messages.append(
+                            ToolMessage(
+                                tool_call_id=tool_id,
+                                content="Bar chart widget rendered successfully.",
+                            )
+                        )
+                        continue
+
+                    if tool_name == "ShowLineChart":
+                        try:
+                            line_data = LineData.model_validate(tool_args)
+                        except ValidationError as error:
+                            messages.append(
+                                ToolMessage(
+                                    tool_call_id=tool_id,
+                                    content=(
+                                        "ShowLineChart payload invalid. "
+                                        "You must send at least 2 points "
+                                        "with x and y values. "
+                                        f"Validation details: {error}"
+                                    ),
+                                )
+                            )
+                            continue
+
+                        if len(line_data.points) < 2:
+                            messages.append(
+                                ToolMessage(
+                                    tool_call_id=tool_id,
+                                    content=(
+                                        "ShowLineChart payload invalid. "
+                                        "At least 2 points are required."
+                                    ),
+                                )
+                            )
+                            continue
+
+                        line_id = str(uuid.uuid4())
+                        yield SSEChunkIncoming(
+                            id=line_id,
+                            event="incoming",
+                            type="line",
+                        )
+                        await asyncio.sleep(1.7)
+                        yield SSEChunkData(
+                            id=line_id,
+                            event="data",
+                            type="line",
+                            data=line_data,
+                        )
+
+                        messages.append(
+                            ToolMessage(
+                                tool_call_id=tool_id,
+                                content="Line chart widget rendered successfully.",
                             )
                         )
                         continue
@@ -284,6 +390,23 @@ class AIService:
                     "[System Note: Displayed Table Widget to user -> "
                     f"Columns: {msg.data.columns}. "
                     f"Data: {rows_json}]"
+                )
+                messages.append(AIMessage(content=content))
+            elif msg.type == "bar":
+                content = (
+                    "[System Note: Displayed Bar Chart Widget to user -> "
+                    f"Title: '{msg.data.title}', Labels: {msg.data.labels}, "
+                    f"Values: {msg.data.values}]"
+                )
+                messages.append(AIMessage(content=content))
+            elif msg.type == "line":
+                points_json = json.dumps(
+                    [point.model_dump() for point in msg.data.points],
+                    ensure_ascii=False,
+                )
+                content = (
+                    "[System Note: Displayed Line Chart Widget to user -> "
+                    f"Title: '{msg.data.title}', Points: {points_json}]"
                 )
                 messages.append(AIMessage(content=content))
             elif msg.type == "question":
