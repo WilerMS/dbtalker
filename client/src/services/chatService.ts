@@ -30,12 +30,6 @@ interface ApiUserMessage {
   timestamp: string
 }
 
-interface StreamChatRequestBody {
-  message: ApiUserMessage
-  database_id: string
-  conversation_id: string
-}
-
 interface StreamState {
   queue: SSEChunk[]
   notifyNextChunk: (() => void) | null
@@ -81,13 +75,20 @@ export class ChatService {
     signal: AbortSignal,
     token?: string,
   ): AsyncGenerator<SSEChunk> {
-    const url = new URL(`${this.apiBaseUrl}/chat/stream`)
-    const state = this.createStreamState()
-    const requestBody = this.buildStreamRequestBody(
-      userMessage,
-      databaseId,
-      conversationId,
+    const url = new URL(
+      `${this.apiBaseUrl}/chat/stream?database_id=${databaseId}&conversation_id=${conversationId}`,
     )
+    const state: StreamState = {
+      queue: [],
+      notifyNextChunk: null,
+      isStreamDone: false,
+      streamError: null,
+    }
+    const requestBody = {
+      message: this.toApiUserMessage(userMessage),
+      database_id: databaseId,
+      conversation_id: conversationId,
+    }
 
     // Setup abort handler to wake up the reader if waiting
     const abortHandler = () => {
@@ -174,18 +175,6 @@ export class ChatService {
     return url
   }
 
-  private buildStreamRequestBody(
-    userMessage: UserMessage,
-    databaseId: string,
-    conversationId: string,
-  ): StreamChatRequestBody {
-    return {
-      message: this.toApiUserMessage(userMessage),
-      database_id: databaseId,
-      conversation_id: conversationId,
-    }
-  }
-
   private toCompleteMessage(message: ApiCompleteMessage): CompleteMessage {
     return {
       ...message,
@@ -237,15 +226,6 @@ export class ChatService {
     }
 
     throw new Error('Invalid SSE chunk shape received from server.')
-  }
-
-  private createStreamState(): StreamState {
-    return {
-      queue: [],
-      notifyNextChunk: null,
-      isStreamDone: false,
-      streamError: null,
-    }
   }
 
   private waitForNextChunk(state: StreamState): Promise<void> {
