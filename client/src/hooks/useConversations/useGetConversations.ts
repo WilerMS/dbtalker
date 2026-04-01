@@ -1,3 +1,4 @@
+import { useAuth } from '@clerk/react'
 import { useQuery } from '@tanstack/react-query'
 import { getConversationsByDatabaseId } from '../../services/dbService'
 import type { ConversationRecord } from '../../types/database'
@@ -8,11 +9,14 @@ export const getConversationsQueryKey = (databaseId: string) =>
   [...CONVERSATIONS_QUERY_KEY, databaseId] as const
 
 export const useGetConversations = (databaseId?: string) => {
+  const { getToken } = useAuth()
+
   const query = useQuery<ConversationRecord[]>({
     queryKey: getConversationsQueryKey(databaseId ?? ''),
-    queryFn: () => {
+    queryFn: async () => {
       if (!databaseId) return Promise.resolve([])
-      return getConversationsByDatabaseId(databaseId)
+      const token = (await getToken()) ?? undefined
+      return getConversationsByDatabaseId(databaseId, token)
     },
     enabled: Boolean(databaseId),
     // Keep cached conversations fresh for the entire app session.

@@ -53,10 +53,16 @@ export class ChatService {
   public async getDatabaseMessages(
     databaseId: string,
     conversationId: string,
+    token?: string,
     signal?: AbortSignal,
   ): Promise<CompleteMessage[]> {
     const url = this.buildDatabaseMessagesUrl(databaseId, conversationId)
-    const response = await fetch(url, { signal })
+    const response = await fetch(url, {
+      signal,
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
 
     if (!response.ok) {
       throw new Error(
@@ -73,6 +79,7 @@ export class ChatService {
     databaseId: string,
     conversationId: string,
     signal: AbortSignal,
+    token?: string,
   ): AsyncGenerator<SSEChunk> {
     const url = new URL(`${this.apiBaseUrl}/chat/stream`)
     const state = this.createStreamState()
@@ -94,6 +101,7 @@ export class ChatService {
       openWhenHidden: true,
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(requestBody),
       onmessage: (event) => {

@@ -1,3 +1,4 @@
+import { useAuth } from '@clerk/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { updateDatabase } from '../../services/dbService'
 import type { UpdateDatabaseInput } from '../../types/database'
@@ -10,10 +11,13 @@ interface UpdateDatabaseVariables {
 
 export const useUpdateDatabase = () => {
   const queryClient = useQueryClient()
+  const { getToken } = useAuth()
 
   const query = useMutation({
-    mutationFn: ({ id, input }: UpdateDatabaseVariables) =>
-      updateDatabase(id, input),
+    mutationFn: async ({ id, input }: UpdateDatabaseVariables) => {
+      const token = (await getToken()) ?? undefined
+      return updateDatabase(id, input, token)
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: DATABASES_QUERY_KEY })
     },

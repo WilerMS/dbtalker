@@ -65,8 +65,14 @@ const mapConversationRecord = (
   }
 }
 
-export const listDatabases = async (): Promise<DatabaseRecord[]> => {
-  const response = await fetch(`${API_BASE_URL}/databases`)
+export const listDatabases = async (
+  token?: string,
+): Promise<DatabaseRecord[]> => {
+  const response = await fetch(`${API_BASE_URL}/databases`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
   if (!response.ok) {
     throw new Error(
       `Failed to list databases. Status: ${response.status} ${response.statusText}`,
@@ -79,9 +85,15 @@ export const listDatabases = async (): Promise<DatabaseRecord[]> => {
 
 export const getDatabaseById = async (
   id: string,
+  token?: string,
 ): Promise<DatabaseRecord | null> => {
   const response = await fetch(
     `${API_BASE_URL}/databases/${encodeURIComponent(id)}`,
+    {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    },
   )
 
   if (response.status === 404) {
@@ -100,6 +112,7 @@ export const getDatabaseById = async (
 
 export const createDatabase = async (
   input: CreateDatabaseInput,
+  token?: string,
 ): Promise<DatabaseRecord> => {
   const requestBody: ApiCreateDatabaseInput = {
     name: input.name,
@@ -117,7 +130,10 @@ export const createDatabase = async (
 
   const response = await fetch(`${API_BASE_URL}/databases`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify(requestBody),
   })
 
@@ -134,12 +150,16 @@ export const createDatabase = async (
 export const updateDatabase = async (
   id: string,
   input: UpdateDatabaseInput,
+  token?: string,
 ): Promise<DatabaseRecord | null> => {
   const response = await fetch(
     `${API_BASE_URL}/databases/${encodeURIComponent(id)}`,
     {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify(input),
     },
   )
@@ -158,11 +178,17 @@ export const updateDatabase = async (
   return mapDatabaseRecord(payload)
 }
 
-export const deleteDatabase = async (id: string): Promise<boolean> => {
+export const deleteDatabase = async (
+  id: string,
+  token?: string,
+): Promise<boolean> => {
   const response = await fetch(
     `${API_BASE_URL}/databases/${encodeURIComponent(id)}`,
     {
       method: 'DELETE',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
     },
   )
 
@@ -181,9 +207,15 @@ export const deleteDatabase = async (id: string): Promise<boolean> => {
 
 export const getConversationsByDatabaseId = async (
   databaseId: string,
+  token?: string,
 ): Promise<ConversationRecord[]> => {
   const response = await fetch(
     `${API_BASE_URL}/databases/${encodeURIComponent(databaseId)}/conversations`,
+    {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    },
   )
 
   if (!response.ok) {
@@ -199,12 +231,16 @@ export const getConversationsByDatabaseId = async (
 export const createConversation = async (
   databaseId: string,
   input: CreateConversationInput,
+  token?: string,
 ): Promise<ConversationRecord> => {
   const response = await fetch(
     `${API_BASE_URL}/databases/${encodeURIComponent(databaseId)}/conversations`,
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify(input),
     },
   )
@@ -222,11 +258,15 @@ export const createConversation = async (
 export const deleteConversation = async (
   databaseId: string,
   conversationId: string,
+  token?: string,
 ): Promise<boolean> => {
   const response = await fetch(
     `${API_BASE_URL}/databases/${encodeURIComponent(databaseId)}/conversations/${encodeURIComponent(conversationId)}`,
     {
       method: 'DELETE',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
     },
   )
 

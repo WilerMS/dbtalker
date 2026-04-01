@@ -1,3 +1,4 @@
+import { useAuth } from '@clerk/react'
 import { useMemo, useEffect, useEffectEvent, useState, useRef } from 'react'
 
 import { ChatService } from '../services/chatService'
@@ -24,8 +25,11 @@ export const useChat = (
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isStreaming, setIsStreaming] = useState<boolean>(false)
   const streamAbortControllerRef = useRef<AbortController | null>(null)
+  const { getToken } = useAuth()
 
   const initializeChat = useEffectEvent(async (signal: AbortSignal) => {
+    const token = (await getToken()) ?? undefined
+
     setIsLoading(true)
     setIsStreaming(false)
     setMessages([])
@@ -34,6 +38,7 @@ export const useChat = (
       const initialMessages = await chatService.getDatabaseMessages(
         databaseId,
         conversationId,
+        token,
         signal,
       )
 
@@ -58,6 +63,7 @@ export const useChat = (
   }, [conversationId, databaseId])
 
   const sendMessage = async (text: string): Promise<void> => {
+    const token = (await getToken()) ?? undefined
     const nextText = text.trim()
 
     if (!nextText) return
@@ -83,6 +89,7 @@ export const useChat = (
         databaseId,
         conversationId,
         streamController.signal,
+        token,
       )) {
         if (streamController.signal.aborted) {
           return
