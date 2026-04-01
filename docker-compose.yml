@@ -4,9 +4,6 @@ services:
     container_name: dbtalkie-postgres
     ports:
       - "${DB_PORT}:5432"
-    restart: unless-stopped
-    env_file:
-      - .env
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -31,8 +28,6 @@ services:
     working_dir: /app
     env_file:
       - .env
-    ports:
-      - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -54,8 +49,6 @@ services:
         - VITE_DEMO_DB_ID=${VITE_DEMO_DB_ID}
         - VITE_DEMO_USER_ID=${VITE_DEMO_USER_ID}
     container_name: dbtalkie-frontend
-    ports:
-      - "3000:3000"
     restart: unless-stopped
     depends_on:
       backend:
