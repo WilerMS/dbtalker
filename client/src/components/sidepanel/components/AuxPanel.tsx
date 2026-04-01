@@ -20,6 +20,7 @@ interface AuxPanelProps {
   anchorRect?: DOMRect
   database?: DatabaseRecord
   isVisible: boolean
+  isEditable?: boolean
   onMouseEnter: () => void
   onMouseLeave: () => void
 }
@@ -28,6 +29,7 @@ export const AuxPanel = ({
   anchorRect,
   database,
   isVisible,
+  isEditable = true,
   onMouseEnter,
   onMouseLeave,
 }: AuxPanelProps) => {
@@ -104,11 +106,13 @@ export const AuxPanel = ({
               </h3>
             </div>
 
-            <DatabaseActions
-              compact
-              onEdit={() => void handleEditDatabase(database)}
-              onDelete={() => void handleDeleteDatabase(database)}
-            />
+            {isEditable && (
+              <DatabaseActions
+                compact
+                onEdit={() => void handleEditDatabase(database)}
+                onDelete={() => void handleDeleteDatabase(database)}
+              />
+            )}
           </header>
 
           <div className="flex min-h-0 flex-1 flex-col gap-2 py-3">

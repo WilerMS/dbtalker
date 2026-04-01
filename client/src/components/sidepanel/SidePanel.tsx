@@ -29,10 +29,31 @@ export const SidePanel: FC = () => {
 
   const [hoveredDb, setHoveredDb] = useState<DatabaseRecord>()
   const [hoveredRect, setHoveredRect] = useState<DOMRect>()
+  const [isDbEditable, setIsDbEditable] = useState(false)
 
   const { cancelHide, scheduleHide } = useDelayedHide(() => {
     setHoveredDb(undefined)
   })
+
+  const handleCreateDbClick = () => {
+    if (!isSignedIn) return openSignIn({ appearance: { theme: dark } })
+    openModal({
+      content: ({ closeModal }) => (
+        <CreateDatabaseModalContent
+          onClose={closeModal}
+          onCreationSuccess={(databaseId, conversationId) => {
+            navigate(`/app/${databaseId}/conversations/${conversationId}`, {
+              viewTransition: true,
+            })
+          }}
+        />
+      ),
+      size: {
+        width: 'min(94vw, 750px)',
+        maxHeight: '90vh',
+      },
+    })
+  }
 
   return (
     <aside className="pointer-events-none z-30">
@@ -57,6 +78,7 @@ export const SidePanel: FC = () => {
             isActive={import.meta.env.VITE_DEMO_DB_ID === selectedDatabaseId}
             onMouseLeave={scheduleHide}
             onMouseEnter={(e) => {
+              setIsDbEditable(false)
               cancelHide()
               setHoveredDb(demoDatabase)
               setHoveredRect(e.currentTarget.getBoundingClientRect())
@@ -72,6 +94,7 @@ export const SidePanel: FC = () => {
             isActive={database.id === selectedDatabaseId}
             onMouseLeave={scheduleHide}
             onMouseEnter={(e) => {
+              setIsDbEditable(true)
               cancelHide()
               setHoveredDb(database)
               setHoveredRect(e.currentTarget.getBoundingClientRect())
@@ -81,31 +104,7 @@ export const SidePanel: FC = () => {
           </SidePanelItemButton>
         ))}
 
-        <SidePanelItemButton
-          title="Add database"
-          onClick={() => {
-            if (!isSignedIn) return openSignIn({ appearance: { theme: dark } })
-            openModal({
-              content: ({ closeModal }) => (
-                <CreateDatabaseModalContent
-                  onClose={closeModal}
-                  onCreationSuccess={(databaseId, conversationId) => {
-                    navigate(
-                      `/app/${databaseId}/conversations/${conversationId}`,
-                      {
-                        viewTransition: true,
-                      },
-                    )
-                  }}
-                />
-              ),
-              size: {
-                width: 'min(94vw, 750px)',
-                maxHeight: '90vh',
-              },
-            })
-          }}
-        >
+        <SidePanelItemButton title="Add database" onClick={handleCreateDbClick}>
           <Plus size={20} />
         </SidePanelItemButton>
 
@@ -136,6 +135,7 @@ export const SidePanel: FC = () => {
 
       <AuxPanel
         anchorRect={hoveredRect}
+        isEditable={isDbEditable}
         database={hoveredDb}
         isVisible={Boolean(hoveredRect && hoveredDb)}
         onMouseEnter={cancelHide}
