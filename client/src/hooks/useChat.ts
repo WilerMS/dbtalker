@@ -4,10 +4,22 @@ import { useMemo, useEffect, useEffectEvent, useState, useRef } from 'react'
 import { ChatService } from '../services/chatService'
 import type {
   CompleteMessage,
+  MessageData,
   Message,
   PendingMessage,
+  TextData,
   UserMessage,
 } from '../types/chat'
+
+const DB_QUERY_STATUS_TEXT = 'Consultando la base de datos...'
+
+const isTextData = (data: MessageData): data is TextData => {
+  return 'text' in data
+}
+
+const isStatusMessage = (message: Message): boolean => {
+  return message.role === 'bot' && message.type === 'status'
+}
 
 export interface UseChatResult {
   messages: Message[]
@@ -96,6 +108,9 @@ export const useChat = (
         }
 
         if (chunk.event === 'finished') {
+          setMessages((prev) =>
+            prev.filter((message) => !isStatusMessage(message)),
+          )
           streamAbortControllerRef.current = null
           return setIsStreaming(false)
         }
@@ -116,7 +131,48 @@ export const useChat = (
 
           setMessages((prev) => [...prev, pending])
         } else if (chunk.event === 'data') {
+          const isDbQueryStatusChunk =
+            chunk.type === 'text' &&
+            isTextData(chunk.data) &&
+            chunk.data.text === DB_QUERY_STATUS_TEXT
+          const statusText = isTextData(chunk.data) ? chunk.data.text : null
+
+          if (isDbQueryStatusChunk) {
+            setMessages((prev) => {
+              const withoutStatusMessages = prev.filter(
+                (message) => !isStatusMessage(message),
+              )
+
+              const statusMessage: CompleteMessage = {
+                id: chunk.id,
+                role: 'bot',
+                type: 'status',
+                status: 'complete',
+                data: { text: statusText ?? DB_QUERY_STATUS_TEXT },
+                timestamp: new Date(),
+              }
+
+              const hasPending = withoutStatusMessages.some(
+                (message) => message.id === chunk.id,
+              )
+
+              if (!hasPending) {
+                return [...withoutStatusMessages, statusMessage]
+              }
+
+              return withoutStatusMessages.map((message) =>
+                message.id === chunk.id ? statusMessage : message,
+              )
+            })
+
+            continue
+          }
+
           setMessages((prev) => {
+            const withoutStatusMessages = prev.filter(
+              (message) => !isStatusMessage(message),
+            )
+
             const complete: CompleteMessage = {
               ...baseChunk,
               role: 'bot',
@@ -125,16 +181,21 @@ export const useChat = (
               timestamp: new Date(),
             }
 
-            const hasPending = prev.some((msg) => msg.id === chunk.id)
+            const hasPending = withoutStatusMessages.some(
+              (msg) => msg.id === chunk.id,
+            )
 
-            if (!hasPending) return [...prev, complete]
+            if (!hasPending) return [...withoutStatusMessages, complete]
 
-            return prev.map((msg) => (msg.id === chunk.id ? complete : msg))
+            return withoutStatusMessages.map((msg) =>
+              msg.id === chunk.id ? complete : msg,
+            )
           })
         }
       }
     } finally {
       streamAbortControllerRef.current = null
+      setMessages((prev) => prev.filter((message) => !isStatusMessage(message)))
       setIsLoading(false)
       setIsStreaming(false)
     }

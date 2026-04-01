@@ -1,6 +1,7 @@
 export type MessageRole = 'user' | 'bot'
 export type MessageType =
   | 'text'
+  | 'status'
   | 'schema'
   | 'kpi'
   | 'bar'
@@ -8,7 +9,7 @@ export type MessageType =
   | 'table'
   | 'code'
   | 'question'
-export type PreviewWidgetType = Exclude<MessageType, 'text'>
+export type PreviewWidgetType = Exclude<MessageType, 'text' | 'status'>
 
 export interface TextData {
   text: string

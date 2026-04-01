@@ -27,6 +27,7 @@ import { TableWidgetSkeleton } from './skeletons/TableWidgetSkeleton'
 import { CodeWidgetSkeleton } from './skeletons/CodeWidgetSkeleton'
 import { QuestionWidgetSkeleton } from './skeletons/QuestionWidgetSkeleton'
 import { TextWidget } from './widgets/TextWidget'
+import { QueryingStatusWidget } from './widgets/QueryingStatusWidget'
 
 interface AiMessageProps {
   message: Message
@@ -72,6 +73,7 @@ export const AiMessage = ({
   if (message.status === 'pending') {
     switch (message.type) {
       case 'text':
+      case 'status':
         return <TextMessageSkeleton />
       case 'schema':
         return <SchemaWidgetSkeleton />
@@ -93,6 +95,8 @@ export const AiMessage = ({
   const complete = message as CompleteMessage
 
   switch (complete.type) {
+    case 'status':
+      return <QueryingStatusWidget text={(complete.data as TextData).text} />
     case 'schema':
       return (
         <ExpandableWidget
