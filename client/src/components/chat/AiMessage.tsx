@@ -26,6 +26,7 @@ import { LineChartWidgetSkeleton } from './skeletons/LineChartWidgetSkeleton'
 import { TableWidgetSkeleton } from './skeletons/TableWidgetSkeleton'
 import { CodeWidgetSkeleton } from './skeletons/CodeWidgetSkeleton'
 import { QuestionWidgetSkeleton } from './skeletons/QuestionWidgetSkeleton'
+import { TextWidget } from './widgets/TextWidget'
 
 interface AiMessageProps {
   message: Message
@@ -199,10 +200,6 @@ export const AiMessage = ({
       )
     case 'text':
     default:
-      return (
-        <p className="text-sm leading-7 text-zinc-100">
-          {(complete.data as TextData).text}
-        </p>
-      )
+      return <TextWidget data={complete.data as TextData} />
   }
 }
