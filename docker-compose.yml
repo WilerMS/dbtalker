@@ -26,6 +26,8 @@ services:
       dockerfile: Dockerfile
     container_name: dbtalkie-backend
     working_dir: /app
+    ports:
+      - "8000:8000"
     env_file:
       - .env
     depends_on:
@@ -49,6 +51,8 @@ services:
         - VITE_DEMO_DB_ID=${VITE_DEMO_DB_ID}
         - VITE_DEMO_USER_ID=${VITE_DEMO_USER_ID}
     container_name: dbtalkie-frontend
+    ports:
+      - "3000:3000"
     restart: unless-stopped
     depends_on:
       backend:
