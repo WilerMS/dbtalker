@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from app.schemas.widgets import CodeLanguage
+
 
 class ShowKPI(BaseModel):
     """
@@ -52,6 +54,86 @@ class ShowTable(BaseModel):
             "CRITICAL: The length of each row array MUST exactly match the length of the 'columns' array. "
             "Ensure numerical values are formatted (e.g., '€250.00'). Use '-' for missing data."
         )
+    )
+
+
+class ShowQuestionOption(BaseModel):
+    id: str = Field(
+        description=(
+            "A stable option identifier in snake_case or kebab-case "
+            "(e.g., 'quick_summary' or 'quick-summary')."
+        )
+    )
+    label: str = Field(
+        description=(
+            "The visible option text in the user's language. "
+            "Keep it short and action-oriented."
+        )
+    )
+    description: str | None = Field(
+        default=None,
+        description=(
+            "Optional secondary helper text for this option in the user's language."
+        ),
+    )
+
+
+class ShowQuestion(BaseModel):
+    """
+    Use this tool when you need a precise user decision before continuing.
+    You MUST provide exactly 3 options.
+    """
+
+    title: str = Field(
+        description=(
+            "A compact title for the question card in the user's language "
+            "(e.g., 'Necesito una aclaración')."
+        )
+    )
+    prompt: str = Field(
+        description=(
+            "The question text shown to the user. "
+            "It must be specific and decision-oriented."
+        )
+    )
+    options: list[ShowQuestionOption] = Field(
+        min_length=3,
+        max_length=3,
+        description=(
+            "Exactly 3 answer choices. They must be clearly distinct and "
+            "written in the user's language."
+        ),
+    )
+    hint: str | None = Field(
+        default=None,
+        description="Optional hint shown below the options in the user's language.",
+    )
+
+
+class ShowCode(BaseModel):
+    """
+    Use this tool to render a SQL preview card for complex or high-risk queries.
+    """
+
+    title: str = Field(
+        description=(
+            "Short title for the code widget in the user's language "
+            "(e.g., 'Consulta SQL propuesta')."
+        )
+    )
+    language: CodeLanguage = Field(
+        description="SQL dialect for syntax highlighting: sql, postgresql, or mysql."
+    )
+    code: str = Field(
+        description=(
+            "The SQL query text to show. It must be executable and aligned with the user goal."
+        )
+    )
+    description: str | None = Field(
+        default=None,
+        description=(
+            "Optional short explanation about what the query does, in the user's language."
+        ),
     )
 
 

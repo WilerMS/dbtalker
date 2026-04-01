@@ -14,14 +14,14 @@ from langchain_core.messages import (
     ToolMessage,
 )
 from langchain_openai import ChatOpenAI
-from pydantic import SecretStr
+from pydantic import SecretStr, ValidationError
 from sqlalchemy.exc import OperationalError as SQLAlchemyOperationalError
 
 from app.config import settings
 from app.schemas.chat import ChatMessage
 from app.schemas.database import DatabaseRecord
 from app.schemas.streaming import SSEChunk, SSEChunkData, SSEChunkIncoming
-from app.schemas.widgets import KpiData, TableData, TextData
+from app.schemas.widgets import CodeData, KpiData, QuestionData, TableData, TextData
 from app.services.ai_service.agent_factory import AgentFactory
 from app.services.ai_service.prompts import EXECUTIVE_ASSISTANT_PROMPT
 
@@ -58,11 +58,11 @@ class AIService:
         # TODO: summarize history to save tokens in large conversations
         messages: list[BaseMessage] = self._build_history(history)
 
-        ITERATIONS = 0
-        MAX_ITERATIONS = 5
+        iterations = 0
+        max_iterations = 5
 
-        while ITERATIONS < MAX_ITERATIONS:
-            ITERATIONS += 1
+        while iterations < max_iterations:
+            iterations += 1
 
             response = await llm_with_tools.ainvoke(messages)
             messages.append(response)
@@ -85,7 +85,7 @@ class AIService:
                     tool_args = tool_call["args"]
                     tool_id = tool_call["id"]
 
-                    # * Backend Tools
+                    # Backend tools
                     if tool_name in [t.name for t in sql_tools]:
                         tool_instance = next(t for t in sql_tools if t.name == tool_name)
 
@@ -93,11 +93,12 @@ class AIService:
                             f"AI requested tool '{tool_name}' with args: {tool_args}"
                         )  # Debug log
 
-                        # Send intermediate "Consulting database..."
-                        # TODO: Change this to a widget
+                        # Send intermediate status
                         status_id = str(uuid.uuid4())
                         yield SSEChunkIncoming(
-                            id=status_id, event="incoming", type="text"
+                            id=status_id,
+                            event="incoming",
+                            type="text",
                         )
                         yield SSEChunkData(
                             id=status_id,
@@ -107,13 +108,13 @@ class AIService:
                         )
 
                         db_result = await tool_instance.ainvoke(tool_args)
-
                         messages.append(
                             ToolMessage(tool_call_id=tool_id, content=str(db_result))
                         )
+                        continue
 
-                    # * Frontend Tools (UI Widgets)
-                    elif tool_name == "ShowKPI":
+                    # Frontend tools (UI widgets)
+                    if tool_name == "ShowKPI":
                         kpi_id = str(uuid.uuid4())
                         yield SSEChunkIncoming(id=kpi_id, event="incoming", type="kpi")
 
@@ -126,22 +127,26 @@ class AIService:
                         await asyncio.sleep(1.7)
 
                         yield SSEChunkData(
-                            id=kpi_id, event="data", type="kpi", data=kpi_data
+                            id=kpi_id,
+                            event="data",
+                            type="kpi",
+                            data=kpi_data,
                         )
-
-                        # Acknowledge to the AI that the widget was rendered successfully
                         messages.append(
                             ToolMessage(
                                 tool_call_id=tool_id,
-                                content="Widget successfully rendered on the screen.",
+                                content="KPI widget rendered successfully.",
                             )
                         )
+                        continue
 
-                    elif tool_name == "ShowTable":
-                        print("Rendering table with args:", tool_args)  # Debug log
+                    if tool_name == "ShowTable":
+                        print(f"Rendering table with args: {tool_args}")  # Debug log
                         table_id = str(uuid.uuid4())
                         yield SSEChunkIncoming(
-                            id=table_id, event="incoming", type="table"
+                            id=table_id,
+                            event="incoming",
+                            type="table",
                         )
 
                         table_data = TableData(
@@ -153,21 +158,105 @@ class AIService:
                         await asyncio.sleep(1.7)
 
                         yield SSEChunkData(
-                            id=table_id, event="data", type="table", data=table_data
+                            id=table_id,
+                            event="data",
+                            type="table",
+                            data=table_data,
                         )
 
                         messages.append(
                             ToolMessage(
                                 tool_call_id=tool_id,
-                                content="Table successfully rendered on the screen.",
+                                content="Table widget rendered successfully.",
+                            )
+                        )
+                        continue
+
+                    if tool_name == "ShowQuestion":
+                        try:
+                            question_data = QuestionData.model_validate(tool_args)
+                        except ValidationError as error:
+                            messages.append(
+                                ToolMessage(
+                                    tool_call_id=tool_id,
+                                    content=(
+                                        "ShowQuestion payload invalid. "
+                                        "You must send title, prompt, "
+                                        "and exactly 3 options. "
+                                        f"Validation details: {error}"
+                                    ),
+                                )
+                            )
+                            continue
+
+                        question_id = str(uuid.uuid4())
+                        yield SSEChunkIncoming(
+                            id=question_id,
+                            event="incoming",
+                            type="question",
+                        )
+                        await asyncio.sleep(1.7)
+                        yield SSEChunkData(
+                            id=question_id,
+                            event="data",
+                            type="question",
+                            data=question_data,
+                        )
+
+                        messages.append(
+                            ToolMessage(
+                                tool_call_id=tool_id,
+                                content=(
+                                    "Question widget rendered successfully "
+                                    "with exactly 3 options."
+                                ),
+                            )
+                        )
+                        continue
+
+                    if tool_name == "ShowCode":
+                        try:
+                            code_data = CodeData.model_validate(tool_args)
+                        except ValidationError as error:
+                            messages.append(
+                                ToolMessage(
+                                    tool_call_id=tool_id,
+                                    content=(
+                                        "ShowCode payload invalid. "
+                                        "You must send title, language "
+                                        "(sql/postgresql/mysql), and code. "
+                                        f"Validation details: {error}"
+                                    ),
+                                )
+                            )
+                            continue
+
+                        code_id = str(uuid.uuid4())
+                        yield SSEChunkIncoming(
+                            id=code_id,
+                            event="incoming",
+                            type="code",
+                        )
+                        await asyncio.sleep(1.7)
+                        yield SSEChunkData(
+                            id=code_id,
+                            event="data",
+                            type="code",
+                            data=code_data,
+                        )
+
+                        messages.append(
+                            ToolMessage(
+                                tool_call_id=tool_id,
+                                content="Code widget rendered successfully.",
                             )
                         )
 
-                # Tools were executed. Continue the while loop so the AI can evaluate the new ToolMessages.
+                # Tools were executed. Continue so the AI can evaluate ToolMessages.
                 continue
-            else:
-                # We break the loop because the final text (if any) was already yielded in step 2.
-                break
+
+            # Break because final text (if any) was already emitted.
+            break
 
     def _build_history(self, history: list[ChatMessage]) -> list[BaseMessage]:
         now = datetime.now().strftime("%Y-%m-%d")
@@ -184,7 +273,7 @@ class AIService:
                 messages.append(AIMessage(content=msg.data.text))
             elif msg.type == "kpi":
                 content = (
-                    f"[System Note: Displayed KPI Widget to user -> "
+                    "[System Note: Displayed KPI Widget to user -> "
                     f"Label: '{msg.data.label}', Value: '{msg.data.value}', "
                     f"Delta: '{msg.data.delta}']"
                 )
@@ -192,14 +281,34 @@ class AIService:
             elif msg.type == "table":
                 rows_json = json.dumps(msg.data.rows, ensure_ascii=False)
                 content = (
-                    f"[System Note: Displayed Table Widget to user -> "
+                    "[System Note: Displayed Table Widget to user -> "
                     f"Columns: {msg.data.columns}. "
                     f"Data: {rows_json}]"
                 )
                 messages.append(AIMessage(content=content))
+            elif msg.type == "question":
+                options_json = json.dumps(
+                    [option.model_dump() for option in msg.data.options],
+                    ensure_ascii=False,
+                )
+                content = (
+                    "[System Note: Displayed Question Widget to user -> "
+                    f"Title: '{msg.data.title}', Prompt: '{msg.data.prompt}', "
+                    f"Options: {options_json}, Hint: '{msg.data.hint}']"
+                )
+                messages.append(AIMessage(content=content))
+            elif msg.type == "code":
+                content = (
+                    "[System Note: Displayed Code Widget to user -> "
+                    f"Title: '{msg.data.title}', Language: '{msg.data.language}', "
+                    f"Code: {msg.data.code}]"
+                )
+                messages.append(AIMessage(content=content))
             else:
-                # TODO: Add more widget types here
-                content = f"[System Note: Displayed {msg.type} widget with data: {msg.data.model_dump_json()}]"
+                content = (
+                    f"[System Note: Displayed {msg.type} widget with data: "
+                    f"{msg.data.model_dump_json()}]"
+                )
                 messages.append(AIMessage(content=content))
 
         return messages

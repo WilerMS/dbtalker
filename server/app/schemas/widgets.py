@@ -92,7 +92,7 @@ class QuestionOption(BaseModel):
 class QuestionData(BaseModel):
     title: str
     prompt: str
-    options: list[QuestionOption] = Field(min_length=1, max_length=3)
+    options: list[QuestionOption] = Field(min_length=3, max_length=3)
     hint: str | None = None
 
 
