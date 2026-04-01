@@ -15,6 +15,7 @@ import { useGetDatabases } from '../../hooks/useDatabases/useGetDatabases'
 import { useDelayedHide } from './hooks/useDelayedHide'
 import { CreateDatabaseModalContent } from './components/database-manager'
 import { UserButton } from './components/user-button/UserButton'
+import { useGetDemoDatabase } from '../../hooks/useDatabases'
 
 export const SidePanel: FC = () => {
   const navigate = useNavigate()
@@ -24,6 +25,7 @@ export const SidePanel: FC = () => {
 
   const { id_db: selectedDatabaseId } = useParams<{ id_db: string }>()
   const { databases = [] } = useGetDatabases()
+  const { database: demoDatabase } = useGetDemoDatabase()
 
   const [hoveredDb, setHoveredDb] = useState<DatabaseRecord>()
   const [hoveredRect, setHoveredRect] = useState<DOMRect>()
@@ -49,6 +51,20 @@ export const SidePanel: FC = () => {
             </span>
           </button>
         </header>
+
+        {!!demoDatabase && (
+          <SidePanelItemButton
+            isActive={import.meta.env.VITE_DEMO_DB_ID === selectedDatabaseId}
+            onMouseLeave={scheduleHide}
+            onMouseEnter={(e) => {
+              cancelHide()
+              setHoveredDb(demoDatabase)
+              setHoveredRect(e.currentTarget.getBoundingClientRect())
+            }}
+          >
+            <DynamicIcon name={'DatabaseZap'} size={20} />
+          </SidePanelItemButton>
+        )}
 
         {databases.map((database) => (
           <SidePanelItemButton

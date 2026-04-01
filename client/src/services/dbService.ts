@@ -110,6 +110,21 @@ export const getDatabaseById = async (
   return mapDatabaseRecord(payload)
 }
 
+export const getDemoDatabase = async (): Promise<DatabaseRecord | null> => {
+  const response = await fetch(`${API_BASE_URL}/databases/demo`)
+
+  if (response.status === 404) return null
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to load demo database. Status: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  const payload = (await response.json()) as ApiDatabaseRecord
+  return mapDatabaseRecord(payload)
+}
+
 export const createDatabase = async (
   input: CreateDatabaseInput,
   token?: string,
