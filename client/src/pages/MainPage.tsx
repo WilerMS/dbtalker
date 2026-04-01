@@ -3,6 +3,7 @@ import { motion, type Variants } from 'framer-motion'
 import { Database, Zap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useClerk, useUser } from '@clerk/react'
+import { dark } from '@clerk/themes'
 
 import { Logo } from '../components/ui/Logo'
 import { useCreateConversation } from '../hooks/useConversations/useCreateConversation'
@@ -180,8 +181,15 @@ export const MainPage: FC = () => {
           <button
             className="group relative inline-flex cursor-pointer items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-900/50 px-5 py-3 font-semibold text-zinc-300 transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-950/20 hover:text-emerald-200 hover:shadow-[0_0_20px_rgba(52,211,153,0.3)] focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
             onClick={() => {
-              if (!isSignedIn) return openSignIn()
+              if (!isSignedIn) {
+                return openSignIn({ appearance: { theme: dark } })
+              }
+
               openModal({
+                size: {
+                  width: 'min(94vw, 750px)',
+                  maxHeight: '90vh',
+                },
                 content: ({ closeModal }) => (
                   <CreateDatabaseModalContent
                     onClose={closeModal}
@@ -195,10 +203,6 @@ export const MainPage: FC = () => {
                     }}
                   />
                 ),
-                size: {
-                  width: 'min(94vw, 750px)',
-                  maxHeight: '90vh',
-                },
               })
             }}
           >

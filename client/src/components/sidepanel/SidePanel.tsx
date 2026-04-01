@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import type { FC } from 'react'
-import { Settings, Plus, User } from 'lucide-react'
-import type { DatabaseRecord } from '../../types/database'
-import { AuxPanel } from './components/AuxPanel'
-import { SidePanelItemButton } from './components/SidePanelItemButton'
+import { dark } from '@clerk/themes'
+import { Show, useClerk, useUser } from '@clerk/react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useGetDatabases } from '../../hooks/useDatabases/useGetDatabases'
-import { DynamicIcon } from '../ui/DynamicIcon'
-import { useDelayedHide } from './hooks/useDelayedHide'
+import { Settings, Plus, User } from 'lucide-react'
+
+import type { DatabaseRecord } from '../../types/database'
 import { Logo } from '../ui/Logo'
+import { DynamicIcon } from '../ui/DynamicIcon'
+import { AuxPanel } from './components/AuxPanel'
 import { useModal } from '../../hooks/useModal'
+import { SidePanelItemButton } from './components/SidePanelItemButton'
+import { useGetDatabases } from '../../hooks/useDatabases/useGetDatabases'
+import { useDelayedHide } from './hooks/useDelayedHide'
 import { CreateDatabaseModalContent } from './components/database-manager'
 import { UserButton } from './components/user-button/UserButton'
-import { Show, useClerk, useUser } from '@clerk/react'
 
 export const SidePanel: FC = () => {
   const navigate = useNavigate()
@@ -66,7 +68,7 @@ export const SidePanel: FC = () => {
         <SidePanelItemButton
           title="Add database"
           onClick={() => {
-            if (!isSignedIn) return openSignIn()
+            if (!isSignedIn) return openSignIn({ appearance: { theme: dark } })
             openModal({
               content: ({ closeModal }) => (
                 <CreateDatabaseModalContent
@@ -108,7 +110,7 @@ export const SidePanel: FC = () => {
 
         <Show when="signed-out">
           <SidePanelItemButton
-            onClick={() => void openSignIn()}
+            onClick={() => void openSignIn({ appearance: { theme: dark } })}
             title="Settings"
           >
             <User size={20} />
