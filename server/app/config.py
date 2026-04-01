@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     db_password: str = Field(default=...)
     db_name: str = Field(default=...)
     db_host: str = Field(default="postgres")
+    db_port: int = Field(default=5432)
 
     openai_api_key: str = Field(default=...)
     database_url: str = Field(default=...)
@@ -16,11 +17,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     demo_db_id: str = Field(default=...)
-    demo_db_host: str = Field(default=...)
-    demo_db_user: str = Field(default=...)
-    demo_db_password: str = Field(default=...)
     demo_db_name: str = Field(default=...)
-    demo_db_port: int = Field(default=...)
 
     clerk_secret_key: str = Field(default=...)
 

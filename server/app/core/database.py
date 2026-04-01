@@ -39,10 +39,10 @@ async def seed_db() -> None:
             user_id=settings.demo_user_id,
             description="Initial demo database with sample e-commerce data.",
             connection_data={
-                "host": settings.demo_db_host,
-                "port": settings.demo_db_port,
-                "user": settings.demo_db_user,
-                "password": settings.demo_db_password,
+                "host": settings.db_host,
+                "port": settings.db_port,
+                "user": settings.db_user,
+                "password": settings.db_password,
                 "database": settings.demo_db_name,
             },
         )
