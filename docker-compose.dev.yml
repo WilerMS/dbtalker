@@ -8,8 +8,11 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+      - DEMO_DB_NAME=${DEMO_DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-demo.sql:/tmp/init-demo.sql:ro
+      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
@@ -64,22 +67,7 @@ services:
       backend:
         condition: service_healthy
 
-  postgres-demo:
-    image: postgres:16-alpine
-    container_name: dbtalkie_postgres_demo
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${DEMO_DB_USER}
-      POSTGRES_PASSWORD: ${DEMO_DB_PASSWORD}
-      POSTGRES_DB: ${DEMO_DB_NAME}
-    ports:
-      - "${DEMO_DB_PORT}:5432"
-    volumes:
-      - postgres_demo_data:/var/lib/postgresql/data
-      - ./scripts/init-demo.sql:/docker-entrypoint-initdb.d/init.sql:ro
-
 volumes:
   postgres_data:
   backend_venv:
   frontend_node_modules:
-  postgres_demo_data:
